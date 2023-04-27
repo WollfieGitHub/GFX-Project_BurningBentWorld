@@ -33,6 +33,11 @@ namespace TerrainGeneration.Components
             { TemperateRainForest, TemperateDeciduousForest, TemperateDeciduousForest,              Grassland,       Grassland,   TemperateDesert },
             {  TropicalRainForest,       TropicalRainForest,   TropicalSeasonalForest, TropicalSeasonalForest,       Grassland, SubtropicalDesert }
         };
+
+        /** Max elevation a biome can have */
+        public static int MaxElevation => _BiomeLookupTable.GetLength(0);
+        /** Min elevation a biome can have */
+        public const int MinElevation = 0;
         
         /**
          * <summary>Finds the biome corresponding to the specified elevation level and moisture level</summary>

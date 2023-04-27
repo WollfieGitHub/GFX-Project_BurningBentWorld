@@ -17,6 +17,8 @@ namespace TerrainGeneration.Components
     {
         private MonoBehaviour _overlay;
         private MonoBehaviour _underlay;
+        
+        public Vector2 Position { get; }
 
         private Chunk _parentChunk;
     }

@@ -1,10 +1,16 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace TerrainGeneration.Components
 {
-    public class Chunk : IEnumerable
+    public class Chunk : IEnumerable<Cell>
     {
+//======== ====== ==== ==
+//      PROPERTIES
+//======== ====== ==== ==
+
         /** Same as in Minecraft */
         public const int Size = 16;
 
@@ -13,24 +19,48 @@ namespace TerrainGeneration.Components
          * A chunk has only one biome but TODO interpolation between neighbouring chunks
          * with different biomes is done to get a smooth appearance transition
          */
-        private Biome _biome;
+        public Biome Biome { get; private set; }
+
+        /** The area of the chunk */
+        private float Area => Size * Size;
 
         /** Cells from this chunk */
-        private readonly Cell[,] _cells = new Cell[Size, Size];
+        private readonly Cell[,] _cells;
+
+//======== ====== ==== ==
+//      CONSTRUCTOR
+//======== ====== ==== ==
+
+        public Chunk(Cell[,] cells, int moistureLevel)
+        {
+            // First save cells into the chunk
+            _cells = cells;
+            // Setup biome from elevation of cells and moisture level
+            Biome = Biome.GetFrom(GetElevation(), moistureLevel);
+        }
+        
+//======== ====== ==== ==
+//      METHODS
+//======== ====== ==== ==
 
         /**
-         * <summary>Enumerates all cells in the order X then Y </summary>
+         * <summary>The elevation of the chunk given from the average of cells height</summary>
+         * <returns>The elevation from <see cref="Biome.MinElevation"/> to <see cref="Biome.MaxElevation"/></returns>
          */
-        public IEnumerator GetEnumerator()
+        public int GetElevation()
         {
-            for (var x = 0; x < Size; x++)
+            var total = 0f;
+            foreach (var cell in this)
             {
-                for (var y = 0; y < Size; y++)
-                {
-                    // Yield each cells
-                    yield return _cells[x, y];
-                }
+                total += GetHeightAt(cell.Position.x, cell.Position.y);
             }
+
+            // Compute average for the chunk
+            var chunkAverage = total / Area;
+            // Compute average relative to terrain Min/Max
+            var relativeAverage = (chunkAverage + Terrain.MinHeight) / (Terrain.MaxHeight - Terrain.MinHeight);
+            // Compute relative to biome elevation and cast as int
+            return (int)(relativeAverage * (Biome.MaxElevation - Biome.MinElevation) + Biome.MinElevation);
         }
 
         /**
@@ -43,5 +73,26 @@ namespace TerrainGeneration.Components
         {
             throw new NotImplementedException();
         }
+        
+//======== ====== ==== ==
+//      OVERRIDES
+//======== ====== ==== ==
+
+        /**
+         * <summary>Enumerates all cells in the order X then Y </summary>
+         */
+        public IEnumerator<Cell> GetEnumerator()
+        {
+            for (var x = 0; x < Size; x++)
+            {
+                for (var y = 0; y < Size; y++)
+                {
+                    // Yield each cells
+                    yield return _cells[x, y];
+                }
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
     }
 }
