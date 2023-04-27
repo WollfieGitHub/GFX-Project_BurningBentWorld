@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Utils;
 
 namespace TerrainGeneration.Components
 {
@@ -19,7 +20,7 @@ namespace TerrainGeneration.Components
          * A chunk has only one biome but TODO interpolation between neighbouring chunks
          * with different biomes is done to get a smooth appearance transition
          */
-        public Biome Biome { get; private set; }
+        public readonly Biome Biome;
 
         /** The area of the chunk */
         private float Area => Size * Size;
@@ -31,17 +32,35 @@ namespace TerrainGeneration.Components
 //      CONSTRUCTOR
 //======== ====== ==== ==
 
-        public Chunk(Cell[,] cells, int moistureLevel)
+        public Chunk(int[,] cellHeights, int moistureLevel)
         {
+            Preconditions.CheckArgument(cellHeights.GetLength(0) == Size);
+            Preconditions.CheckArgument(cellHeights.GetLength(1) == Size);
+            
             // First save cells into the chunk
-            _cells = cells;
+            _cells = new Cell[Size,Size];
+            
+            for (var x = 0; x < Size; x++) { for (var y = 0; y < Size; y++) {
+                _cells[x, y] = new Cell(cellHeights[x, y]);
+            } }
             // Setup biome from elevation of cells and moisture level
-            Biome = Biome.GetFrom(GetElevation(), moistureLevel);
+            int elevation = GetElevation();
+            Biome = Biome.GetFrom(elevation, moistureLevel);
         }
         
 //======== ====== ==== ==
 //      METHODS
 //======== ====== ==== ==
+
+        /**
+         * <param name="x">The x coordinate in the chunk's referential</param>
+         * <param name="y">The y coordinate in the chunk's referential</param>
+         * <returns>The <see cref="Cell"/> at coordinates x,y</returns>
+         */
+        public Cell GetCellAt(int x, int y)
+        {
+            return _cells[x, y];
+        }
 
         /**
          * <summary>The elevation of the chunk given from the average of cells height</summary>
@@ -58,9 +77,9 @@ namespace TerrainGeneration.Components
             // Compute average for the chunk
             var chunkAverage = total / Area;
             // Compute average relative to terrain Min/Max
-            var relativeAverage = (chunkAverage + Terrain.MinHeight) / (Terrain.MaxHeight - Terrain.MinHeight);
+            var relativeAverage = (chunkAverage - Terrain.MinHeight) / (Terrain.MaxHeight - Terrain.MinHeight);
             // Compute relative to biome elevation and cast as int
-            return (int)(relativeAverage * (Biome.MaxElevation - Biome.MinElevation) + Biome.MinElevation);
+            return Mathf.FloorToInt(relativeAverage * (Biome.MaxElevation - Biome.MinElevation) + Biome.MinElevation);
         }
 
         /**
@@ -71,7 +90,7 @@ namespace TerrainGeneration.Components
          */
         public float GetHeightAt(float x, float y)
         {
-            throw new NotImplementedException();
+            return _cells[Mathf.RoundToInt(x), Mathf.RoundToInt(y)].Height;
         }
         
 //======== ====== ==== ==

@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 using Utils;
 
 namespace TerrainGeneration.Components
@@ -28,16 +29,22 @@ namespace TerrainGeneration.Components
 
         private static readonly Biome[,] BiomeLookupTable =
         {
-            {                Snow,                     Snow,                     Snow,                 Tundra,            Bare,          Scorched },
-            {               Taiga,                    Taiga,                Shrubland,        TemperateDesert, TemperateDesert,   TemperateDesert },
+            {  TropicalRainForest,       TropicalRainForest,   TropicalSeasonalForest, TropicalSeasonalForest,       Grassland, SubtropicalDesert },
             { TemperateRainForest, TemperateDeciduousForest, TemperateDeciduousForest,              Grassland,       Grassland,   TemperateDesert },
-            {  TropicalRainForest,       TropicalRainForest,   TropicalSeasonalForest, TropicalSeasonalForest,       Grassland, SubtropicalDesert }
+            {               Taiga,                    Taiga,                Shrubland,        TemperateDesert, TemperateDesert,   TemperateDesert },
+            {                Snow,                     Snow,                     Snow,                 Tundra,            Bare,          Scorched }
         };
 
         /** Max elevation a biome can have */
         public static int MaxElevation => BiomeLookupTable.GetLength(0);
+
         /** Min elevation a biome can have */
         public const int MinElevation = 0;
+        
+        /** Max elevation a biome can have */
+        public static int MaxMoisture => BiomeLookupTable.GetLength(1);
+        /** Min elevation a biome can have */
+        public const int MinMoisture = 0;
         
         /**
          * <summary>Finds the biome corresponding to the specified elevation level and moisture level</summary>
@@ -47,8 +54,9 @@ namespace TerrainGeneration.Components
          */
         public static Biome GetFrom(int elevationLevel, int moistureLevel)
         {
-            Preconditions.CheckArgument(0<= elevationLevel && elevationLevel <= BiomeLookupTable.GetLength(0)-1);
-            Preconditions.CheckArgument(0<= moistureLevel && moistureLevel <= BiomeLookupTable.GetLength(1)-1);
+            Debug.Log($"{elevationLevel}, {moistureLevel}");
+            Preconditions.CheckArgument(0<= elevationLevel && elevationLevel < BiomeLookupTable.GetLength(0));
+            Preconditions.CheckArgument(0<= moistureLevel && moistureLevel < BiomeLookupTable.GetLength(1));
             // Return corresponding biome
             return BiomeLookupTable[elevationLevel, moistureLevel];
         }

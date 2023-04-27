@@ -15,6 +15,13 @@ namespace TerrainGeneration.Components
      */
     public class Cell
     {
+        public readonly float Height;
+
+        public Cell(float height)
+        {
+            Height = height;
+        }
+
         private MonoBehaviour _overlay;
         private MonoBehaviour _underlay;
         
