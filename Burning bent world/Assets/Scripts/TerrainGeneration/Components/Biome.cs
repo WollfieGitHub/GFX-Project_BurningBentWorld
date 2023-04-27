@@ -26,7 +26,7 @@ namespace TerrainGeneration.Components
         public static readonly Biome TropicalSeasonalForest = new ("Tropical Seasonal Forest");
         public static readonly Biome SubtropicalDesert = new ("Subtropical Desert");
 
-        private static readonly Biome[,] _BiomeLookupTable =
+        private static readonly Biome[,] BiomeLookupTable =
         {
             {                Snow,                     Snow,                     Snow,                 Tundra,            Bare,          Scorched },
             {               Taiga,                    Taiga,                Shrubland,        TemperateDesert, TemperateDesert,   TemperateDesert },
@@ -35,7 +35,7 @@ namespace TerrainGeneration.Components
         };
 
         /** Max elevation a biome can have */
-        public static int MaxElevation => _BiomeLookupTable.GetLength(0);
+        public static int MaxElevation => BiomeLookupTable.GetLength(0);
         /** Min elevation a biome can have */
         public const int MinElevation = 0;
         
@@ -47,10 +47,10 @@ namespace TerrainGeneration.Components
          */
         public static Biome GetFrom(int elevationLevel, int moistureLevel)
         {
-            Preconditions.CheckArgument(0<= elevationLevel && elevationLevel <= _BiomeLookupTable.GetLength(0)-1);
-            Preconditions.CheckArgument(0<= moistureLevel && moistureLevel <= _BiomeLookupTable.GetLength(1)-1);
+            Preconditions.CheckArgument(0<= elevationLevel && elevationLevel <= BiomeLookupTable.GetLength(0)-1);
+            Preconditions.CheckArgument(0<= moistureLevel && moistureLevel <= BiomeLookupTable.GetLength(1)-1);
             // Return corresponding biome
-            return _BiomeLookupTable[elevationLevel, moistureLevel];
+            return BiomeLookupTable[elevationLevel, moistureLevel];
         }
         
     }
