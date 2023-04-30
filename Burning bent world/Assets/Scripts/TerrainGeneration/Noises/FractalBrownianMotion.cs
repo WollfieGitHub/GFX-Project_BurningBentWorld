@@ -21,12 +21,15 @@ namespace TerrainGeneration.Noises
             var amplitude = 1.0f;
             var frequency = 0.005f;
 
+            var persistence = 0.5f;
+            var lacunarity = 2.0f;
+
             for (var octave = 0; octave < octaveCount; octave++) {
                 var n = amplitude * Mathf.PerlinNoise(x * frequency, y * frequency);
                 result += n;
 		
-                amplitude *= 0.5f;
-                frequency *= 2.0f;
+                amplitude *= persistence;
+                frequency *= lacunarity;
             }
 
             return result;

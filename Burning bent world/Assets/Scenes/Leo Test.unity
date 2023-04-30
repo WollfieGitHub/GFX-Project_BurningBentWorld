@@ -333,7 +333,7 @@ Light:
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
   m_ColorTemperature: 5000
-  m_UseColorTemperature: 1
+  m_UseColorTemperature: 0
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
@@ -504,11 +504,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5ab6fe850584801bd11cce14988af44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pixWidth: 8
-  pixHeight: 8
+  pixWidth: 4096
+  pixHeight: 4096
   xOrg: 0
   yOrg: 0
-  scale: 128
 --- !u!23 &1831591809
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -529,7 +528,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: ef19bd0cce186984ab5883ec3195be3a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

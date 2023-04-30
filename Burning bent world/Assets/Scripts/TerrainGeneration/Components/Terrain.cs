@@ -19,11 +19,13 @@ namespace TerrainGeneration.Components
         /** All chunks in this terrain */
         private readonly Chunk[,] _chunks;
 
-        public Terrain(Chunk[,] chunks)
-        {
-            _chunks = chunks;
-        }
-        
+        public Terrain(Chunk[,] chunks) { _chunks = chunks; }
+
+        /** Width (in number of cells) of the terrain */
+        public int Width => _chunks.GetLength(0) * Chunk.Size;
+        /** Height (in number of cells) of the terrain */
+        public int Height => _chunks.GetLength(1) * Chunk.Size;
+
 //======== ====== ==== ==
 //      METHODS
 //======== ====== ==== ==
