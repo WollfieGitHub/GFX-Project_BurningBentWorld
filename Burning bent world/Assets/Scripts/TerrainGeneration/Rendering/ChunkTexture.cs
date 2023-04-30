@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
-namespace TerrainGeneration
+namespace TerrainGeneration.Rendering
 {
-    public static class TerrainTexture
+    public static class ChunkTexture
     {
         /// <summary>
         /// Creates a texture to visualize the height map

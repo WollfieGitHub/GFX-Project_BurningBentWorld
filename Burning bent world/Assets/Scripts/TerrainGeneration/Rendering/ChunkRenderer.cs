@@ -6,10 +6,10 @@ using TerrainGeneration.Generators;
 using UnityEngine;
 using Terrain = TerrainGeneration.Components.Terrain;
 
-namespace TerrainGeneration
+namespace TerrainGeneration.Rendering
 {
     [RequireComponent(typeof(Renderer))]
-    public class TerrainRenderer : MonoBehaviour
+    public class ChunkRenderer : MonoBehaviour
     {
         // Width and height of the texture in pixels.
         public int pixWidth;
@@ -70,7 +70,7 @@ namespace TerrainGeneration
                 }
             }
 
-            return TerrainTexture.FromHeightMap(heightMap);
+            return ChunkTexture.FromHeightMap(heightMap);
         }
     }
 }
