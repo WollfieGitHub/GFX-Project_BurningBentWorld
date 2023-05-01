@@ -1,32 +1,34 @@
-﻿using UnityEngine;
+﻿using TerrainGeneration.Components;
+using UnityEngine;
+using Utils;
+using Terrain = TerrainGeneration.Components.Terrain;
 
 namespace TerrainGeneration.Rendering
 {
     public static class ChunkTexture
     {
         /// <summary>
-        /// Creates a texture to visualize the height map
+        /// Creates a texture to visualize the height map of the chunk
         /// </summary>
-        /// <param name="heightMap">The height map</param>
+        /// <param name="chunk">The chunk</param>
         /// <returns>The texture with height map</returns>
-        public static Texture2D FromHeightMap(float[,] heightMap)
+        public static Texture2D From(Chunk chunk)
         {
             // Compute the texture parameters
-            var width = heightMap.GetLength(0);
-            var height = heightMap.GetLength(1);
+            var width = chunk.Width;
+            var height = chunk.Height;
             
             // Create the color map
-            Color[] pixels = new Color[width * height];
+            var pixels = new Color[width * height];
             
             for (var y = 0; y < height; y++)
             {
                 for (var x = 0; x < width; x++)
                 {
-                    pixels[y * width + x] = Color.Lerp(
-                        Color.black, 
-                        Color.white,
-                        heightMap[x, y]
-                    );
+                    var cellHeight = chunk.GetHeightAt(x, y);
+                    cellHeight = Mathf.InverseLerp(Terrain.MinHeight, Terrain.MaxHeight, cellHeight);
+                    
+                    pixels[y * width + x] = chunk.Biome.Color.Darken(cellHeight);
                 }
             }
             

@@ -15,6 +15,11 @@ namespace TerrainGeneration.Components
         public const int MinHeight = -128;
         /** Height of the sea */
         public const int SeaLevel = 0;
+        
+        /** Min Height the Terrain can have */
+        public const float MaxWaterDepth = 0;
+        /** Max Height the Terrain can have */
+        public const float MinWaterDepth = 0;
 
         /** All chunks in this terrain */
         private readonly Chunk[,] _chunks;
@@ -44,6 +49,21 @@ namespace TerrainGeneration.Components
             var y0 = y - yChunk * Chunk.Size;
 
             return _chunks[xChunk, yChunk].GetCellAt(x0, y0);
+        }
+
+        /// <param name="x">X index of the chunk or the cell the returned chunk owns</param>
+        /// <param name="y">Y index of the chunk or the cell the returned chunk owns</param>
+        /// <param name="cellCoordinates">Whether the x and y parameter indicates cell coordinates (if set to
+        /// true) or chunk coordinates (if set to false)</param>
+        /// <returns>The chunk with index (x, y) in the terrain</returns>
+        public Chunk GetChunkAt(int x, int y, bool cellCoordinates = false)
+        {
+            if (!cellCoordinates) { return _chunks[x, y]; }
+            
+            var xChunk = x / Chunk.Size;
+            var yChunk = y / Chunk.Size;
+
+            return _chunks[xChunk, yChunk];
         }
 
 //======== ====== ==== ==

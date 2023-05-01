@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TerrainGeneration.Components;
 using TerrainGeneration.Noises;
 using UnityEngine;
+using static Utils.Utils;
 using Terrain = TerrainGeneration.Components.Terrain;
 
 namespace TerrainGeneration.Generators
@@ -23,13 +25,21 @@ namespace TerrainGeneration.Generators
             {
                 for (var yChunk = 0; yChunk < height; yChunk++)
                 {
+                    // Determine elevation and moisture level (Use perlin noise to have well-behaved variation
+                    // between close locations)
+                    float ElevationMap(float x, float y) => ClampedPerlinAt(x, y, Biome.MinElevation, Biome.MaxElevation, 0.05f);
+                    float MoistureMap(float x, float y) => ClampedPerlinAt(x, y, Biome.MinMoisture, Biome.MaxMoisture, 0.005f);
+                    
                     // Chunks are lazily loaded to have decent performance
-                    chunks[xChunk, yChunk] = new Chunk(xChunk, yChunk);
+                    // chunks[xChunk, yChunk] = new Chunk(
+                    //     xChunk, yChunk, Biome.CreateHeightGenerator(ElevationMap(xChunk, yChunk), MoistureMap(xChunk, yChunk))
+                    // );
                 }
             }
 
             return new Terrain(chunks);
         }
+        
     }
 
 }

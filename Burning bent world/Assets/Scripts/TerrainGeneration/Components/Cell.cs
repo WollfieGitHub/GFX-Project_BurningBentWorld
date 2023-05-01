@@ -17,15 +17,10 @@ namespace TerrainGeneration.Components
     {
         public readonly float Height;
 
-        public Cell(float height)
-        {
-            Height = height;
-        }
+        public Cell(float height) { Height = height; }
 
         private MonoBehaviour _overlay;
         private MonoBehaviour _underlay;
-        
-        public Vector2 Position { get; }
 
         private Chunk _parentChunk;
     }

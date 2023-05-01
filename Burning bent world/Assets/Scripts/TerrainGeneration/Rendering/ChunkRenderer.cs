@@ -3,74 +3,110 @@ using System.Collections.Generic;
 using System.Linq;
 using TerrainGeneration.Components;
 using TerrainGeneration.Generators;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Terrain = TerrainGeneration.Components.Terrain;
 
 namespace TerrainGeneration.Rendering
 {
     [RequireComponent(typeof(Renderer))]
+    [RequireComponent(typeof(MeshFilter))]
     public class ChunkRenderer : MonoBehaviour
     {
-        // Width and height of the texture in pixels.
-        public int pixWidth;
-        public int pixHeight;
+        private TerrainRenderer _terrainRenderer;
 
-        // The origin of the sampled area in the plane.
-        public float xOrg;
-        public float yOrg;
+        private Transform _transform;
 
-        private Texture2D noiseTex;
-        private Renderer rend;
+        private Texture2D _noiseTex;
+        private Renderer _rend;
+        private MeshFilter _meshFilter;
 
-        private Terrain Terrain;
+        private Mesh _mesh;
 
-        void Start()
+        private Chunk _chunk;
+
+        private bool _renderMesh;
+        public bool RenderMesh
         {
-            rend = GetComponent<Renderer>();
+            get => _renderMesh;
+            set
+            {
+                _renderMesh = value;
+                if (_chunk == null) { return; }
+                CalcNewMesh();
+            }
+        }
+    
+        // Must wait for parent to setup in Awake
+        private void Start()
+        {
+            // Cache the transform
+            _transform = transform;
+            
+            _rend = GetComponent<Renderer>();
+            _meshFilter = GetComponent<MeshFilter>();
 
-            Terrain = TerrainGenerator.GenerateNew(
-                pixWidth / Chunk.Size,
-                pixHeight / Chunk.Size
+            _terrainRenderer = transform.parent.GetComponent<TerrainRenderer>();
+
+            var position = _transform.position;
+            
+            _chunk = _terrainRenderer.Terrain.GetChunkAt(
+                (int)position.x,
+                (int)position.z,
+                true
             );
 
             // Set up the texture.
-            noiseTex = CalcNoise(Terrain);
-            rend.material.mainTexture = noiseTex;
-            
-            CalMesh();
+            _noiseTex = CalcNoise(_chunk);
+            _rend.sharedMaterial.mainTexture = _noiseTex;
+
+            CalcNewMesh();
         }
 
-        private void CalMesh()
+        private void CalcNewMesh()
         {
+            if (_mesh != null && !_mesh.IsDestroyed()) { DestroyImmediate(_mesh); }
+
+            _mesh = _renderMesh ? GenerateChunkMesh(_chunk) : GeneratePlanarMesh(_chunk);
             
+            _meshFilter.sharedMesh = _mesh;
         }
 
-        Texture2D CalcNoise(Terrain terrain)
+        private Mesh GeneratePlanarMesh(Chunk chunk)
         {
-            // For each pixel in the texture...
-            if (ReferenceEquals(null, Terrain)) { return default; }
-
-            var width = terrain.Width;
-            var height = terrain.Height;
-            
-            var heightMap = new float[width, height];
-            
-            for (var x = 0; x < width; x++)
+            Mesh mesh = new Mesh();
+            var vertices = new [] {
+                new Vector3(        0.0f, 0.0f,          0.0f),
+                new Vector3(chunk.Width, 0.0f,          0.0f),
+                new Vector3(        0.0f, 0.0f, chunk.Height),
+                new Vector3(chunk.Width, 0.0f, chunk.Height),
+            };
+            var triangles = new[]
             {
-                for (var y = 0; y < height; y++)
-                {
-                    Cell sample = Terrain.GetCellAt(
-                        Mathf.RoundToInt(x), 
-                        Mathf.RoundToInt(y)
-                    );
-                    
-                    var cellHeight = (sample.Height - Terrain.MinHeight) / (Terrain.MaxHeight - Terrain.MinHeight);
-                    
-                    heightMap[x, y] = cellHeight;
-                }
-            }
+                0, 3, 1,
+                0, 2, 3
+            };
+            var uvs = new[]
+            {
+                new Vector2(0, 0),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(1, 1),
+            };
 
-            return ChunkTexture.FromHeightMap(heightMap);
+            mesh.vertices = vertices;
+            mesh.triangles = triangles;
+            mesh.uv = uvs;
+
+            mesh.Optimize();
+            mesh.RecalculateNormals();
+
+            return mesh;
         }
+
+        private Mesh GenerateChunkMesh(Chunk chunk) => ChunkMesh.From(chunk);
+
+        Texture2D CalcNoise(Chunk chunk) => ChunkTexture.From(chunk);
     }
 }

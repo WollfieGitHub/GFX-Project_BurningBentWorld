@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Utils
 {
@@ -12,12 +13,28 @@ namespace Utils
          */
         public static void Shuffle<T>(this IList<T> list)  
         {  
-            int n = list.Count;  
+            var n = list.Count;  
             while (n > 1) {  
                 n--;  
-                int k = Constants.URandom.Next(n + 1);
+                var k = Constants.URandom.Next(n + 1);
                 (list[n], list[k]) = (list[k], list[n]);
             }  
         }
+
+        /// <summary>
+        /// Darkens the color by the specified factor
+        /// </summary>
+        /// <param name="c">The color to darken</param>
+        /// <param name="factor">The factor by which to darken the color</param>
+        /// <returns>The darkened color</returns>
+        public static Color Darken(this Color c, float factor) => new Color(c.r * factor, c.g * factor, c.b * factor, c.a);
+        
+        /// <summary>
+        /// Lightens the color by the specified factor
+        /// </summary>
+        /// <param name="c">The color to lighten</param>
+        /// <param name="factor">The factor by which to lighten the color</param>
+        /// <returns>The lightened color</returns>
+        public static Color Lighten(this Color c, float factor) => Darken(c, 1+factor);
     }
 }
