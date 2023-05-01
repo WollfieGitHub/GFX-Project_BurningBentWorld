@@ -2,7 +2,7 @@
 
 namespace TerrainGeneration.Noises
 {
-    public class FractalBrownianMotion : IGenerationMap
+    public class FractalBrownianMotion
     {
         private float _initialAmplitude;
         private float _initialFrequency;

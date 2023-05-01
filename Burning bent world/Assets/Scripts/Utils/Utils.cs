@@ -41,5 +41,16 @@ namespace Utils
         /// <param name="b">Blue channel</param>
         /// <returns>The newly created color</returns>
         public static Color Color255(int r, int g, int b) => Color255(r, g, b,255);
+
+        /// <summary>
+        /// Draws a random result form the specified odds
+        /// </summary>
+        /// <param name="head">Object returned in case of Head</param>
+        /// <param name="tail">Object returned in case of Tail</param>
+        /// <param name="headOdds">Odds of drawing Head</param>
+        /// <typeparam name="T">Type of the object to return</typeparam>
+        /// <returns>The result of the random event</returns>
+        public static T CoinToss<T>(T head, T tail, float headOdds) =>
+            Constants.URandom.NextDouble() < headOdds ? head : tail;
     }
 }

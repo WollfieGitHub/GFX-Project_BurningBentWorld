@@ -76,7 +76,7 @@ namespace TerrainGeneration.Components
         /// <param name="elevation">Level of elevation in the <see cref="Biome"/>. Ranges from 0 (low) to 3 (high)</param>
         /// <param name="moisture">Level of moisture in the <see cref="Biome"/>. Ranges from 0 (dry) to 5 (wet)</param>
         /// <returns>The map generator object</returns>
-        public static IGenerationMap CreateHeightGenerator(
+        public static GenerationMap<float> CreateHeightGenerator(
             float elevation,
             float moisture
         ) {
@@ -86,10 +86,7 @@ namespace TerrainGeneration.Components
              *  - 0.005 -> Mountains
              */
             var relativeElevation = Mathf.InverseLerp(MinElevation, MaxElevation, elevation);
-            
-            return new FractalBrownianMotion(
-                initialFrequency: Mathf.Lerp(0.001f, 0.005f, relativeElevation)
-            );
+            throw new NotImplementedException();
         }
         
     }

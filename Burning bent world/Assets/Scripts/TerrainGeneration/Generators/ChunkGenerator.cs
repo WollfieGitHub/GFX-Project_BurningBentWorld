@@ -15,25 +15,23 @@ namespace TerrainGeneration.Generators
         /// <param name="yChunk">Y coordinate relative to terrain's origin</param>
         /// <param name="mapGenerator">The object generating the height map given the chunk</param>
         /// <returns>Map of cell integer height</returns>
-        public static int[,] GenerateHeight(int xChunk, int yChunk, MapGenerator mapGenerator)
+        public static Cell[,] GenerateHeight(int xChunk, int yChunk, GenerationMap<CellInfo> mapGenerator)
         {
-            var cells = new int[Chunk.Size, Chunk.Size];
+            var cells = new Cell[Chunk.Size, Chunk.Size];
 
             for (var x = 0; x < Chunk.Size; x++)
             {
                 for (var y = 0; y < Chunk.Size; y++)
                 {
-                    var cellHeight = mapGenerator.ApplyHeight(
+                    var cellInfo = mapGenerator(
                         (float)xChunk * Chunk.Size + x,
                         (float)yChunk * Chunk.Size + y 
                     );
-                    
-                    // Be sure we never reach max
-                    cellHeight = Mathf.Clamp(cellHeight, 0f, .999999f);
 
-                    cellHeight = Mathf.Lerp(Terrain.MinHeight, Terrain.MaxHeight, cellHeight);
-
-                    cells[x, y] = Mathf.FloorToInt(cellHeight);
+                    var cell = new Cell(
+                        cellInfo.Land ? 10.0f : -10.0f
+                    );
+                    cells[x, y] = cell;
                 }
             }
             
@@ -47,7 +45,7 @@ namespace TerrainGeneration.Generators
         /// <param name="yChunk">Y coordinate relative to terrain's origin</param>
         /// <param name="mapGenerator">The object generating the water map given the chunk</param>
         /// <returns>Map of depth offsets</returns>
-        public static float[,] GenerateWater(int xChunk, int yChunk, MapGenerator mapGenerator)
+        public static float[,] GenerateWater(int xChunk, int yChunk, GenerationMap<float> mapGenerator)
         {
             var cells = new float[Chunk.Size, Chunk.Size];
 
@@ -55,7 +53,7 @@ namespace TerrainGeneration.Generators
             {
                 for (var y = 0; y < Chunk.Size; y++)
                 {
-                    var cellOffset = mapGenerator.ApplyWater(
+                    var cellOffset = mapGenerator(
                         xChunk * Chunk.Size + x,
                         yChunk * Chunk.Size + y
                     );

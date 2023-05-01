@@ -48,7 +48,7 @@ namespace TerrainGeneration.Components
         /** Y Coordinate relative to parent terrain's origin in number of chunks */
         public readonly int ChunkY;
 
-        private readonly MapGenerator _mapGenerator;
+        private readonly GenerationMap<CellInfo> _mapGenerator;
 
         /** Whether the chunk has been initialized at least once or not */
         public bool Initialized { get; private set; } = false;
@@ -59,7 +59,7 @@ namespace TerrainGeneration.Components
 //      CONSTRUCTOR
 //======== ====== ==== ==
 
-        public Chunk(int xChunk, int yChunk, MapGenerator mapGenerator)
+        public Chunk(int xChunk, int yChunk, GenerationMap<CellInfo> mapGenerator)
         {
             ChunkX = xChunk;
             ChunkY = yChunk;
@@ -86,25 +86,15 @@ namespace TerrainGeneration.Components
         private void Initialize()
         {
             var cellHeights = ChunkGenerator.GenerateHeight(ChunkX, ChunkY, _mapGenerator);
-            var waterDepths = ChunkGenerator.GenerateWater(ChunkX, ChunkY, _mapGenerator);
             
             // First save cells into the chunk
-            _cells = new Cell[Width,Height];
-            
-            for (var x = 0; x < Width; x++) { for (var y = 0; y < Height; y++) {
-                _cells[x, y] = new Cell(
-                    cellHeights[x, y] - waterDepths[x, y]
-                );
-            } }
-            
+            _cells = cellHeights;
+
             // Set the chunk as initialized once the cells are loaded
             Initialized = true;
             
-            // Setup biome from elevation of cells and moisture level
-            var elevation = GetElevation();
-            var moisture = _mapGenerator.MoistureLevel;
             // Find corresponding biome
-            Biome = Biome.GetFrom(elevation, moisture);
+            Biome = Biome.Grassland;
         }
 
         /// <summary>The elevation of the chunk given from the average of cells height</summary>

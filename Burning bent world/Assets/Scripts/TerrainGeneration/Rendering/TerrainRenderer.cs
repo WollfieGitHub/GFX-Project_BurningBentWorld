@@ -8,6 +8,7 @@ using Terrain = TerrainGeneration.Components.Terrain;
 
 namespace TerrainGeneration.Rendering
 {
+    [RequireComponent(typeof(TerrainGenerator))]
     public class TerrainRenderer : MonoBehaviour
     {
         [Header("Dimensions")]
@@ -46,13 +47,13 @@ namespace TerrainGeneration.Rendering
         private void Awake()
         {
             _transform = transform;
+
+            var generator = GetComponent<TerrainGenerator>();
             
-            Terrain = TerrainGenerator.GenerateNew(
+            Terrain = generator.GenerateNew(
                 width / Chunk.Size,
                 height / Chunk.Size
             );
-            
-            
         }
 
         private void Start()

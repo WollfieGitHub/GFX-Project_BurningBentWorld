@@ -5,11 +5,11 @@ namespace TerrainGeneration.Noises
     /// <summary>
     /// Smooth the transition between two property steps
     /// </summary>
-    public class PropertySmoother : IGenerationMap
+    public class PropertySmoother
     {
-        private IGenerationMap _propertyMap;
+        private GenerationMap<float> _propertyMap;
         
-        public PropertySmoother(IGenerationMap propertyMap)
+        public PropertySmoother(GenerationMap<float> propertyMap)
         {
             _propertyMap = propertyMap;
         }
@@ -25,7 +25,7 @@ namespace TerrainGeneration.Noises
         /// <returns>The interpolation factor (0 to 1) of the property value</returns>
         public float Apply(float x, float y)
         {
-            var propValue = _propertyMap.Apply(x, y);
+            var propValue = _propertyMap(x, y);
 
             // Closest distance to an integer is 
             var relativeBiomeValue = Mathf.Abs(propValue - Mathf.RoundToInt(propValue));

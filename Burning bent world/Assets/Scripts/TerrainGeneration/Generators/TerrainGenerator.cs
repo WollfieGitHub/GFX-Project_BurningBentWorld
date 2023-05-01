@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TerrainGeneration.Components;
+using TerrainGeneration.Layers;
 using TerrainGeneration.Noises;
 using UnityEngine;
 using static Utils.Utils;
@@ -9,37 +10,81 @@ using Terrain = TerrainGeneration.Components.Terrain;
 
 namespace TerrainGeneration.Generators
 {
-    public static class TerrainGenerator
+    public class TerrainGenerator : MonoBehaviour
     {
-        /**
-         * <summary>Generate new <see cref="Terrain"/> from the specified width and height</summary>
-         * <param name="width">Width of the <see cref="Terrain"/> to generate in Number of Chunks</param>
-         * <param name="height">Height of the <see cref="Terrain"/> to generate in Number of Chunks</param>
-         * <returns>The newly generated <see cref="Terrain"/></returns>
-         */
-        public static Terrain GenerateNew(int width, int height)
+        [SerializeField][Range(-1, 10)] private int stopIndex = 0;
+
+        private void OnValidate()
+        {
+            _biomeStack.StoppingLayerIdx = stopIndex;
+        }
+
+        private readonly DebugGenerationStack _biomeStack = new(new ITransformLayer[]
+        {
+            new Zoom2Layer(),           // 4096 -> 2048
+            
+            new AddIslandLayer(),
+            new Zoom2Layer(),           // 2048 -> 1024
+            
+            new AddIslandLayer(),       //  
+            new AddIslandLayer(),       // 
+            new AddIslandLayer(),       // 
+            
+            new Zoom2Layer(),
+            new Zoom2Layer(),
+            new Zoom2Layer(),
+            new Zoom2Layer(),
+            new Zoom2Layer(),
+            new Zoom2Layer(),
+            new Zoom2Layer(),
+            
+            new ShrinkOceanLayer(),     //
+            new AddTemperaturesLayer(), //
+            
+            new AddBiomesLayer(),       // Add biomes
+            
+            new Zoom2Layer(),           // 1024 -> 512
+            new Zoom2Layer(),           // 512 -> 256
+            
+            new AddIslandLayer(),       // 
+        });
+
+        public GenerationMap<CellInfo> GenerateMaps()
+        {
+            var baseNoise = WhiteNoise.CreateNew(0.1f);
+            var baseMap = baseNoise.Get();
+            
+            CellInfo InitialMap(float x, float y)
+            {
+                var value = baseMap(x, y);
+                
+                return new CellInfo { Land = value == 1 };
+            }
+            
+            var biomesMap = _biomeStack.Apply(InitialMap);
+
+            return biomesMap;
+        }
+
+        public Terrain GenerateNew(int width, int height)
         {
             var chunks = new Chunk[width, height];
+            var map = GenerateMaps();
             
             for (var xChunk = 0; xChunk < width; xChunk++)
             {
                 for (var yChunk = 0; yChunk < height; yChunk++)
                 {
-                    // Determine elevation and moisture level (Use perlin noise to have well-behaved variation
-                    // between close locations)
-                    float ElevationMap(float x, float y) => ClampedPerlinAt(x, y, Biome.MinElevation, Biome.MaxElevation, 0.05f);
-                    float MoistureMap(float x, float y) => ClampedPerlinAt(x, y, Biome.MinMoisture, Biome.MaxMoisture, 0.005f);
-                    
                     // Chunks are lazily loaded to have decent performance
-                    // chunks[xChunk, yChunk] = new Chunk(
-                    //     xChunk, yChunk, Biome.CreateHeightGenerator(ElevationMap(xChunk, yChunk), MoistureMap(xChunk, yChunk))
-                    // );
+                    chunks[xChunk, yChunk] = new Chunk(
+                        xChunk, yChunk, map
+                    );
                 }
             }
 
             return new Terrain(chunks);
         }
-        
+
     }
 
 }
