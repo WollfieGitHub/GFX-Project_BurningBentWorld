@@ -36,5 +36,23 @@ namespace Utils
         /// <param name="factor">The factor by which to lighten the color</param>
         /// <returns>The lightened color</returns>
         public static Color Lighten(this Color c, float factor) => Darken(c, 1+factor);
+
+        /// <summary>
+        /// Performs a Linear mix in the RGBA space between this color
+        /// and the <see cref="endColor"/> by the specified <see cref="factor"/>
+        /// </summary>
+        /// <param name="c">This color, starting color in the interpolation</param>
+        /// <param name="endColor">The end color, ending color in the interpolation</param>
+        /// <param name="factor">The interpolation factor between the two colors</param>
+        /// <returns>The interpolated color</returns>
+        public static Color Mix(this Color c, Color endColor, float factor)
+        {
+            return new Color(
+                c.r * factor + endColor.r * (1 - factor),
+                c.g * factor + endColor.g * (1 - factor),
+                c.b * factor + endColor.b * (1 - factor),
+                c.a * factor + endColor.a * (1 - factor)
+            );
+        }
     }
 }
