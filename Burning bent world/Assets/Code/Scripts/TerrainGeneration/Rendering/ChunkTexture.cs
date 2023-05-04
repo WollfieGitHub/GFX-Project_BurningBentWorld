@@ -10,7 +10,7 @@ namespace TerrainGeneration.Rendering
     {
         public enum DisplayType
         {
-            Default, Temperature, Humidity, Height
+            Default, Temperature, Humidity, Height, Biome
         }
         
         /// <summary>
@@ -41,6 +41,7 @@ namespace TerrainGeneration.Rendering
                         DisplayType.Temperature => GetTemperatureColor(cellInfo.Temperature),
                         DisplayType.Humidity => GetPrecipitationColor(cellInfo.Precipitation),
                         DisplayType.Height => GetHeightColor(cell.Height),
+                        DisplayType.Biome => GetBiomeColor(cellInfo),
                         _ => Color.magenta // Indicates a bug
                     };
                     
@@ -55,6 +56,11 @@ namespace TerrainGeneration.Rendering
             texture.Apply();
 
             return texture;
+        }
+
+        private static Color GetBiomeColor(CellInfo cellInfo)
+        {
+            return Color.white.Mix(Color.black, cellInfo.BiomeIntensityFactor);
         }
 
         private static Color GetHeightColor(float cellHeight)

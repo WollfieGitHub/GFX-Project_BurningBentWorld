@@ -6,7 +6,7 @@ namespace Code.Scripts.TerrainGeneration.Layers
 {
     public class AddHumidityLayer : ITransformLayer
     {
-        private const float Frequency = 0.05f * 64; // Frequency varies more than temperature
+        private const float Frequency = 0.010f * 32; // Precipitation varies more than temperature
         
         public CellMap Apply(CellMap inputMap)
         {

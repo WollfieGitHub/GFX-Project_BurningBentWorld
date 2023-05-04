@@ -98,18 +98,18 @@ namespace TerrainGeneration.Components
             var relTemperature = Mathf.InverseLerp(MinTemperatureDeg, MaxTemperatureDeg, temperature);
             var relPrecipitation = Mathf.InverseLerp(MinPrecipitationCm, MaxPrecipitationCm, precipitation);
 
-            var temperatureIdx = Mathf.RoundToInt(relTemperature * (temperatureRegionsCount - 1));
-            var precipitationIdx = Mathf.RoundToInt(relPrecipitation * (precipitationRegionsCount - 1));
-
-            var referenceRelTemperature = (float)temperatureIdx / (temperatureRegionsCount - 1);
-            var referenceRelPrecipitation = (float)precipitationIdx / (precipitationRegionsCount - 1);
+            var temperatureIdx = relTemperature * (temperatureRegionsCount - 1);
+            var precipitationIdx = relPrecipitation * (precipitationRegionsCount - 1);
+            
+            var temperatureRefIdx = Mathf.RoundToInt(temperatureIdx);
+            var precipitationRefIdx = Mathf.RoundToInt(precipitationIdx);
 
             var biomeIntensityFactor = Mathf.Min(
-                Mathf.Abs(relTemperature - referenceRelTemperature),
-                Mathf.Abs(relPrecipitation - referenceRelPrecipitation)
+                1 - Mathf.Abs(temperatureIdx - temperatureRefIdx) * 2,
+                1 - Mathf.Abs(precipitationIdx - precipitationRefIdx) * 2
             );
             
-            var result = BiomeMap[temperatureIdx, precipitationIdx];
+            var result = BiomeMap[temperatureRefIdx, precipitationRefIdx];
             RepresentedBiomes.Add(result);
             return (result, biomeIntensityFactor);
         }

@@ -37,7 +37,7 @@ namespace Code.Scripts.TerrainGeneration.Layers
                         var baseHeight = BaseHeightMap.Apply(rX, rY);
 
                         var mixedRelHeight = Mathf.Lerp(
-                            baseHeight, biomeHeight, TransitionFunction(cell.BiomeIntensityFactor)
+                            Terrain.SeaLevel, biomeHeight, TransitionFunction(cell.BiomeIntensityFactor)
                         );
 
                         cell.Height = Mathf.Lerp(Terrain.SeaLevel, Terrain.MaxHeight, mixedRelHeight);

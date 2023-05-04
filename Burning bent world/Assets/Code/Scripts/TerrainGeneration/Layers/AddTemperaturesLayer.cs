@@ -5,7 +5,7 @@ namespace TerrainGeneration.Layers
 {
     public class AddTemperaturesLayer : ITransformLayer
     {
-        private const float Frequency = 0.005f * 64;
+        private const float Frequency = 0.005f * 32;
         
         public CellMap Apply(CellMap inputMap)
         {
