@@ -8,6 +8,6 @@ namespace Code.Scripts.TerrainGeneration.Layers
     /// </summary>
     public interface IMixLayer
     {
-        CellMap Apply(CellMap input1, CellMap input2);
+        CellMap Mix(CellMap input1, CellMap input2);
     }
 }

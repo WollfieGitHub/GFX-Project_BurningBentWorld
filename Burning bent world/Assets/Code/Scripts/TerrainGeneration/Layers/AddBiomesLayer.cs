@@ -17,10 +17,13 @@ namespace TerrainGeneration.Layers
                     {
                         var cell = cells[rX, rY];
 
-                        cells[rX,rY].Biome = Biome.From(
+                        var (biome, intensity) = Biome.From(
                             cell.Temperature,
                             cell.Precipitation
                         );
+
+                        cells[rX, rY].Biome = biome;
+                        cells[rX, rY].BiomeIntensityFactor = intensity;
                     }
                 }
 

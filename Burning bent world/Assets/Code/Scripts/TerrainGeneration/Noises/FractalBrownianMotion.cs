@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Utils;
 
 namespace TerrainGeneration.Noises
 {
@@ -11,6 +12,9 @@ namespace TerrainGeneration.Noises
         private float _lacunarity;
 
         private int _octaveCount;
+
+        private readonly float _offsetX = Constants.URandom.Next(999);
+        private readonly float _offsetY = Constants.URandom.Next(999);
 
         public FractalBrownianMotion(
             float initialAmplitude = 0.5f, 
@@ -44,7 +48,10 @@ namespace TerrainGeneration.Noises
             var amplitude = _initialAmplitude;
 
             for (var octave = 0; octave < _octaveCount; octave++) {
-                var n = amplitude * Perlin(x * frequency, y * frequency);
+                var n = amplitude * Perlin(
+                    (x + _offsetX) * frequency,
+                    (y + _offsetY ) * frequency
+                );
                 result += n;
 		
                 amplitude *= _gain;

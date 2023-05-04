@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using TerrainGeneration.Noises;
 using UnityEngine;
 using static Utils.Utils;
 
@@ -9,18 +10,26 @@ namespace TerrainGeneration.Components
      */
     public class Biome
     {
+
         public readonly int Id;
         public readonly string Name;
         public readonly Color Color;
+        public readonly FractalBrownianMotion FBm;
 
-        public Biome(
+        private Biome(
             int id,
             string name,
-            Color color
+            Color color,
+            float fbmFrequency = 0.005f,
+            float fbmAmplitude = 0.2f
         ) {
             Id = id;
             Name = name;
             Color = color;
+            FBm = new FractalBrownianMotion(
+                initialAmplitude: fbmAmplitude,
+                initialFrequency: fbmFrequency
+            );
         }
         
         public static readonly Biome Snow = new (0, "Snow", Color255(248, 248, 248));
@@ -40,9 +49,11 @@ namespace TerrainGeneration.Components
         public static readonly Biome TropicalSeasonalForest = new (11, "Tropical Seasonal Forest", Color255(169, 204, 164));
         public static readonly Biome SubtropicalDesert = new (12, "Subtropical Desert", Color255(233, 221, 199));
 
-        public static readonly Biome Shore = new (13, "Shore", Color255(255, 245, 150));
-        public static readonly Biome River = new (14, "River", Color255(150, 255, 250));
-        public static readonly Biome FrozenRiver = new (15, "FrozenRiver", Color255(217, 255, 253));
+        public static readonly Biome Shore = new (13, "Shore", Color255(255, 245, 150), fbmFrequency: 0.005f, fbmAmplitude: 0.05f);
+        public static readonly Biome River = new(14, "River", Color255(150, 255, 250), fbmFrequency: 0.005f, fbmAmplitude: 0.05f);
+        public static readonly Biome FrozenRiver = new (15, "FrozenRiver", Color255(217, 255, 253), fbmFrequency: 0.005f, fbmAmplitude: 0.05f);
+        
+        public bool IsRiver => River.Equals(this) || FrozenRiver.Equals(this);
 
         public override string ToString() => $"Biome[{Name}]";
         public override int GetHashCode() => Name.GetHashCode();
@@ -63,17 +74,20 @@ namespace TerrainGeneration.Components
             { TemperateRainForest, TemperateDeciduousForest, TemperateDeciduousForest, Grassland, Grassland, TemperateDesert, },
             { TropicalRainForest, TropicalRainForest, TropicalSeasonalForest, TropicalSeasonalForest, Grassland, SubtropicalDesert, },
         };
-
-        public static readonly HashSet<Biome> RepresentedBiomes = new ();
-
+        
+        public static readonly HashSet<Biome> RepresentedBiomes = new();
+        
         /// <summary>
         /// Finds the biome that best corresponds to the given
         /// temperature and precipitation 
         /// </summary>
         /// <param name="temperature">The temperature (in degrees celsius)</param>
         /// <param name="precipitation">The precipitation (in centimeters)</param>
-        /// <returns>The corresponding <see cref="Biome"/></returns>
-        public static Biome From(float temperature, float precipitation)
+        /// <returns>The corresponding <see cref="Biome"/> and biome intensity factor
+        /// The biome intensity factor is a number from 1 to 0 where 1 means the
+        /// parameters correspond to the middle of the biome and 0 means
+        /// the parameters correspond to a biome boundary</returns>
+        public static (Biome, float) From(float temperature, float precipitation)
         {
             temperature = Mathf.Clamp(temperature, MinTemperatureDeg, MaxTemperatureDeg);
             precipitation = Mathf.Clamp(precipitation, MinPrecipitationCm, MaxPrecipitationCm);
@@ -86,10 +100,18 @@ namespace TerrainGeneration.Components
 
             var temperatureIdx = Mathf.RoundToInt(relTemperature * (temperatureRegionsCount - 1));
             var precipitationIdx = Mathf.RoundToInt(relPrecipitation * (precipitationRegionsCount - 1));
+
+            var referenceRelTemperature = (float)temperatureIdx / (temperatureRegionsCount - 1);
+            var referenceRelPrecipitation = (float)precipitationIdx / (precipitationRegionsCount - 1);
+
+            var biomeIntensityFactor = Mathf.Min(
+                Mathf.Abs(relTemperature - referenceRelTemperature),
+                Mathf.Abs(relPrecipitation - referenceRelPrecipitation)
+            );
             
             var result = BiomeMap[temperatureIdx, precipitationIdx];
             RepresentedBiomes.Add(result);
-            return result;
+            return (result, biomeIntensityFactor);
         }
 
     }

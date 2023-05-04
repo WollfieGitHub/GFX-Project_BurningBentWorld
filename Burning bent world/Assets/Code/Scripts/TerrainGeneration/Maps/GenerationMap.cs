@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using TerrainGeneration.Components;
+using TerrainGeneration.Noises;
 using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 using Utils;
@@ -37,6 +38,40 @@ namespace TerrainGeneration
                     }
                 }
                 
+                return cells;
+            };
+        }
+
+        /// <summary>
+        /// Returns a map of cells with their <see cref="CellInfo.Height"/>
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public static CellMap FBmNoise(int minHeight, int maxHeight, float frequency)
+        {
+            var fbm = new FractalBrownianMotion(
+                initialAmplitude: 1.0f,
+                initialFrequency: frequency
+            );
+
+            return (x, y, width, height) =>
+            {
+                var cells = new CellInfo[width, height];
+
+                for (var rX = 0; rX < width; rX++)
+                {
+                    for (var rY = 0; rY < height; rY++)
+                    {
+                        var cell = new CellInfo();
+
+                        cell.Height = Mathf.Lerp(
+                            minHeight, maxHeight, fbm.Apply(rX, rY)
+                        );
+                        
+                        cells[rX, rY] = cell;
+                    }
+                }
+
                 return cells;
             };
         }

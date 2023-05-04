@@ -5,7 +5,7 @@ namespace Code.Scripts.TerrainGeneration.Layers
 {
     public class RiverMixerLayer : IMixLayer
     {
-        public CellMap Apply(CellMap baseMap, CellMap riverMap)
+        public CellMap Mix(CellMap baseMap, CellMap riverMap)
         {
             return (x, y, width, height) =>
             {

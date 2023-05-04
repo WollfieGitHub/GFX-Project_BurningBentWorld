@@ -37,7 +37,7 @@ namespace TerrainGeneration.Rendering
 
                     var color = displayType switch
                     {
-                        DisplayType.Default => cellInfo.Ocean ? Color.blue : cellInfo.Biome.Color,
+                        DisplayType.Default => cellInfo.Ocean || cellInfo.Biome.IsRiver ? Color.blue : cellInfo.Biome.Color,
                         DisplayType.Temperature => GetTemperatureColor(cellInfo.Temperature),
                         DisplayType.Humidity => GetPrecipitationColor(cellInfo.Precipitation),
                         DisplayType.Height => GetHeightColor(cell.Height),

@@ -14,6 +14,10 @@ namespace TerrainGeneration.Generators
 {
     public class TerrainGenerator : MonoBehaviour
     {
+//======== ====== ==== ==
+//      STACKS
+//======== ====== ==== ==
+        
         private static readonly GenerationStack BiomeStack = new(new ITransformLayer[]
         {
             new Zoom2Layer(),           // 4096 -> 2048
@@ -83,15 +87,35 @@ namespace TerrainGeneration.Generators
             new VoronoiZoomLayer(), // Final zoom, voronoi
         });
 
-        private static readonly RiverMixerLayer RiverMixerLayer = new ();
+        private static readonly GenerationStack HeightStack = new(new ITransformLayer[]
+        {
+            new AddHeightLayer(),
+            new SmoothLayer(),
+        });
 
+//======== ====== ==== ==
+//      MIXING
+//======== ====== ==== ==
+
+        private static readonly RiverMixerLayer RiverMixerLayer = new();
+        
+//======== ====== ==== ==
+//      BASE LAYERS
+//======== ====== ==== ==
+
+        private static readonly CellMap BaseTerrainNoise = GenerationMaps.WhiteNoise(0.1f);
+
+        private static readonly CellMap BaseHeightNoise 
+            = GenerationMaps.FBmNoise(Terrain.MinHeight, Terrain.MaxHeight, 0.005f);
+        
+//======== ====== ==== ==
+//      METHODS
+//======== ====== ==== ==
+        
         private CellMap GenerateMaps()
         {
-            // Generate base
-            var baseNoise = GenerationMaps.WhiteNoise(0.1f);
-            
             // Add islands, ocean, temperatures, precipitations and compute biome
-            var biomesMap = BiomeStack.Apply(baseNoise);
+            var biomesMap = BiomeStack.Apply(BaseTerrainNoise);
             // Add details like shore, and smooth
             var detailsMap = DetailsStack.Apply(biomesMap);
 
@@ -99,13 +123,15 @@ namespace TerrainGeneration.Generators
             var riverInitMap = RiverInitStack.Apply(biomesMap);
             // Complete rivers
             var completeRiverMap = RiverStack.Apply(riverInitMap);
-            
             // Mix river with main
-            var mixedRiver = RiverMixerLayer.Apply(detailsMap, completeRiverMap);
+            var mixedRiver = RiverMixerLayer.Mix(detailsMap, completeRiverMap);
+
+            // Generate Height
+            var heightMap = HeightStack.Apply(mixedRiver);
 
             // Apply final transformations
-            var finalMap = FinalStack.Apply(mixedRiver);
-            
+            var finalMap = FinalStack.Apply(heightMap);
+
             return finalMap;
         }
 
