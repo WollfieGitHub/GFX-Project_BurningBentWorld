@@ -15,12 +15,13 @@ namespace TerrainGeneration.Rendering
         [Header("Dimensions")]
         [SerializeField] private int width;
         [SerializeField] private int height;
-        
-        
+
         [Header("Appearance")]
         [SerializeField] private bool renderMesh = true;
         [SerializeField] private ChunkTexture.DisplayType displayType;
         [SerializeField] private Material material;
+
+        private Progress<TerrainGenerator.ProgressStatus> _progress;
 
         private void OnValidate()
         {
@@ -50,17 +51,26 @@ namespace TerrainGeneration.Rendering
             }
         }
 
-        private void Awake()
-        {
-            _transform = transform;
+        private void Awake() { _transform = transform; }
 
-            var generator = GetComponent<TerrainGenerator>();
-            
-            Terrain = generator.GenerateNew(width, height);
+        private void OnEnable()
+        {
+            _progress = new Progress<TerrainGenerator.ProgressStatus>();
+            _progress.ProgressChanged += OnProgressReported;
         }
 
+        private void OnDisable() { _progress.ProgressChanged -= OnProgressReported; }
+
+        private void OnProgressReported(object sender, TerrainGenerator.ProgressStatus status)
+        {
+            Debug.Log($"[{status.StackName}] : {status.Progress*100:00}%");
+        }
+        
         private void Start()
         {
+            var generator = GetComponent<TerrainGenerator>();
+            Terrain = generator.GenerateNew(width, height, _progress).Result;
+            
             var altitude = _transform.position.y;
             
             foreach (var chunk in Terrain)

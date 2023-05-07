@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using System.Xml;
+using Code.Scripts.TerrainGeneration.Layers.Optimization;
 using TerrainGeneration.Noises;
 using UnityEngine;
 using static Utils.Utils;
@@ -32,7 +33,7 @@ namespace TerrainGeneration.Layers
                 var tempWidth = (parentWidth - 1) * ScaleFactor;
                 var tempHeight = (parentHeight - 1) * ScaleFactor;
 
-                var tempArray = new CellInfo[tempWidth, tempHeight];
+                var tempArray = MapAllocator.GetNew(tempWidth, tempHeight);
 
                 for (var rX = 0; rX < parentWidth - 1; rX++)
                 {
@@ -59,7 +60,7 @@ namespace TerrainGeneration.Layers
                 var startX = x & 1;
                 var startY = x & 1;
 
-                var resultArray = new CellInfo[width, height];
+                var resultArray = MapAllocator.GetNew(width, height);
 
                 for (var rx = startX; rx < startX + width; rx++)
                 {

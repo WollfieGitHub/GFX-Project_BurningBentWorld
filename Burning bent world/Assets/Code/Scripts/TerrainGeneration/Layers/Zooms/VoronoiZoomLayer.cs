@@ -1,4 +1,5 @@
-﻿using TerrainGeneration;
+﻿using Code.Scripts.TerrainGeneration.Layers.Optimization;
+using TerrainGeneration;
 using static Utils.Constants;
 
 namespace Code.Scripts.TerrainGeneration.Layers
@@ -27,7 +28,7 @@ namespace Code.Scripts.TerrainGeneration.Layers
                 
                 var tempWidth = (pWidth - 1) * ScaleFactor;
                 var tempHeight = (pHeight - 1) * ScaleFactor;
-                var tempCells = new CellInfo[tempWidth, tempHeight];
+                var tempCells = MapAllocator.GetNew(tempWidth, tempHeight);
                 
                 for (var tX = 0; tX < pHeight - 1; ++tX)
                 {
@@ -95,7 +96,7 @@ namespace Code.Scripts.TerrainGeneration.Layers
                 var startX = x & 3;
                 var startY = x & 3;
 
-                var resultCells = new CellInfo[width, height];
+                var resultCells = MapAllocator.GetNew(width, height);
 
                 for (var rx = startX; rx < startX + width; rx++)
                 {

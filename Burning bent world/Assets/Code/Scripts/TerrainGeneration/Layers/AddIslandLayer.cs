@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using Code.Scripts.TerrainGeneration.Layers.Optimization;
 using UnityEngine;
 using static Utils.Utils;
 
@@ -12,7 +13,7 @@ namespace TerrainGeneration.Layers
         {
             return (x, y, width, height) =>
             {
-                var resultCells = new CellInfo[width, height];
+                var resultCells = MapAllocator.GetNew(width, height);
 
                 // Increase map size to not be bothered with indices
                 var pX = x - 1;

@@ -23,15 +23,13 @@ namespace Code.Scripts.TerrainGeneration.Layers
         {
             return (x, y, width, height) =>
             {
-                var resultCells = new CellInfo[width, height];
-
-                var parentCells = inputMap(x, y, width, height);
+                var cells = inputMap(x, y, width, height);
 
                 for (var rX = 0; rX < width; rX++)
                 {
                     for (var rY = 0; rY < height; rY++)
                     {
-                        var cell = parentCells[rX, rY];
+                        var cell = cells[rX, rY];
 
                         var biomeHeight = cell.Biome.FBm.Apply(rX, rY);
                         var baseHeight = BaseHeightMap.Apply(rX, rY);
@@ -42,11 +40,11 @@ namespace Code.Scripts.TerrainGeneration.Layers
 
                         cell.Height = Mathf.Lerp(Terrain.SeaLevel, Terrain.MaxHeight, mixedRelHeight);
 
-                        resultCells[rX, rY] = cell;
+                        cells[rX, rY] = cell;
                     }
                 }
                 
-                return resultCells;
+                return cells;
             };
         }
     }

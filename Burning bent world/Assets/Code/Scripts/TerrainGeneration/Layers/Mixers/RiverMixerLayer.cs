@@ -1,4 +1,5 @@
-﻿using TerrainGeneration;
+﻿using Code.Scripts.TerrainGeneration.Layers.Optimization;
+using TerrainGeneration;
 using TerrainGeneration.Components;
 
 namespace Code.Scripts.TerrainGeneration.Layers
@@ -9,7 +10,7 @@ namespace Code.Scripts.TerrainGeneration.Layers
         {
             return (x, y, width, height) =>
             {
-                var resultCells = new CellInfo[width,height];
+                var resultCells = MapAllocator.GetNew(width, height);
 
                 var baseCells = baseMap(x, y, width, height);
                 var riverCells = riverMap(x, y, width, height);
