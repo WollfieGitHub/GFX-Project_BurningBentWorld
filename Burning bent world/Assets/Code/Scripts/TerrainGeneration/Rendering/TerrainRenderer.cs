@@ -52,24 +52,18 @@ namespace TerrainGeneration.Rendering
         }
 
         private void Awake() { _transform = transform; }
-
-        private void OnEnable()
-        {
-            _progress = new Progress<TerrainGenerator.ProgressStatus>();
-            _progress.ProgressChanged += OnProgressReported;
-        }
-
-        private void OnDisable() { _progress.ProgressChanged -= OnProgressReported; }
-
-        private void OnProgressReported(object sender, TerrainGenerator.ProgressStatus status)
-        {
-            Debug.Log($"[{status.StackName}] : {status.Progress*100:00}%");
-        }
         
         private void Start()
         {
+            Debug.Log("Starting terrain generation...");
             var generator = GetComponent<TerrainGenerator>();
-            Terrain = generator.GenerateNew(width, height, _progress).Result;
+            generator.GenerateNew(width, height)
+                .ContinueWith(task => InitRender(task.Result));
+        }
+
+        private void InitRender(Terrain terrain)
+        {
+            Terrain = terrain;
             
             var altitude = _transform.position.y;
             

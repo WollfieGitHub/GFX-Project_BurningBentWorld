@@ -15,6 +15,17 @@ namespace TerrainGeneration.Generators
 {
     public class TerrainGenerator : MonoBehaviour
     {
+
+        public event Action<ProgressStatus> OnProgressReported;
+
+        private readonly Progress<ProgressStatus> _progress = new ();
+
+        private void OnEnable() => _progress.ProgressChanged += OnProgress;
+        private void OnDisable() => _progress.ProgressChanged -= OnProgress;
+
+        private void OnProgress(object sender, ProgressStatus status) =>
+            OnProgressReported?.Invoke(status);
+
 //======== ====== ==== ==
 //      STACKS
 //======== ====== ==== ==
@@ -136,16 +147,16 @@ namespace TerrainGeneration.Generators
             return finalMap;
         }
 
-        public async Task<Terrain> GenerateNew(int width, int height, IProgress<ProgressStatus> progress)
+        public async Task<Terrain> GenerateNew(int width, int height)
         {
             var chunks = new Chunk[width / Chunk.Size, height / Chunk.Size];
-            var map = await Task.Run(() => GenerateMaps(progress));
+            var map = await Task.Run(() => GenerateMaps(_progress));
 
             // var (mapWidth, mapHeight) = _biomeStack.DimensionModifier(width, height);
 
             var cellInfo = map(-width/2, -height/2, width, height);
 
-            var nbCells = width * height;
+            var nbCells = width * height / Chunk.Size;
 
             for (var xChunk = 0; xChunk < width / Chunk.Size; xChunk++)
             {
@@ -156,7 +167,7 @@ namespace TerrainGeneration.Generators
                         xChunk, yChunk, (x, y) => cellInfo[x, y]
                     );
                     // Report progress on build chunk instances
-                    progress.Report(new ProgressStatus
+                    ((IProgress<ProgressStatus>)_progress).Report(new ProgressStatus
                     {
                         StackName = "ChunkBuilding",
                         Progress = (float)(yChunk * width + xChunk) / nbCells
