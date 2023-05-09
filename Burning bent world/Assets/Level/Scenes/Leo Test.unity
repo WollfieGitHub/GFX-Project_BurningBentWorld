@@ -847,8 +847,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8eecb98b8fd64b75bc923c28b70fa766, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 512
-  height: 512
+  width: 1024
+  height: 1024
   renderMesh: 1
   displayType: 0
   material: {fileID: 2100000, guid: 91133f16b3d743347b54cbda491ee27f, type: 2}
@@ -1198,7 +1198,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 0.634
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []

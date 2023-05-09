@@ -21,7 +21,7 @@ namespace TerrainGeneration.Components
             string name,
             Color color,
             float fbmFrequency = 0.005f,
-            float fbmAmplitude = 0.2f
+            float fbmAmplitude = 0.1f
         ) {
             Id = id;
             Name = name;

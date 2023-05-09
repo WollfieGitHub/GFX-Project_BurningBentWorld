@@ -1,4 +1,5 @@
-﻿using TerrainGeneration.Components;
+﻿using System.Collections.Generic;
+using TerrainGeneration.Components;
 using UnityEngine;
 
 namespace Utils
@@ -68,5 +69,46 @@ namespace Utils
         /// <param name="odds">The inverse of the odds of returning true</param>
         /// <returns>True if random drawn true with one in <see cref="odds"/> chances, false otherwise</returns>
         public static bool OneIn(int odds) => Constants.URandom.Next(odds) == 0;
+
+        /// <summary>
+        /// Finds whether the element with coordinates (x, y) is within the bounds of a
+        /// 2 dimensional array with specified with and height
+        /// </summary>
+        /// <param name="x">The x coordinate of the element</param>
+        /// <param name="y">The y coordinate of the element</param>
+        /// <param name="width">The width of the array</param>
+        /// <param name="height">The height of the array</param>
+        /// <returns>True if the element is within the bounds of the array, false otherwise</returns>
+        public static bool IsInBounds(int x, int y, int width, int height) =>
+            0 <= x && x < width && 0 <= y && y < height;
+        
+        /// <summary>
+        /// Gives an Enumerable of (x, y) coordinate tuple which iterates on a grid in a spiral fashion :
+        /// From the center (0, 0), it returns the elements of the grid in a spiral
+        /// until either the radius is reached
+        /// </summary>
+        /// <param name="radius">The radius of the spiral from the center</param>
+        /// <returns>The (x, y) tuples of the grid in a spiral order</returns>
+        /// <remarks><a href="https://stackoverflow.com/questions/398299/looping-in-a-spiral">Source</a></remarks>
+        public static IEnumerable<(int, int)> Spiral(int radius) {
+            int x = 0, y = 0, dx = 0, dy = -1;
+            var maxI = (radius*radius*4);
+
+            for (var i = 0; i < maxI; i++)
+            {
+                // Check if the x,y coordinates are still within the spiral
+                if (-radius <= x && x <= radius && -radius <= y && y <= radius)
+                {
+                    yield return (x, y);
+                }
+                if( x == y || (x < 0 && x == -y) || (x > 0 && x == 1-y))
+                {
+                    // Swap dx and dy values
+                    (dx, dy) = (-dy, dx);
+                }
+                x += dx;
+                y += dy;
+            }
+        }
     }
 }

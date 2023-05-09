@@ -147,10 +147,10 @@ namespace TerrainGeneration.Generators
             return finalMap;
         }
 
-        public async Task<Terrain> GenerateNew(int width, int height)
+        public Terrain GenerateNew(int width, int height)
         {
             var chunks = new Chunk[width / Chunk.Size, height / Chunk.Size];
-            var map = await Task.Run(() => GenerateMaps(_progress));
+            var map = GenerateMaps(_progress);
 
             // var (mapWidth, mapHeight) = _biomeStack.DimensionModifier(width, height);
 
@@ -174,6 +174,12 @@ namespace TerrainGeneration.Generators
                     });
                 }
             }
+            // Report completion of terrain generation
+            ((IProgress<ProgressStatus>)_progress).Report(new ProgressStatus
+            {
+                StackName = "Complete",
+                Progress = 1f
+            });
             
             return new Terrain(chunks);
         }

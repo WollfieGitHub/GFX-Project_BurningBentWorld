@@ -11,15 +11,6 @@ namespace Code.Scripts.TerrainGeneration.Layers.Optimization
         /// </summary>
         private const int ArrayLifespan = 2;
 
-        /// <summary>
-        /// The Ids of the array cannot go pass this size
-        /// and will instead wrap around to 0 if this number tries to be
-        /// attributed as an ID
-        /// </summary>
-        private const int IdWrapSize = ArrayLifespan + 10;
-        
-        private static int CurrentId = 0;
-
         private static readonly Dictionary<(int, int), List<AllocatedArray>> AllocatedArraysByDimension = new();
         
         

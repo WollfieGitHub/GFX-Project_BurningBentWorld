@@ -1,4 +1,5 @@
-﻿using TerrainGeneration.Components;
+﻿using System.Runtime.CompilerServices;
+using TerrainGeneration.Components;
 using UnityEngine;
 using Utils;
 using static Utils.Utils;
@@ -10,7 +11,7 @@ namespace TerrainGeneration.Rendering
     {
         public enum DisplayType
         {
-            Default, Temperature, Humidity, Height, Biome
+            Default, Temperature, Humidity, Height, Biome, Dist
         }
         
         /// <summary>
@@ -41,7 +42,7 @@ namespace TerrainGeneration.Rendering
                         DisplayType.Temperature => GetTemperatureColor(cellInfo.Temperature),
                         DisplayType.Humidity => GetPrecipitationColor(cellInfo.Precipitation),
                         DisplayType.Height => GetHeightColor(cell.Height),
-                        DisplayType.Biome => GetBiomeColor(cellInfo),
+                        DisplayType.Dist => GetDistColor(cellInfo.Dist),
                         _ => Color.magenta // Indicates a bug
                     };
                     
@@ -58,9 +59,9 @@ namespace TerrainGeneration.Rendering
             return texture;
         }
 
-        private static Color GetBiomeColor(CellInfo cellInfo)
+        private static Color GetDistColor(float infoDist)
         {
-            return Color.white.Mix(Color.black, cellInfo.BiomeIntensityFactor);
+            return Color.black.Mix(Color.white, infoDist);
         }
 
         private static Color GetHeightColor(float cellHeight)

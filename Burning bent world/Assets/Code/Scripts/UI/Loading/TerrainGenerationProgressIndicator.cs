@@ -14,12 +14,14 @@ public class TerrainGenerationProgressIndicator : MonoBehaviour
     private void OnEnable() => terrainGenerator.OnProgressReported += OnProgress;
     private void OnDisable() => terrainGenerator.OnProgressReported -= OnProgress;
 
+    private float _progress = 0f;
+    private string _displayText = "Loading...";
+    
     private void OnProgress(TerrainGenerator.ProgressStatus status)
     {
-        Debug.Log(status.Progress);
-        _slider.value = status.Progress;
-        _text.text = "Loading...\n" +
-                     $"[{status.StackName}] : {status.Progress * 100:00}%";
+        _progress = status.Progress;
+        _displayText = "Loading...\n" +
+                        $"[{status.StackName}] : {status.Progress * 100:00}%";
     }
 
     private TextMeshProUGUI _text;
@@ -29,5 +31,11 @@ public class TerrainGenerationProgressIndicator : MonoBehaviour
     {
         _slider = GetComponentInChildren<Slider>();
         _text = GetComponentInChildren<TextMeshProUGUI>();
+    }
+
+    private void Update()
+    {
+        _slider.value = _progress;
+        _text.text = _displayText;
     }
 }

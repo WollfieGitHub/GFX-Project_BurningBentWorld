@@ -54,5 +54,7 @@ namespace Utils
                 c.a * factor + endColor.a * (1 - factor)
             );
         }
+
+        
     }
 }

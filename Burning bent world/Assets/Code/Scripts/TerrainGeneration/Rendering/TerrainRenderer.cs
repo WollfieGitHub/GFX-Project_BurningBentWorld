@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using TerrainGeneration.Components;
 using TerrainGeneration.Generators;
 using Unity.VisualScripting;
@@ -50,20 +52,22 @@ namespace TerrainGeneration.Rendering
                 return _chunkRenderers;
             }
         }
-
-        private void Awake() { _transform = transform; }
         
         private void Start()
         {
+            _transform = transform;
+            
             Debug.Log("Starting terrain generation...");
-            var generator = GetComponent<TerrainGenerator>();
-            generator.GenerateNew(width, height)
-                .ContinueWith(task => InitRender(task.Result));
+
+            InitRender();
         }
 
-        private void InitRender(Terrain terrain)
+        private async void InitRender()
         {
-            Terrain = terrain;
+            var generator = GetComponent<TerrainGenerator>();
+            
+            Terrain = await Task.Run(() => generator.GenerateNew(width, height));
+            Debug.Log($"Initiating terrain rendering with dimensions {Terrain.Width}x{Terrain.Height}...");
             
             var altitude = _transform.position.y;
             
