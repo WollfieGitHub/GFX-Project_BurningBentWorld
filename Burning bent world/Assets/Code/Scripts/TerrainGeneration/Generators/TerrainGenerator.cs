@@ -56,11 +56,15 @@ namespace TerrainGeneration.Generators
             new AddIslandLayer(),       // Add islands
         });
 
-
-        private static readonly GenerationStack DetailsStack = new("DetailsStack", new ITransformLayer[]
+        private static readonly GenerationStack PreHillsStack = new("PreHills", new ITransformLayer[]
         {
             new Zoom2Layer(),       // 256 -> 128
             new Zoom2Layer(),       // 128 -> 64
+        });
+
+
+        private static readonly GenerationStack DetailsStack = new("DetailsStack", new ITransformLayer[]
+        {
             new Zoom2Layer(),       // 64 -> 32
             
             new AddIslandLayer(),   // Add some more islands :)
@@ -110,6 +114,8 @@ namespace TerrainGeneration.Generators
 //======== ====== ==== ==
 
         private static readonly RiverMixerLayer RiverMixerLayer = new();
+
+        private static readonly AddHillsLayer HillsLayer = new();
         
 //======== ====== ==== ==
 //      BASE LAYERS
@@ -128,11 +134,17 @@ namespace TerrainGeneration.Generators
         {
             // Add islands, ocean, temperatures, precipitations and compute biome
             var biomesMap = BiomeStack.Apply(BaseTerrainNoise, progress);
-            // Add details like shore, and smooth
-            var detailsMap = DetailsStack.Apply(biomesMap, progress);
+
+            var preHillsMap = PreHillsStack.Apply(biomesMap);
 
             // Init rivers 
             var riverInitMap = RiverInitStack.Apply(biomesMap, progress);
+
+            // Add hills, using initial river tracing
+            var hillsMap = HillsLayer.Mix(preHillsMap, riverInitMap);
+            // Add details like shore, and smooth
+            var detailsMap = DetailsStack.Apply(hillsMap, progress);
+            
             // Complete rivers
             var completeRiverMap = RiverStack.Apply(riverInitMap, progress);
             // Mix river with main
@@ -147,6 +159,12 @@ namespace TerrainGeneration.Generators
             return finalMap;
         }
 
+        /// <summary>
+        /// Generate a new <see cref="Terrain"/> of specified dimensions
+        /// </summary>
+        /// <param name="width">The width of the terrain to generate</param>
+        /// <param name="height">The height of the terrain to generate</param>
+        /// <returns>The newly generated terrain</returns>
         public Terrain GenerateNew(int width, int height)
         {
             var chunks = new Chunk[width / Chunk.Size, height / Chunk.Size];

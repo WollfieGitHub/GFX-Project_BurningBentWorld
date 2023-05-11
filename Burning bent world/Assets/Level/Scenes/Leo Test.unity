@@ -813,6 +813,7 @@ GameObject:
   - component: {fileID: 1227201711}
   - component: {fileID: 1227201712}
   - component: {fileID: 1227201713}
+  - component: {fileID: 1227201714}
   m_Layer: 0
   m_Name: Terrain Generator
   m_TagString: Untagged
@@ -864,6 +865,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68beefdc140b7df4cbf5b51c0de33c13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1227201714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1227201710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e27137134b634ca8aa7cd350a2145c94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ComputeShader: {fileID: 7200000, guid: 5301fecd6eb34bb6866d080147729375, type: 3}
+  Material: {fileID: 2100000, guid: b1bb99e8c7a66aa458d961cffd3e342a, type: 2}
 --- !u!1 &1249355307
 GameObject:
   m_ObjectHideFlags: 0

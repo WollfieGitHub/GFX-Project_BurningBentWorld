@@ -35,7 +35,7 @@ namespace TerrainGeneration.Layers
                         // Center  cell
                         var center = cells[rX + 1, rY + 1];
                         
-                        var neighbours = new []{ north, east, south, west }.ToList();
+                        var neighbours = new []{ north, east, south, west };
                         
                         if (center.Land || neighbours.All(_ => _.Ocean))
                         {

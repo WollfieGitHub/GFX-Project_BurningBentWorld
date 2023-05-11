@@ -6,7 +6,8 @@ namespace Code.Scripts.TerrainGeneration.Components
 {
     public struct BiomeAttribute
     {
-        private const float HillAmplitudeModifier = 2f;
+        private const float HillAmplitudeModifier = 5f;
+        private const float OceanAmplitudeModifier = -2f;
         
         /** The biome concerned by this attribute */
         public Biome Biome;
@@ -24,7 +25,7 @@ namespace Code.Scripts.TerrainGeneration.Components
             var baseFbm = Biome.FBm.Apply(x, y);
 
             if (IsShore) { baseFbm = 0; }
-            if (IsOcean) { baseFbm *= -1; }
+            if (IsOcean) { baseFbm *= OceanAmplitudeModifier; }
             if (IsHill) { baseFbm *= HillAmplitudeModifier; }
 
             return baseFbm;

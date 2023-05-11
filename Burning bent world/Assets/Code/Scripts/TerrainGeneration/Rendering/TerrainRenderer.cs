@@ -3,14 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Code.Scripts.TerrainGeneration.Vegetation.Plants;
 using TerrainGeneration.Components;
 using TerrainGeneration.Generators;
+using TerrainGeneration.Vegetation;
 using Unity.VisualScripting;
 using UnityEngine;
 using Terrain = TerrainGeneration.Components.Terrain;
 
 namespace TerrainGeneration.Rendering
 {
+    [RequireComponent(typeof(TerrainGrass))]
     [RequireComponent(typeof(TerrainGenerator))]
     public class TerrainRenderer : MonoBehaviour
     {
@@ -25,7 +28,13 @@ namespace TerrainGeneration.Rendering
 
         private Progress<TerrainGenerator.ProgressStatus> _progress;
 
-        private void OnValidate()
+        private bool _needMeshRefresh = false;
+        private void OnValidate() => _needMeshRefresh = true;
+
+        /// <summary>
+        /// Force recalculation of mesh and texture of all chunks in the terrain
+        /// </summary>
+        private void RecalculateMesh()
         {
             foreach (var chunkRenderer in ChunkRenderers)
             {
@@ -73,9 +82,9 @@ namespace TerrainGeneration.Rendering
             
             foreach (var chunk in Terrain)
             {
-                var chunkRendererObj = new GameObject($"Chunk_Renderer#{chunk.ChunkX}#{chunk.ChunkY}");
+                var chunkRendererObj = new GameObject($"Chunk_Renderer#{chunk.ChunkX}#{chunk.ChunkZ}");
                 chunkRendererObj.transform.position =
-                    new Vector3(chunk.ChunkX * chunk.Width, altitude, chunk.ChunkY * chunk.Height);
+                    new Vector3(chunk.ChunkX * chunk.Width, altitude, chunk.ChunkZ * chunk.Height);
                 chunkRendererObj.transform.SetParent(_transform);
 
                 chunkRendererObj.AddComponent<MeshFilter>();
@@ -83,13 +92,32 @@ namespace TerrainGeneration.Rendering
                 var renderer = chunkRendererObj.AddComponent<MeshRenderer>();
                 renderer.sharedMaterial = material;
 
+                var chunkCollider = chunkRendererObj.AddComponent<ChunkCollider>();
+                chunkCollider.Chunk = chunk;
+
+                var rb = chunkRendererObj.AddComponent<Rigidbody>();
+                rb.isKinematic = true;
+                rb.useGravity = false;
+
+                var chunkGrass = chunkRendererObj.AddComponent<ChunkGrass>();
+                
                 var chunkRen = chunkRendererObj.AddComponent<ChunkRenderer>();
                 chunkRen.RenderMesh = renderMesh;
                 chunkRen.DisplayType = displayType;
+                chunkRen.Init(chunk);
                 ChunkRenderers.Add(chunkRen);
             }
             
             Debug.Log(Biome.RepresentedBiomes.ToCommaSeparatedString());
+        }
+
+        private void Update()
+        {
+            if (_needMeshRefresh)
+            {
+                _needMeshRefresh = false;
+                StartCoroutine(nameof(RecalculateMesh));
+            }
         }
     }
 }

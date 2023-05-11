@@ -5,6 +5,7 @@ using TerrainGeneration.Generators;
 using TerrainGeneration.Noises;
 using UnityEngine;
 using Utils;
+using static Utils.Utils;
 using Random = UnityEngine.Random;
 
 namespace TerrainGeneration.Components
@@ -46,7 +47,7 @@ namespace TerrainGeneration.Components
         /** X Coordinate relative to parent terrain's origin in number of chunks */
         public readonly int ChunkX;
         /** Y Coordinate relative to parent terrain's origin in number of chunks */
-        public readonly int ChunkY;
+        public readonly int ChunkZ;
 
         private readonly ChunkMap _mapGenerator;
 
@@ -59,10 +60,10 @@ namespace TerrainGeneration.Components
 //      CONSTRUCTOR
 //======== ====== ==== ==
 
-        public Chunk(int xChunk, int yChunk, ChunkMap mapGenerator)
+        public Chunk(int xChunk, int zChunk, ChunkMap mapGenerator)
         {
             ChunkX = xChunk;
-            ChunkY = yChunk;
+            ChunkZ = zChunk;
             _mapGenerator = mapGenerator;
         }
         
@@ -71,13 +72,13 @@ namespace TerrainGeneration.Components
 //======== ====== ==== ==
 
         /// <param name="x">The x coordinate in the chunk's referential</param>
-        /// <param name="y">The y coordinate in the chunk's referential</param>
+        /// <param name="z">The y coordinate in the chunk's referential</param>
         /// <returns>The <see cref="Cell"/> at coordinates x,y</returns>
-        public Cell GetCellAt(int x, int y)
+        public Cell GetCellAt(int x, int z)
         {
             // Initialize the whole chunk if it wasn't before
             if (!Initialized) { Initialize(); }
-            return _cells[x, y];
+            return _cells[x, z];
         }
 
         /// <summary>
@@ -85,7 +86,7 @@ namespace TerrainGeneration.Components
         /// </summary>
         private void Initialize()
         {
-            var cellHeights = ChunkGenerator.GenerateHeight(ChunkX, ChunkY, _mapGenerator);
+            var cellHeights = ChunkGenerator.GenerateHeight(ChunkX, ChunkZ, _mapGenerator);
             
             // First save cells into the chunk
             _cells = cellHeights;
@@ -99,9 +100,18 @@ namespace TerrainGeneration.Components
 
         /// <summary>Finds the height (unity units) at the specified point</summary>
         /// <param name="x">X coordinate in the chunk's referential (between 0 and <see cref="Size"/>)</param>
-        /// <param name="y">Y coordinate in the chunk's referential (between 0 and <see cref="Size"/>)</param>
+        /// <param name="z">Z coordinate in the chunk's referential (between 0 and <see cref="Size"/>)</param>
         /// <returns>The height of the terrain at the specified coordinates</returns>
-        public float GetHeightAt(int x, int y) => GetCellAt(x, y).Height;
+        public float GetHeightAt(int x, int z) => GetCellAt(x, z).Height;
+
+        /// <summary>Finds the height (unity units) at the specified point or returns fallback if
+        /// the cell is not within the bounds of the chunk</summary>
+        /// <param name="x">X coordinate in the chunk's referential</param>
+        /// <param name="z">Z coordinate in the chunk's referential</param>
+        /// <param name="fallback">Fallback height in case the x, z coordinates are not in the grid's bounds</param>
+        /// <returns>The height of the terrain at the specified coordinates</returns>
+        public float GetHeightAtOrDefault(int x, int z, float fallback) =>
+            IsInBounds(x, z, Size, Size) ? GetCellAt(x, z).Height : fallback;
 
 //======== ====== ==== ==
 //      OVERRIDES
@@ -112,10 +122,10 @@ namespace TerrainGeneration.Components
         {
             for (var x = 0; x < Size; x++)
             {
-                for (var y = 0; y < Size; y++)
+                for (var z = 0; z < Size; z++)
                 {
                     // Yield each cells
-                    yield return GetCellAt(x, y);
+                    yield return GetCellAt(x, z);
                 }
             }
         }

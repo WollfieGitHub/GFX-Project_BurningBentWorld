@@ -5,16 +5,16 @@ namespace TerrainGeneration.Noises
 {
     public class FractalBrownianMotion
     {
-        private float _initialAmplitude;
-        private float _initialFrequency;
+        private readonly float _initialAmplitude;
+        private readonly float _initialFrequency;
 
-        private float _gain;
-        private float _lacunarity;
+        private readonly float _gain;
+        private readonly float _lacunarity;
 
-        private int _octaveCount;
+        private readonly int _octaveCount;
 
-        private readonly float _offsetX = Constants.URandom.Next(999);
-        private readonly float _offsetY = Constants.URandom.Next(999);
+        private readonly float _offsetX = Constants.URandom.Next(1000);
+        private readonly float _offsetY = Constants.URandom.Next(1000);
 
         public FractalBrownianMotion(
             float initialAmplitude = 0.5f, 

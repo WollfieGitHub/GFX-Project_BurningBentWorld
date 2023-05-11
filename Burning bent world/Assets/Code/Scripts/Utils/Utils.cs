@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TerrainGeneration.Components;
+using Unity.Burst.Intrinsics;
 using UnityEngine;
 
 namespace Utils
@@ -109,6 +111,35 @@ namespace Utils
                 x += dx;
                 y += dy;
             }
+        }
+
+        /// <summary>
+        /// Creates a texture easily with specified width and height
+        /// </summary>
+        /// <param name="width">Width of the texture</param>
+        /// <param name="height">Height of the texture</param>
+        /// <param name="getPixel">Return the pixel color at x,y</param>
+        /// <returns>The newly created texture</returns>
+        public static Texture2D CreateTexture(int width, int height, Func<int, int, Color> getPixel)
+        {
+            // Create the color map
+            var pixels = new Color[width * height];
+            
+            for (var y = 0; y < height; y++)
+            {
+                for (var x = 0; x < width; x++)
+                {
+                    pixels[y * width + x] = getPixel(x, y);
+                }
+            }
+            
+            var texture = new Texture2D(width, height);
+            texture.filterMode = FilterMode.Point;
+            texture.wrapMode = TextureWrapMode.Clamp;
+            texture.SetPixels(pixels);
+            texture.Apply();
+
+            return texture;
         }
     }
 }

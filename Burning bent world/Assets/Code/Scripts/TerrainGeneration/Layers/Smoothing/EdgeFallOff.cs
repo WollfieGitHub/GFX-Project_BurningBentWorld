@@ -1,10 +1,6 @@
 ﻿using TerrainGeneration;
-using Unity.Mathematics;
-using Unity.VisualScripting;
 using UnityEngine;
-using Utils;
 using static Utils.Utils;
-using Terrain = TerrainGeneration.Components.Terrain;
 
 namespace Code.Scripts.TerrainGeneration.Layers.Smoothing
 {
@@ -12,11 +8,10 @@ namespace Code.Scripts.TerrainGeneration.Layers.Smoothing
     {
         private const int Distance = 16;
 
-        private float _distRef = -1f;
-        
-        public void Print()
+        private static float FallOffFunction(float x)
         {
-            Debug.Log(_distRef);
+            var sin = Mathf.Sin((x+2) / 2f * Mathf.PI);
+            return sin * sin;
         }
 
         public float GetBiomeHeightAt(int x, int y, int width, int height, CellInfo[,] cells)
@@ -44,15 +39,11 @@ namespace Code.Scripts.TerrainGeneration.Layers.Smoothing
             // Normalize distance from (0 to Distance) to (0 to 1)
             minDist /= Distance;
 
-            if (minDist < 0.9f && minDist > _distRef)
-            {
-                _distRef = minDist;
-            }
-
             // If the biome transition is further away than Distance, set Biome strength to 1,
             // Otherwise, transition between biome height and base height
             return Mathf.Lerp(
-                0f, centerCell.BiomeAttribute.FBm(x, y), minDist
+                0f, centerCell.BiomeAttribute.FBm(x, y), 
+                FallOffFunction(minDist)
             );
         }
     }

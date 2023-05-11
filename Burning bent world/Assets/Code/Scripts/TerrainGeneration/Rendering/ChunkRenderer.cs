@@ -1,4 +1,5 @@
 ﻿using TerrainGeneration.Components;
+using TerrainGeneration.Vegetation;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -6,6 +7,8 @@ namespace TerrainGeneration.Rendering
 {
     [RequireComponent(typeof(Renderer))]
     [RequireComponent(typeof(MeshFilter))]
+    [RequireComponent(typeof(ChunkCollider))]
+    [RequireComponent(typeof(ChunkGrass))]
     public class ChunkRenderer : MonoBehaviour
     {
         private TerrainRenderer _terrainRenderer;
@@ -15,6 +18,8 @@ namespace TerrainGeneration.Rendering
         private Texture2D _texture;
         private Renderer _rend;
         private MeshFilter _meshFilter;
+        private ChunkGrass _chunkGrass;
+        private ChunkCollider _chunkCollider;
 
         private Mesh _mesh;
 
@@ -46,24 +51,20 @@ namespace TerrainGeneration.Rendering
         }
     
         // Must wait for parent to setup in Awake
-        private void Start()
+        public void Init(Chunk chunk)
         {
+            _chunk = chunk;
             // Cache the transform
             _transform = transform;
             
+            // Collect rendering components
             _rend = GetComponent<Renderer>();
             _meshFilter = GetComponent<MeshFilter>();
+            _chunkCollider = GetComponent<ChunkCollider>();
+            _chunkGrass = GetComponent<ChunkGrass>();
 
             _terrainRenderer = transform.parent.GetComponent<TerrainRenderer>();
-
-            var position = _transform.position;
             
-            _chunk = _terrainRenderer.Terrain.GetChunkAt(
-                (int)position.x,
-                (int)position.z,
-                true
-            );
-
             // Set up the texture.
             CalcNewTexture();
             CalcNewMesh();
@@ -76,6 +77,9 @@ namespace TerrainGeneration.Rendering
             _mesh = _renderMesh ? GenerateChunkMesh(_chunk) : GeneratePlanarMesh(_chunk);
             
             _meshFilter.sharedMesh = _mesh;
+            
+            _chunkCollider.Recalculate();
+            _chunkGrass.Recalculate(_chunk);
         }
 
         private Mesh GeneratePlanarMesh(Chunk chunk)

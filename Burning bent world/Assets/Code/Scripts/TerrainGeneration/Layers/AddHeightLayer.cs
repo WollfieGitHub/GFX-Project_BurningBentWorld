@@ -35,12 +35,9 @@ namespace Code.Scripts.TerrainGeneration.Layers
                         );
 
                         cells[rX, rY] = cell;
-
-                        // Debug.Log($"Cell {rX},{rY} / {width},{height}");
                     }
                 }
                 
-                Smoother.Print();
                 Debug.Log("Height Layer Stack processed ");
 
                 return cells;

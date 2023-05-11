@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Code.Scripts.TerrainGeneration.Components;
-using TerrainGeneration;
+﻿using TerrainGeneration;
 
 namespace Code.Scripts.TerrainGeneration.Layers.Smoothing
 {
