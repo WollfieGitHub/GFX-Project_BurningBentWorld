@@ -1,17 +1,21 @@
 ﻿using TerrainGeneration;
 using TerrainGeneration.Components;
 using UnityEngine;
+using Utils;
 
 namespace Code.Scripts.TerrainGeneration.Layers
 {
     public class AddHumidityLayer : ITransformLayer
     {
-        private const float Frequency = 0.05f * 64; // Frequency varies more than temperature
+        private const float Frequency = 0.010f * 64; // Precipitation varies more than temperature
         
         public CellMap Apply(CellMap inputMap)
         {
             return (x, y, width, height) =>
             {
+                var xOffset = Constants.URandom.Next(1000);
+                var yOffset = Constants.URandom.Next(1000);
+                
                 var cells = inputMap(x, y, width, height);
                 
                 for (var rX = 0; rX < width; rX++)
@@ -21,8 +25,8 @@ namespace Code.Scripts.TerrainGeneration.Layers
                         cells[rX,rY].Precipitation = Mathf.Lerp(
                             Biome.MinPrecipitationCm, Biome.MaxPrecipitationCm,
                             Mathf.Clamp01(Mathf.PerlinNoise(
-                                Frequency * rX,
-                                Frequency * rY
+                                Frequency * (rX + xOffset),
+                                Frequency * (rY + yOffset)
                             ))
                         );
                     }

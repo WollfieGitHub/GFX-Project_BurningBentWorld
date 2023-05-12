@@ -29,8 +29,7 @@ namespace TerrainGeneration.Generators
                     );
 
                     // TODO
-                    var cell = new Cell(cellInfo.Land ? 1f : 0f);
-                    cell.Info = cellInfo;
+                    var cell = new Cell(cellInfo);
                     cells[x, y] = cell;
                 }
             }
