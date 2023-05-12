@@ -1,10 +1,6 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using TerrainGeneration.Generators;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 public class TerrainGenerationProgressIndicator : MonoBehaviour
@@ -22,6 +18,10 @@ public class TerrainGenerationProgressIndicator : MonoBehaviour
         _progress = status.Progress;
         _displayText = "Loading...\n" +
                         $"[{status.StackName}] : {status.Progress * 100:00}%";
+        if (status.StackName == "Complete" && Mathf.Abs(status.Progress) - 1f < 0.01f)
+        {
+            gameObject.SetActive(false);
+        }
     }
 
     private TextMeshProUGUI _text;
