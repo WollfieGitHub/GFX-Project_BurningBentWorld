@@ -8,7 +8,6 @@ namespace TerrainGeneration.Rendering
     [RequireComponent(typeof(Renderer))]
     [RequireComponent(typeof(MeshFilter))]
     [RequireComponent(typeof(ChunkCollider))]
-    [RequireComponent(typeof(ChunkGrass))]
     public class ChunkRenderer : MonoBehaviour
     {
         private TerrainRenderer _terrainRenderer;
@@ -18,7 +17,6 @@ namespace TerrainGeneration.Rendering
         private Texture2D _texture;
         private Renderer _rend;
         private MeshFilter _meshFilter;
-        private ChunkGrass _chunkGrass;
         private ChunkCollider _chunkCollider;
 
         private Mesh _mesh;
@@ -61,7 +59,6 @@ namespace TerrainGeneration.Rendering
             _rend = GetComponent<Renderer>();
             _meshFilter = GetComponent<MeshFilter>();
             _chunkCollider = GetComponent<ChunkCollider>();
-            _chunkGrass = GetComponent<ChunkGrass>();
 
             _terrainRenderer = transform.parent.GetComponent<TerrainRenderer>();
             
@@ -79,7 +76,6 @@ namespace TerrainGeneration.Rendering
             _meshFilter.sharedMesh = _mesh;
             
             _chunkCollider.Recalculate();
-            _chunkGrass.Recalculate(_chunk);
         }
 
         private Mesh GeneratePlanarMesh(Chunk chunk)

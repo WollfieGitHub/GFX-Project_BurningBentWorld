@@ -9,11 +9,11 @@ using static Utils.Utils;
 
 namespace TerrainGeneration
 {
-    public delegate T GenerationMap<out T>(int x, int y, int width, int height);
+    public delegate T GenerationMap<out T>(int x, int z, int width, int height);
     
-    public delegate CellInfo[,] CellMap(int x, int y, int width, int height);
+    public delegate CellInfo[,] CellMap(int x, int z, int width, int height);
 
-    public delegate CellInfo ChunkMap(int x, int y);
+    public delegate CellInfo ChunkMap(int x, int z);
 
     public static class GenerationMaps
     {
@@ -31,10 +31,10 @@ namespace TerrainGeneration
 
                 for (var px = 0; px < width; px++)
                 {
-                    for (var py = 0; py < height; py++)
+                    for (var pz = 0; pz < height; pz++)
                     {
-                        cells[px, py] = new CellInfo();
-                        cells[px, py].Land = CoinFlip(true, false, fractionOfLand);
+                        cells[px, pz] = new CellInfo();
+                        cells[px, pz].Land = CoinFlip(true, false, fractionOfLand);
                     }
                 }
                 
@@ -60,15 +60,15 @@ namespace TerrainGeneration
 
                 for (var rX = 0; rX < width; rX++)
                 {
-                    for (var rY = 0; rY < height; rY++)
+                    for (var rZ = 0; rZ < height; rZ++)
                     {
                         var cell = new CellInfo();
 
                         cell.Height = Mathf.Lerp(
-                            minHeight, maxHeight, fbm.Apply(rX, rY)
+                            minHeight, maxHeight, fbm.Apply(rX, rZ)
                         );
                         
-                        cells[rX, rY] = cell;
+                        cells[rX, rZ] = cell;
                     }
                 }
 

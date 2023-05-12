@@ -13,7 +13,6 @@ using Terrain = TerrainGeneration.Components.Terrain;
 
 namespace TerrainGeneration.Rendering
 {
-    [RequireComponent(typeof(TerrainGrass))]
     [RequireComponent(typeof(TerrainGenerator))]
     public class TerrainRenderer : MonoBehaviour
     {
@@ -75,7 +74,7 @@ namespace TerrainGeneration.Rendering
         {
             var generator = GetComponent<TerrainGenerator>();
             
-            Terrain = await Task.Run(() => generator.GenerateNew(width, height));
+            Terrain = await Task.Run(() => generator.GenerateNew(-width/2, -width/2, width, height));
             Debug.Log($"Initiating terrain rendering with dimensions {Terrain.Width}x{Terrain.Height}...");
             
             var altitude = _transform.position.y;
@@ -98,8 +97,6 @@ namespace TerrainGeneration.Rendering
                 var rb = chunkRendererObj.AddComponent<Rigidbody>();
                 rb.isKinematic = true;
                 rb.useGravity = false;
-
-                var chunkGrass = chunkRendererObj.AddComponent<ChunkGrass>();
                 
                 var chunkRen = chunkRendererObj.AddComponent<ChunkRenderer>();
                 chunkRen.RenderMesh = renderMesh;

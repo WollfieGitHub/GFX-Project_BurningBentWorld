@@ -11,8 +11,8 @@ namespace Utils
 //      MODIFY SEED HERE
 //======== ====== ==== ==
 
-        private const bool UseRandomSeed = true;
-        private const int CustomSeed = 1209109;
+        private const bool UseRandomSeed = false;
+        private const int CustomSeed = 1159795043;
         
 //======== ====== ==== ==
 //      END OF SEED MODIFICATION

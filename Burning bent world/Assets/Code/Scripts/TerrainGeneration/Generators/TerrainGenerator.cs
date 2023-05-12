@@ -162,33 +162,35 @@ namespace TerrainGeneration.Generators
         /// <summary>
         /// Generate a new <see cref="Terrain"/> of specified dimensions
         /// </summary>
+        /// <param name="xOffset">Offset on the X coordinate for the map position</param>
+        /// <param name="zOffset">Offset on the Z coordinate for the map position</param>
         /// <param name="width">The width of the terrain to generate</param>
         /// <param name="height">The height of the terrain to generate</param>
         /// <returns>The newly generated terrain</returns>
-        public Terrain GenerateNew(int width, int height)
+        public Terrain GenerateNew(int xOffset, int zOffset, int width, int height)
         {
             var chunks = new Chunk[width / Chunk.Size, height / Chunk.Size];
             var map = GenerateMaps(_progress);
 
             // var (mapWidth, mapHeight) = _biomeStack.DimensionModifier(width, height);
 
-            var cellInfo = map(-width/2, -height/2, width, height);
+            var cellInfo = map(xOffset, zOffset, width, height);
 
             var nbCells = width * height / Chunk.Size;
 
             for (var xChunk = 0; xChunk < width / Chunk.Size; xChunk++)
             {
-                for (var yChunk = 0; yChunk < height / Chunk.Size; yChunk++)
+                for (var zChunk = 0; zChunk < height / Chunk.Size; zChunk++)
                 {
                     // Chunks are lazily loaded to have decent performance
-                    chunks[xChunk, yChunk] = new Chunk(
-                        xChunk, yChunk, (x, y) => cellInfo[x, y]
+                    chunks[xChunk, zChunk] = new Chunk(
+                        xChunk, zChunk, (x, z) => cellInfo[x, z]
                     );
                     // Report progress on build chunk instances
                     ((IProgress<ProgressStatus>)_progress).Report(new ProgressStatus
                     {
                         StackName = "ChunkBuilding",
-                        Progress = (float)(yChunk * width + xChunk) / nbCells
+                        Progress = (float)(zChunk * width + xChunk) / nbCells
                     });
                 }
             }

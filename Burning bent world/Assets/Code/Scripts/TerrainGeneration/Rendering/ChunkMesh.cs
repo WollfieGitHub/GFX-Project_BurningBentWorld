@@ -49,8 +49,8 @@ namespace TerrainGeneration.Rendering
                         vBot1 = meshData.AddBoundaryVertex(x, y+1, VertexDir.Sw);
                         vBot2 = meshData.AddBoundaryVertex(x, y+1, VertexDir.Se);
                     
-                        meshData.AddTriangle(vTop1, vTop2, vBot2);
-                        meshData.AddTriangle(vTop1, vBot2, vBot1);
+                        meshData.AddTriangle(vTop1, vBot2, vTop2);
+                        meshData.AddTriangle(vTop1, vBot1, vBot2);
                     }
 
                     //======== ====== ==== ==
