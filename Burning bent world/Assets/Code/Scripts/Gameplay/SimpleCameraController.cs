@@ -13,12 +13,12 @@ public class SimpleCameraController : MonoBehaviour
         );
         if (input.x != 0)
         {
-            transform.Translate(Vector3.right * (input.x* speed * Time.deltaTime));
+            transform.position += Vector3.right * (input.x * speed * Time.deltaTime);
         }
 
         if (input.y != 0)
         {
-            transform.Translate(Vector3.up * (input.y * speed * Time.deltaTime));
+            transform.position += Vector3.forward * (input.y * speed * Time.deltaTime);
         }
     }
 }

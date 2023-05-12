@@ -21,7 +21,6 @@ public class TerrainGenerationProgressIndicator : MonoBehaviour
                         $"[{status.StackName}] : {status.Progress * 100:00}%";
         if (status.StackName == "Complete" && Mathf.Abs(status.Progress - 1f) < 0.01f)
         {
-            Debug.Log("EYO");
             isEnabled = false;
         }
     }

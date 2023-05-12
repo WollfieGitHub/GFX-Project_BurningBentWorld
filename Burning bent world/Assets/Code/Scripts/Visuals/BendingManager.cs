@@ -23,8 +23,8 @@ public class BendingManager : MonoBehaviour
   private bool enablePlanet = default;
 
   [SerializeField]
-  [Range(0.005f, 0.1f)]
-  private float bendingAmount = 0.015f;
+  [Range(0, 100f)]
+  private float bendingAmount = 5;
 
   #endregion
 
@@ -81,14 +81,14 @@ public class BendingManager : MonoBehaviour
 
   private void UpdateBendingAmount ()
   {
-    _prevAmount = bendingAmount;
-    Shader.SetGlobalFloat(BENDING_AMOUNT, bendingAmount);
+    _prevAmount = bendingAmount / 1000f;
+    Shader.SetGlobalFloat(BENDING_AMOUNT, bendingAmount / 1000f);
   }
 
   private static void OnBeginCameraRendering (ScriptableRenderContext ctx,
                                               Camera cam)
   {
-    cam.cullingMatrix = Matrix4x4.Ortho(-99, 99, -99, 99, 0.001f, 99) *
+    cam.cullingMatrix = Matrix4x4.Ortho(-400, 400, -99, 99, 0.001f, 1000) *
                         cam.worldToCameraMatrix;
   }
 
