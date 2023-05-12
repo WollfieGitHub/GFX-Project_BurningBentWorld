@@ -12,15 +12,17 @@ public class TerrainGenerationProgressIndicator : MonoBehaviour
 
     private float _progress = 0f;
     private string _displayText = "Loading...";
+    private bool isEnabled = true;
     
     private void OnProgress(TerrainGenerator.ProgressStatus status)
     {
         _progress = status.Progress;
         _displayText = "Loading...\n" +
                         $"[{status.StackName}] : {status.Progress * 100:00}%";
-        if (status.StackName == "Complete" && Mathf.Abs(status.Progress) - 1f < 0.01f)
+        if (status.StackName == "Complete" && Mathf.Abs(status.Progress - 1f) < 0.01f)
         {
-            gameObject.SetActive(false);
+            Debug.Log("EYO");
+            isEnabled = false;
         }
     }
 
@@ -35,6 +37,10 @@ public class TerrainGenerationProgressIndicator : MonoBehaviour
 
     private void Update()
     {
+        if (!isEnabled)
+        {
+            gameObject.SetActive(false);
+        }
         _slider.value = _progress;
         _text.text = _displayText;
     }
