@@ -13,7 +13,6 @@ using Terrain = TerrainGeneration.Components.Terrain;
 
 namespace TerrainGeneration.Rendering
 {
-    [RequireComponent(typeof(TerrainGrass))]
     [RequireComponent(typeof(TerrainGenerator))]
     public class TerrainRenderer : MonoBehaviour
     {
