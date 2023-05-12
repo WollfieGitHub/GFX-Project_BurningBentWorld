@@ -1,4 +1,5 @@
-﻿using TerrainGeneration.Components;
+﻿using Code.Scripts.TerrainGeneration.Vegetation.Plants.ProceduralGrass;
+using TerrainGeneration.Components;
 using TerrainGeneration.Vegetation;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -18,6 +19,7 @@ namespace TerrainGeneration.Rendering
         private Renderer _rend;
         private MeshFilter _meshFilter;
         private ChunkCollider _chunkCollider;
+        private ChunkGrass _chunkGrass;
 
         private Mesh _mesh;
 
@@ -62,6 +64,9 @@ namespace TerrainGeneration.Rendering
 
             _terrainRenderer = transform.parent.GetComponent<TerrainRenderer>();
             
+            _chunkGrass = gameObject.AddComponent<ChunkGrass>();
+            _chunkGrass.Init(chunk);
+
             // Set up the texture.
             CalcNewTexture();
             CalcNewMesh();

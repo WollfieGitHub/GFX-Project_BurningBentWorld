@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Code.Scripts.TerrainGeneration.Vegetation.Plants;
+using Code.Scripts.TerrainGeneration.Vegetation.Plants.ProceduralGrass;
 using TerrainGeneration.Components;
 using TerrainGeneration.Generators;
-using TerrainGeneration.Vegetation;
 using Unity.VisualScripting;
 using UnityEngine;
 using Terrain = TerrainGeneration.Components.Terrain;
@@ -23,7 +21,7 @@ namespace TerrainGeneration.Rendering
         [Header("Appearance")]
         [SerializeField] private bool renderMesh = true;
         [SerializeField] private ChunkTexture.DisplayType displayType;
-        [SerializeField] private Material material;
+        [SerializeField] private Material[] materials;
 
         private Progress<TerrainGenerator.ProgressStatus> _progress;
 
@@ -89,7 +87,7 @@ namespace TerrainGeneration.Rendering
                 chunkRendererObj.AddComponent<MeshFilter>();
                 
                 var renderer = chunkRendererObj.AddComponent<MeshRenderer>();
-                renderer.sharedMaterial = material;
+                renderer.SetSharedMaterials(new List<Material>(materials));
 
                 var chunkCollider = chunkRendererObj.AddComponent<ChunkCollider>();
                 chunkCollider.Chunk = chunk;

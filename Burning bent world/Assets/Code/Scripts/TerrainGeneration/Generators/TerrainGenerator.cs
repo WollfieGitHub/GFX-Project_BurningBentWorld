@@ -1,14 +1,8 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Code.Scripts.TerrainGeneration.Layers;
 using TerrainGeneration.Components;
 using TerrainGeneration.Layers;
-using TerrainGeneration.Noises;
-using Unity.VisualScripting;
 using UnityEngine;
-using static Utils.Utils;
 using Terrain = TerrainGeneration.Components.Terrain;
 
 namespace TerrainGeneration.Generators

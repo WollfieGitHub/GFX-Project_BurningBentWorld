@@ -1,6 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Code.Scripts.TerrainGeneration.Layers.Optimization;
 using TerrainGeneration;
+using Unity.VisualScripting;
+using UnityEngine;
 using static Utils.Utils;
 
 namespace Code.Scripts.TerrainGeneration.Layers
@@ -55,10 +58,20 @@ namespace Code.Scripts.TerrainGeneration.Layers
 
                             var neighbours = new[] { north, east, south, west };
 
-                            // If enough neighbours are of the same biome, then turn into hill
-                            if (neighbours.Count(_ => _.Biome.Equals(center.Biome)) >= 3)
+                            try
                             {
-                                center.BiomeAttribute.IsHill = true;
+                                // If enough neighbours are of the same biome, then turn into hill
+                                if (neighbours.Count(_ => _.Biome.Equals(center.Biome)) >= 3)
+                                {
+                                    center.BiomeAttribute.IsHill = true;
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                Debug.LogError(e);
+                                Debug.LogError(center.Biome);
+                                Debug.LogError(neighbours.Select(_ => _.Biome).ToCommaSeparatedString());
+                                throw;
                             }
                             
                             resultCells[rX, rY] = center;
