@@ -132,7 +132,7 @@ namespace FireSystem
             {
                 cell.linkedGameobject = Instantiate(firePrefab,
                 new Vector3(cell.x + 0.5f, cell.height, cell.z + 0.5f),
-                Quaternion.identity);
+                Quaternion.identity, this.transform);
             }                                
         }
 
