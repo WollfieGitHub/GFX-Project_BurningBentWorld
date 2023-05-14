@@ -41,7 +41,7 @@ VisualEffect:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5583795235792809517}
   m_Enabled: 1
-  m_Asset: {fileID: 8926484042661614526, guid: 8db8edadd0e1040d68f9ee12eda5c8e5, type: 3}
+  m_Asset: {fileID: 8926484042661614526, guid: db17de7298b9d4728865aa8b049da477, type: 3}
   m_InitialEventName: OnPlay
   m_InitialEventNameOverriden: 0
   m_StartSeed: 0
@@ -50,7 +50,10 @@ VisualEffect:
   m_ResourceVersion: 1
   m_PropertySheet:
     m_Float:
-      m_Array: []
+      m_Array:
+      - m_Value: -0.26
+        m_Name: SparksSize
+        m_Overridden: 0
     m_Vector2f:
       m_Array: []
     m_Vector3f:
@@ -141,5 +144,5 @@ Transform:
   m_Children:
   - {fileID: 6396344495433431734}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

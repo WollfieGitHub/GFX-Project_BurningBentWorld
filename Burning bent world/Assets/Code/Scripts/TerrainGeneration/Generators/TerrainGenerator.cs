@@ -15,7 +15,6 @@ namespace TerrainGeneration.Generators
 {
     public class TerrainGenerator : MonoBehaviour
     {
-
         public event Action<ProgressStatus> OnProgressReported;
 
         private readonly Progress<ProgressStatus> _progress = new ();

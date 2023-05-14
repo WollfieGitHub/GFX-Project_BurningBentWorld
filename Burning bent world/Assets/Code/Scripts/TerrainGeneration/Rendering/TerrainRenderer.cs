@@ -26,6 +26,7 @@ namespace TerrainGeneration.Rendering
         [SerializeField] private Material material;
 
         private Progress<TerrainGenerator.ProgressStatus> _progress;
+        public event Action OnGenerationFinished;
 
         private bool _needMeshRefresh = false;
         private void OnValidate() => _needMeshRefresh = true;
@@ -61,7 +62,7 @@ namespace TerrainGeneration.Rendering
             }
         }
         
-        private void Start()
+        private void Awake()
         {
             _transform = transform;
             
@@ -108,6 +109,9 @@ namespace TerrainGeneration.Rendering
             }
             
             Debug.Log(Biome.RepresentedBiomes.ToCommaSeparatedString());
+
+            //TODO: I was looking for a better way to do this, open to suggestions.
+            OnGenerationFinished?.Invoke();
         }
 
         private void Update()
