@@ -15,11 +15,11 @@ namespace TerrainGeneration.Components
      */
     public class Cell
     {
-        public readonly float Height;
+        public float Height => Info.Height;
 
-        public CellInfo Info { get; set; }
+        public readonly CellInfo Info;
 
-        public Cell(float height) { Height = height; }
+        public Cell(CellInfo cellInfo) { Info = cellInfo; }
 
         private MonoBehaviour _overlay;
         private MonoBehaviour _underlay;

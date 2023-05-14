@@ -9,17 +9,15 @@ namespace Code.Scripts.TerrainGeneration.Layers
         {
             return (x, y, width, height) =>
             {
-                var parentCells = inputMap(x, y, width, height);
-
-                var resultCells = new CellInfo[width, height];
-
+                var cells = inputMap(x, y, width, height);
+                
                 for (var rX = 0; rX < width; rX++)
                 {
                     for (var rY = 0; rY < height; rY++)
                     {
                         var cell = new CellInfo();
 
-                        if (parentCells[rX, rY].Land)
+                        if (cells[rX, rY].Land)
                         {
                             cell.RiverIndicator = Constants.URandom.Next(299999) + 2;
                         }
@@ -28,11 +26,11 @@ namespace Code.Scripts.TerrainGeneration.Layers
                             cell.RiverIndicator = 0;
                         }
 
-                        resultCells[rX, rY] = cell;
+                        cells[rX, rY] = cell;
                     }
                 }
 
-                return resultCells;
+                return cells;
             };
         }
     }

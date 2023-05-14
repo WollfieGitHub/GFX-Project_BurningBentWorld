@@ -1,4 +1,5 @@
-﻿using TerrainGeneration.Components;
+﻿using System.Runtime.CompilerServices;
+using TerrainGeneration.Components;
 using UnityEngine;
 using Utils;
 using static Utils.Utils;
@@ -10,7 +11,7 @@ namespace TerrainGeneration.Rendering
     {
         public enum DisplayType
         {
-            Default, Temperature, Humidity, Height
+            Default, Temperature, Humidity, Height, Biome, Dist
         }
         
         /// <summary>
@@ -24,37 +25,36 @@ namespace TerrainGeneration.Rendering
             // Compute the texture parameters
             var width = chunk.Width;
             var height = chunk.Height;
-            
-            // Create the color map
-            var pixels = new Color[width * height];
-            
-            for (var y = 0; y < height; y++)
+
+            return CreateTexture(width, height, (x, y) =>
             {
-                for (var x = 0; x < width; x++)
+                var cell = chunk.GetCellAt(x, y);
+                var cellInfo = cell.Info;
+
+                return displayType switch
                 {
-                    var cell = chunk.GetCellAt(x, y);
-                    var cellInfo = cell.Info;
+                    DisplayType.Default => cellInfo.Ocean || cellInfo.Biome.IsRiver ? Color.blue : cellInfo.Biome.Color,
+                    DisplayType.Temperature => GetTemperatureColor(cellInfo.Temperature),
+                    DisplayType.Humidity => GetPrecipitationColor(cellInfo.Precipitation),
+                    DisplayType.Height => GetHeightColor(cell.Height),
+                    DisplayType.Dist => GetDistColor(cellInfo.Dist),
+                    DisplayType.Biome => GetBiomeColor(cellInfo),
+                    _ => Color.magenta // Indicates a bug
+                };
+            });
+        }
 
-                    var color = displayType switch
-                    {
-                        DisplayType.Default => cellInfo.Ocean ? Color.blue : cellInfo.Biome.Color,
-                        DisplayType.Temperature => GetTemperatureColor(cellInfo.Temperature),
-                        DisplayType.Humidity => GetPrecipitationColor(cellInfo.Precipitation),
-                        DisplayType.Height => GetHeightColor(cell.Height),
-                        _ => Color.magenta // Indicates a bug
-                    };
-                    
-                    pixels[y * width + x] = color;
-                }
-            }
-            
-            var texture = new Texture2D(width, height);
-            texture.filterMode = FilterMode.Point;
-            texture.wrapMode = TextureWrapMode.Clamp;
-            texture.SetPixels(pixels);
-            texture.Apply();
+        private static Color GetBiomeColor(CellInfo cellInfo)
+        {
+            return Color.HSVToRGB(
+                cellInfo.Biome.Id / (float)Biome.MaxId,
+                0.8f, cellInfo.BiomeAttribute.IsHill ? 0.4f : 0.8f
+            );
+        }
 
-            return texture;
+        private static Color GetDistColor(float infoDist)
+        {
+            return Color.black.Mix(Color.white, infoDist);
         }
 
         private static Color GetHeightColor(float cellHeight)

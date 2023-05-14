@@ -1,5 +1,6 @@
 ﻿using TerrainGeneration.Components;
 using UnityEngine;
+using Utils;
 
 namespace TerrainGeneration.Layers
 {
@@ -11,6 +12,9 @@ namespace TerrainGeneration.Layers
         {
             return (x, y, width, height) =>
             {
+                var xOffset = Constants.URandom.Next(1000);
+                var yOffset = Constants.URandom.Next(1000);
+                
                 var cells = inputMap(x, y, width, height);
 
                 for (var rX = 0; rX < width; rX++)
@@ -20,8 +24,8 @@ namespace TerrainGeneration.Layers
                         cells[rX,rY].Temperature = Mathf.Lerp(
                             Biome.MinTemperatureDeg, Biome.MaxTemperatureDeg,
                             Mathf.Clamp01(Mathf.PerlinNoise(
-                                Frequency * rX,
-                                Frequency * rY
+                                Frequency * (rX + xOffset),
+                                Frequency * (rY + yOffset)
                             ))
                         );
                     }

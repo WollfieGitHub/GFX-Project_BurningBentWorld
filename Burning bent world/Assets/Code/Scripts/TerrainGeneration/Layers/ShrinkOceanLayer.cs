@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Code.Scripts.TerrainGeneration.Layers.Optimization;
+using UnityEngine;
 using static Utils.Utils;
 
 namespace TerrainGeneration.Layers
@@ -9,7 +10,7 @@ namespace TerrainGeneration.Layers
         {
             return (x, y, width, height) =>
             {
-                var resultCells = new CellInfo[width, height];
+                var resultCells = MapAllocator.GetNew(width, height);
 
                 var pX = x - 1;
                 var pY = y - 1;
