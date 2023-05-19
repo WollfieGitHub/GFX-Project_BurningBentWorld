@@ -59,7 +59,7 @@ Transform:
   m_GameObject: {fileID: 5708937304000278323}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 10, y: 10, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6230587740671684819}
@@ -83,13 +83,13 @@ VisualEffect:
   m_PropertySheet:
     m_Float:
       m_Array:
-      - m_Value: 0.4
+      - m_Value: 1
         m_Name: FlamesSize
         m_Overridden: 1
-      - m_Value: 2
+      - m_Value: 1
         m_Name: FlamesLifetime
         m_Overridden: 1
-      - m_Value: 0.1
+      - m_Value: 0.4
         m_Name: SparksSize
         m_Overridden: 1
       - m_Value: 1.2
@@ -102,7 +102,7 @@ VisualEffect:
       - m_Value: {x: 0.3, y: 0.7, z: 0.3}
         m_Name: FlamesVelocity
         m_Overridden: 1
-      - m_Value: {x: 0.5, y: 1.5, z: 0.5}
+      - m_Value: {x: 0.5, y: 3, z: 0.5}
         m_Name: SparksVelocity
         m_Overridden: 1
     m_Vector4f:
@@ -114,11 +114,17 @@ VisualEffect:
       m_Array: []
     m_Int:
       m_Array:
-      - m_Value: 12
+      - m_Value: 200
         m_Name: FlamesRate
         m_Overridden: 1
-      - m_Value: 12
+      - m_Value: 200
         m_Name: SparksRate
+        m_Overridden: 1
+      - m_Value: 16
+        m_Name: ChunkSize
+        m_Overridden: 1
+      - m_Value: 16
+        m_Name: MaxHeight
         m_Overridden: 1
     m_Matrix4x4f:
       m_Array: []
@@ -197,6 +203,9 @@ VisualEffect:
         m_Overridden: 1
       - m_Value: {fileID: 2800000, guid: d9c51b438ac2949b391cf00d90483c16, type: 3}
         m_Name: SparksTexture
+        m_Overridden: 1
+      - m_Value: {fileID: 2800000, guid: 038f22c9a8857b3468a2ee2fe945dc97, type: 3}
+        m_Name: ActiveCells
         m_Overridden: 1
     m_Bool:
       m_Array: []

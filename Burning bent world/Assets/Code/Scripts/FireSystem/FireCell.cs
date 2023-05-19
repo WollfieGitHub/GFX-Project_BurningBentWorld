@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TerrainGeneration.Components;
 using UnityEngine;
 
 namespace FireSystem
@@ -15,17 +16,42 @@ namespace FireSystem
         public int z;
         public bool burning;
         public float burningLifetime;
-        public GameObject linkedGameobject;
-        //TODO: Add a radius of effect maybe
+        //TODO: Add a radius of effect maybe                
 
-        public FireCell(int x, float height, int z, float HP, float burningLifetime)
-        {
-            this.HP = HP;
+        ///<summary>
+        /// The constructor of the fireCell will be responsible for determining the stats of a cell based on the informations
+        /// given to it as parameters.
+        /// </summary>
+        /// <param name="c">The corresponding cell from the terrain.</param>
+        /// <param name="x"></param>
+        /// <param name="z">The cell y position.</param>
+        /// <param name="averageTemperature"> of all cells.</param>
+        /// <param name="averageHumidity"> of all cells.</param>
+        /// <param name="temperatureHPMultiplier"></param>
+        /// <param name="humidityHPMultiplier"></param>
+        /// <param name="baseCellHP"></param>
+        /// <param name="burningLifetimeRandomizer"></param>
+        public FireCell(Cell c, int x, int z,
+            float averageTemperature, float averageHumidity, float temperatureHPMultiplier, float humidityHPMultiplier,
+            float baseCellHP, float baseBurningLifetime, float burningLifetimeRandomizer)
+        {                        
+            if (c.Info.Ocean || c.Info.Biome.IsRiver)
+            {
+                HP = -1;
+                burningLifetime = baseBurningLifetime;
+            }
+            else
+            {
+                //TODO: Revise this calculation. For now it is very arbitrary, but the idea is that the higher the temperature, the lower 
+                //the HP; and the higher the precipitation, the higher the HP.
+                HP = averageTemperature / c.Info.Temperature * temperatureHPMultiplier + c.Info.Precipitation / averageHumidity * humidityHPMultiplier + baseCellHP;
+                burningLifetime = baseBurningLifetime * Random.Range(1 - burningLifetimeRandomizer, 1 + burningLifetimeRandomizer);
+            }
+
             this.x = x;
-            this.height = height;
-            this.z = z;
-            this.burningLifetime = burningLifetime;
-            this.burning = false;
+            height = c.Height;
+            this.z = z;            
+            burning = false;
         }
     }
 }

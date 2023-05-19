@@ -37,7 +37,7 @@ namespace TerrainGeneration.Rendering
                 return displayType switch
                 {
                     DisplayType.Default => cellInfo.Ocean || cellInfo.Biome.IsRiver ? Color.blue 
-                    : cell.burnt ? Color.Lerp(new Color(77, 29, 20), cellInfo.Biome.Color, 0.2f)
+                    : cell.burnt ? Color.Lerp(new Color(0.77f, 0.29f, 0.20f), cellInfo.Biome.Color, 0.2f)
                     : cellInfo.Biome.Color,
                     DisplayType.Temperature => GetTemperatureColor(cellInfo.Temperature),
                     DisplayType.Humidity => GetPrecipitationColor(cellInfo.Precipitation),
