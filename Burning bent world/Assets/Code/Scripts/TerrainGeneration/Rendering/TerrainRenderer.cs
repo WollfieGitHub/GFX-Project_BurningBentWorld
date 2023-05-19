@@ -28,8 +28,26 @@ namespace TerrainGeneration.Rendering
         private Progress<TerrainGenerator.ProgressStatus> _progress;
         public event Action OnGenerationFinished;
 
+        public Terrain Terrain { get; private set; }
+
+        private Transform _transform;
+
+        private List<ChunkRenderer> _chunkRenderers;
+
+
         private bool _needMeshRefresh = false;
         private void OnValidate() => _needMeshRefresh = true;
+
+        /// <summary>
+        /// Return the chunk renderer corresponding to these cell's coordinates.
+        /// </summary>
+        /// <param name="chunkX">X coordinate of the chunk.</param>
+        /// <param name="chunkY">Y coordinate of the chunk.</param>
+        public ChunkRenderer GetChunkRenderer(int chunkX, int chunkY)
+        {
+            //TODO: Not implemented, waiting for Léo's modifications.
+            return null;
+        }
 
         /// <summary>
         /// Force recalculation of mesh and texture of all chunks in the terrain
@@ -41,13 +59,7 @@ namespace TerrainGeneration.Rendering
                 chunkRenderer.RenderMesh = renderMesh;
                 chunkRenderer.DisplayType = displayType;
             }
-        }
-
-        private Transform _transform;
-        
-        public Terrain Terrain { get; private set; }
-
-        private List<ChunkRenderer> _chunkRenderers;
+        }        
 
         private List<ChunkRenderer> ChunkRenderers
         {

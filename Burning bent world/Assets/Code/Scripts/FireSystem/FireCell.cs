@@ -13,6 +13,7 @@ namespace FireSystem
         public int x;
         public float height;
         public int z;
+        public bool burning;
         public float burningLifetime;
         public GameObject linkedGameobject;
         //TODO: Add a radius of effect maybe
@@ -24,6 +25,7 @@ namespace FireSystem
             this.height = height;
             this.z = z;
             this.burningLifetime = burningLifetime;
+            this.burning = false;
         }
     }
 }

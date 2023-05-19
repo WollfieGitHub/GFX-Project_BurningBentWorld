@@ -46,7 +46,7 @@ namespace TerrainGeneration.Rendering
             {
                 _displayType = value;
                 if (_chunk == null) { return; }
-                CalcNewTexture();
+                GenerateTexture();
             }
         }
     
@@ -66,7 +66,7 @@ namespace TerrainGeneration.Rendering
             _terrainRenderer = transform.parent.GetComponent<TerrainRenderer>();
             
             // Set up the texture.
-            CalcNewTexture();
+            GenerateTexture();
             CalcNewMesh();
         }
 
@@ -116,7 +116,10 @@ namespace TerrainGeneration.Rendering
 
         private Mesh GenerateChunkMesh(Chunk chunk) => ChunkMesh.From(chunk);
 
-        private void CalcNewTexture()
+        /// <summary>
+        /// Generates a texture from the chunk's information and applies it.
+        /// </summary>
+        public void GenerateTexture()
         {
             if (_texture != null && !_texture.IsDestroyed()) { Destroy(_texture); }
             
