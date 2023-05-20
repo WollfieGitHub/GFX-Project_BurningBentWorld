@@ -11,8 +11,10 @@ namespace Utils
 //      MODIFY SEED HERE
 //======== ====== ==== ==
 
-        private const bool UseRandomSeed = false;
+        private const bool UseRandomSeed = true;
         private const int CustomSeed = 1159795043;
+
+        public static int Seed;
         
 //======== ====== ==== ==
 //      END OF SEED MODIFICATION
@@ -25,10 +27,10 @@ namespace Utils
             // Don't pay attention to this hehe
             // ReSharper disable once HeuristicUnreachableCode
 #pragma warning disable CS0162
-            var seed = UseRandomSeed ?  (int)DateTime.Now.Ticks : CustomSeed;
+            Seed = UseRandomSeed ?  (int)DateTime.Now.Ticks : CustomSeed;
 #pragma warning restore CS0162
-            URandom = new(seed);
-            Debug.Log($"Starting with seed [{seed}]");
+            URandom = new(Seed);
+            Debug.Log($"Starting with seed [{Seed}]");
         }
 
 //======== ====== ==== ==

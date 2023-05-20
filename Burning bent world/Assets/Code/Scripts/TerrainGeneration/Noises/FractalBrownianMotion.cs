@@ -35,22 +35,24 @@ namespace TerrainGeneration.Noises
          * Applies a Fractal Brownian Motion to the specified coordinates, taking
          * the given <see cref="_octaveCount"/> to give variations on the perlin noise
          * </summary>
-         * <param name="x">X coordinate between 0 and 1</param>
-         * <param name="y">Y coordinate between 0 and 1</param>
+         * <param name="offsetX">X coordinate between 0 and 1, which already contains a random offset</param>
+         * <param name="offsetY">Y coordinate between 0 and 1, which already contains a random offset</param>
          * <returns>The value of the fractal brownian motion</returns>
          * <remarks><a href="https://rtouti.github.io/graphics/perlin-noise-algorithm">Source</a></remarks>
          */
-        public float Apply(float x, float y)
+        public float Apply(float offsetX, float offsetY)
         {
             var result = 0.0f;
 
+            // TODO Change from one FBM per biome instantiated once
+            // to use the chunk seed at layer instantiation
             var frequency = _initialFrequency;
             var amplitude = _initialAmplitude;
 
             for (var octave = 0; octave < _octaveCount; octave++) {
                 var n = amplitude * Perlin(
-                    (x + _offsetX) * frequency,
-                    (y + _offsetY ) * frequency
+                    (offsetX + _offsetX) * frequency,
+                    (offsetY + _offsetY ) * frequency
                 );
                 result += n;
 		

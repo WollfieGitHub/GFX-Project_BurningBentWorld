@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using Code.Scripts.TerrainGeneration.Components;
 using TerrainGeneration.Components;
 using UnityEngine;
 using static Utils.Utils;
@@ -12,8 +13,8 @@ namespace TerrainGeneration.Rendering
     {
         [SerializeField][DefaultValue(false)] private bool colliderEnabled; 
 
-        public Chunk Chunk;
         private Transform _transform;
+        private Chunk _chunk;
 
         private void OnValidate()
         {
@@ -25,7 +26,9 @@ namespace TerrainGeneration.Rendering
         {
             colliderEnabled = false;
             _collidersLoaded = false;
+            
             _transform = transform;
+            _chunk = GetComponent<Chunk>();
         }
 
         public bool ColliderEnabled
@@ -53,25 +56,28 @@ namespace TerrainGeneration.Rendering
             {
                 for (var z = 0; z < Chunk.Size; z++)
                 {
-                    var go = new GameObject($"ChunkCollider#{x}_{z}");
-                    go.transform.position =
-                        new Vector3(
-                            Chunk.ChunkX * Chunk.Size + x,
-                            0,
-                            Chunk.ChunkZ * Chunk.Size + z
-                        );
+                    var go = new GameObject($"ChunkCollider#{x}_{z}") {
+                        transform = {
+                            position = new Vector3(
+                                _chunk.ChunkX * Chunk.Size + x,
+                                0,
+                                _chunk.ChunkZ * Chunk.Size + z
+                            )
+                        }
+                    };
+                    
                     go.transform.SetParent(_transform);
                     var boxCollider = go.AddComponent<BoxCollider>();
                     _colliders[x, z] = go;
 
-                    var cellHeight = Chunk.GetHeightAt(x, z);
+                    var cellHeight = _chunk.GetHeightAt(x, z);
 
                     var maxDiff = new []
                     {
-                        cellHeight - Chunk.GetHeightAtOrDefault(x, z + 1, 1),
-                        cellHeight - Chunk.GetHeightAtOrDefault(x, z - 1, 1),
-                        cellHeight - Chunk.GetHeightAtOrDefault(x - 1, z, 1),
-                        cellHeight - Chunk.GetHeightAtOrDefault(x + 1, z, 1),
+                        cellHeight - _chunk.GetHeightAtOrDefault(x, z + 1, 1),
+                        cellHeight - _chunk.GetHeightAtOrDefault(x, z - 1, 1),
+                        cellHeight - _chunk.GetHeightAtOrDefault(x - 1, z, 1),
+                        cellHeight - _chunk.GetHeightAtOrDefault(x + 1, z, 1),
                     }.Max();
                     
                     var centerY = Mathf.Lerp(

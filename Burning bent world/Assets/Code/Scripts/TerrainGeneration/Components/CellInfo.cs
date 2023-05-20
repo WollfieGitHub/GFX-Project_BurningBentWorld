@@ -1,7 +1,4 @@
-﻿using Code.Scripts.TerrainGeneration.Components;
-using TerrainGeneration.Components;
-
-namespace TerrainGeneration
+﻿namespace Code.Scripts.TerrainGeneration.Components
 {
     public struct CellInfo
     {

@@ -1,6 +1,8 @@
-﻿using UnityEngine;
+﻿using TerrainGeneration;
+using TerrainGeneration.Components;
+using UnityEngine;
 
-namespace TerrainGeneration.Components
+namespace Code.Scripts.TerrainGeneration.Components
 {
     /**
      * 2D Cell in the terrain, its underlay/overlay field represent anything we could

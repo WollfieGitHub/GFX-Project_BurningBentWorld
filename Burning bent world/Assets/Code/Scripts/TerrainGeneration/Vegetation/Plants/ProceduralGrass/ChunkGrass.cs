@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Code.Scripts.TerrainGeneration.Components;
 using TerrainGeneration.Components;
 using TerrainGeneration.Rendering;
 using UnityEngine;
@@ -17,7 +18,13 @@ namespace Code.Scripts.TerrainGeneration.Vegetation.Plants.ProceduralGrass
         private Renderer _renderer;
 
         private static bool _noWindZoneWarningDisplayed;
+        private Material _grassMaterialInstance;
 
+        private Transform _cameraTransform;
+        private Transform _transform;
+
+        private const int VisibilityThreshold = 50;
+        
         private void Awake()
         {
             _windZone = FindObjectOfType<WindZone>();
@@ -27,17 +34,30 @@ namespace Code.Scripts.TerrainGeneration.Vegetation.Plants.ProceduralGrass
                 Debug.LogWarning("No wind zone found");
                 _noWindZoneWarningDisplayed = true;
             }
+
+            _transform = transform;
+            _cameraTransform = Camera.main.transform;
         }
 
         private void Update()
         {
+            return;
+            // TODO
             var velocity = _windZone.transform.forward * _windZone.windMain;
-            _renderer.materials.ToList().ForEach(_ => _.SetVector("_WindVelocity", velocity));
-            _renderer.materials.ToList().ForEach(_ => _.SetFloat("_WindFrequency", _windZone.windPulseFrequency));
+            _grassMaterialInstance.SetVector("_WindVelocity", velocity);
+            _grassMaterialInstance.SetFloat("_WindFrequency", _windZone.windPulseFrequency);
+            
+            var visible = Vector3.Distance(_cameraTransform.position, _transform.position) < VisibilityThreshold;
+            
+            // Set if it should be displayed
+            // _renderer.materials[TerrainRenderer.GrassMaterialIdx] = visible ? _grassMaterialInstance : null;
+
         }
 
         public void Init(Chunk chunk)
         {
+            return;
+            // TODO
             _renderer = GetComponent<Renderer>();
 
             var baseTexture = CreateTexture(Chunk.Size, Chunk.Size, 
@@ -59,14 +79,18 @@ namespace Code.Scripts.TerrainGeneration.Vegetation.Plants.ProceduralGrass
                 }
             );
 
+            // _grassMaterialInstance = _renderer.materials[TerrainRenderer.GrassMaterialIdx];
+            
             // Send color mapping
-            _renderer.materials.ToList().ForEach(_ => _.SetTexture("_GrassBaseColor", baseTexture));
-            _renderer.materials.ToList().ForEach(_ => _.SetTexture("_GrassTipColor", tipTexture));
-            _renderer.materials.ToList().ForEach(_ => _.SetTexture("_GrassMap", grassVisibility));
+            _grassMaterialInstance.SetTexture("_GrassBaseColor", baseTexture);
+            _grassMaterialInstance.SetTexture("_GrassTipColor", tipTexture);
+            _grassMaterialInstance.SetTexture("_GrassMap", grassVisibility);
             
             // Give displacement due to chunk coordinates
-            _renderer.materials.ToList().ForEach(_ => _.SetInt("_ChunkX", chunk.ChunkX * Chunk.Size));
-            _renderer.materials.ToList().ForEach(_ => _.SetInt("_ChunkZ", chunk.ChunkZ * Chunk.Size));
+            _grassMaterialInstance.SetInt("_ChunkX", chunk.ChunkX * Chunk.Size);
+            _grassMaterialInstance.SetInt("_ChunkZ", chunk.ChunkZ * Chunk.Size);
+            
+            _grassMaterialInstance.SetInt("_Visible", 0);
         }
     }
 }

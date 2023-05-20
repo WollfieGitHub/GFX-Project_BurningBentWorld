@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Code.Scripts.TerrainGeneration.Components;
 using TerrainGeneration.Components;
 using UnityEngine;
 using Utils;
 using Terrain = TerrainGeneration.Components.Terrain;
 
-namespace TerrainGeneration.Rendering
+namespace Code.Scripts.TerrainGeneration.Rendering
 {
-    public class ChunkMesh
+    public static class ChunkMesh
     {
         /// <summary>
         /// Generates a mesh for a chunk
@@ -18,14 +18,14 @@ namespace TerrainGeneration.Rendering
         {
             var mesh = new Mesh();
 
-            var meshData = new MeshData(chunk.Width, chunk.Height);
+            var meshData = new MeshData(Chunk.Size, Chunk.Size);
 
             // Simple algorithm :
             // - For sides : Depends on height difference with 4 neighbouring cells
             // - For top : 2 triangles at height level of cell
-            for (var x = 0; x < chunk.Width; x++)
+            for (var x = 0; x < Chunk.Size; x++)
             {
-                for (var y = 0; y < chunk.Height; y++)
+                for (var y = 0; y < Chunk.Size; y++)
                 {
                     var height = chunk.GetHeightAt(x, y);
                     
@@ -44,7 +44,7 @@ namespace TerrainGeneration.Rendering
                     //      NORTH VERTICAL PANE
                     //======== ====== ==== ==
 
-                    if (y == chunk.Height-1)
+                    if (y == Chunk.Size-1)
                     {
                         vBot1 = meshData.AddBoundaryVertex(x, y+1, VertexDir.Sw);
                         vBot2 = meshData.AddBoundaryVertex(x, y+1, VertexDir.Se);
@@ -90,7 +90,7 @@ namespace TerrainGeneration.Rendering
                     //      EAST VERTICAL PANE
                     //======== ====== ==== ==
 
-                    if (x == chunk.Width-1)
+                    if (x == Chunk.Size-1)
                     {
                         vBot2 = meshData.AddBoundaryVertex(x + 1, y, VertexDir.Nw);
                         vBot3 = meshData.AddBoundaryVertex(x + 1, y, VertexDir.Sw);

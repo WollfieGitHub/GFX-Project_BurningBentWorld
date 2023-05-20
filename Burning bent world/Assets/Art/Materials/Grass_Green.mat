@@ -153,7 +153,7 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _GrassFalloff: 0.5
-    - _GrassThreshold: 0.395
+    - _GrassThreshold: 0.158
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
@@ -168,6 +168,7 @@ Material:
     - _TessellationEdgeLength: 0.25
     - _TessellationFactor: 4
     - _TessellationGrassDistance: 0.11
+    - _Visible: 0
     - _WindFrequency: 0.0125
     - _WindStrength: 0.5
     - _WorkflowMode: 1

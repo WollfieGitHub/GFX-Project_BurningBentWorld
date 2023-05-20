@@ -24,11 +24,14 @@ namespace Code.Scripts.TerrainGeneration.Components
             // Between 0 and 1
             var baseFbm = Biome.FBm.Apply(x, y);
 
-            if (IsShore) { baseFbm = 0; }
-            if (IsOcean) { baseFbm *= OceanAmplitudeModifier; }
-            if (IsHill) { baseFbm *= HillAmplitudeModifier; }
+            var correctedFBm = baseFbm;
+            
+            if (IsOcean) { correctedFBm *= OceanAmplitudeModifier; }
+            if (IsHill) { correctedFBm *= HillAmplitudeModifier; }
 
-            return baseFbm;
+            if (IsShore) { correctedFBm = 0.001f; }
+
+            return correctedFBm;
         }
 
         public bool Equals(BiomeAttribute other)

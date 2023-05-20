@@ -4,13 +4,14 @@ using TerrainGeneration.Vegetation;
 using UnityEngine;
 using static Utils.Utils;
 
-namespace TerrainGeneration.Components
+namespace Code.Scripts.TerrainGeneration.Components
 {
     /**
      * Source : http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/
      */
     public class Biome
     {
+        public static readonly HashSet<Biome> AllBiomes = new();
 
         public readonly int Id;
         public readonly string Name;
@@ -38,6 +39,7 @@ namespace TerrainGeneration.Components
                 initialFrequency: fbmFrequency
             );
             Vegetation = vegetation;
+            AllBiomes.Add(this);
         }
         
         public static readonly Biome Snow = new (0, "Snow", Color255(248, 248, 248), new (0, 0.05f, 0, 0));
@@ -83,19 +85,14 @@ namespace TerrainGeneration.Components
             { TropicalRainForest, TropicalRainForest, TropicalSeasonalForest, TropicalSeasonalForest, Grassland, SubtropicalDesert, },
         };
         
-        public static readonly HashSet<Biome> RepresentedBiomes = new();
-        
         /// <summary>
         /// Finds the biome that best corresponds to the given
         /// temperature and precipitation 
         /// </summary>
         /// <param name="temperature">The temperature (in degrees celsius)</param>
         /// <param name="precipitation">The precipitation (in centimeters)</param>
-        /// <returns>The corresponding <see cref="Biome"/> and biome intensity factor
-        /// The biome intensity factor is a number from 1 to 0 where 1 means the
-        /// parameters correspond to the middle of the biome and 0 means
-        /// the parameters correspond to a biome boundary</returns>
-        public static (Biome, float) From(float temperature, float precipitation)
+        /// <returns>The corresponding <see cref="Biome"/></returns>
+        public static Biome From(float temperature, float precipitation)
         {
             temperature = Mathf.Clamp(temperature, MinTemperatureDeg, MaxTemperatureDeg);
             precipitation = Mathf.Clamp(precipitation, MinPrecipitationCm, MaxPrecipitationCm);
@@ -112,15 +109,19 @@ namespace TerrainGeneration.Components
             var temperatureRefIdx = Mathf.RoundToInt(temperatureIdx);
             var precipitationRefIdx = Mathf.RoundToInt(precipitationIdx);
 
-            var biomeIntensityFactor = Mathf.Min(
-                1 - Mathf.Abs(temperatureIdx - temperatureRefIdx) * 2,
-                1 - Mathf.Abs(precipitationIdx - precipitationRefIdx) * 2
-            );
             
-            var result = BiomeMap[temperatureRefIdx, precipitationRefIdx];
-            RepresentedBiomes.Add(result);
-            return (result, biomeIntensityFactor);
+            var resultBiome = BiomeMap[temperatureRefIdx, precipitationRefIdx];
+            return resultBiome;
         }
 
+        public static Biome FromId(int biomeId)
+        {
+            foreach (var biome in AllBiomes)
+            {
+                if (biome.Id == biomeId) { return biome; }
+            }
+
+            return null;
+        }
     }
 }

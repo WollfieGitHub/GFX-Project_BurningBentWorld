@@ -1,11 +1,12 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Code.Scripts.TerrainGeneration.Components;
+using TerrainGeneration;
 using TerrainGeneration.Components;
 using UnityEngine;
 using Utils;
 using static Utils.Utils;
 using Terrain = TerrainGeneration.Components.Terrain;
 
-namespace TerrainGeneration.Rendering
+namespace Code.Scripts.TerrainGeneration.Rendering
 {
     public static class ChunkTexture
     {
@@ -23,8 +24,8 @@ namespace TerrainGeneration.Rendering
         public static Texture2D From(Chunk chunk, DisplayType displayType)
         {
             // Compute the texture parameters
-            var width = chunk.Width;
-            var height = chunk.Height;
+            var width = Chunk.Size;
+            var height = Chunk.Size;
 
             return CreateTexture(width, height, (x, y) =>
             {
