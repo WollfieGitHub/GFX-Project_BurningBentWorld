@@ -1,4 +1,5 @@
-﻿using TerrainGeneration;
+using System;
+using TerrainGeneration;
 using TerrainGeneration.Components;
 using UnityEngine;
 
@@ -24,8 +25,8 @@ namespace Code.Scripts.TerrainGeneration.Components
         public Cell(CellInfo cellInfo) { Info = cellInfo; }
 
         private MonoBehaviour _overlay;
-        private MonoBehaviour _underlay;
+        private MonoBehaviour _underlay;        
 
-        private Chunk _parentChunk;
+        public Boolean burnt = false;
     }
 }
