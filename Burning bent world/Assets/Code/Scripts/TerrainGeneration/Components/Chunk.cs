@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using TerrainGeneration.Rendering;
 using UnityEngine;
 using static Utils.Utils;
 
@@ -37,7 +38,25 @@ namespace Code.Scripts.TerrainGeneration.Components
             // Initialize cells
             _cells = cells;
         }
-        
+
+        public ChunkRenderer ChunkRenderer { private set; get; }
+        public ChunkCollider ChunkCollider { private set; get; }
+
+        /// <summary>
+        /// Updates the reference to the chunk's objects
+        /// to make sure they are always available
+        /// </summary>
+        /// <param name="chunkRenderer">Chunk Renderer</param>
+        /// <param name="chunkCollider">Chunk Collider</param>
+        public void UpdateRefs(
+            ChunkRenderer chunkRenderer,
+            ChunkCollider chunkCollider
+        )
+        {
+            ChunkRenderer = chunkRenderer;
+            ChunkCollider = chunkCollider;
+        }
+
 //======== ====== ==== ==
 //      METHODS
 //======== ====== ==== ==

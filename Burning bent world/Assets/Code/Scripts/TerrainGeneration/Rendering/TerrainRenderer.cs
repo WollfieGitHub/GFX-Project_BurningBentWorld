@@ -31,6 +31,8 @@ namespace TerrainGeneration.Rendering
         private void OnValidate() => needMeshRefresh = true;
         
         private readonly List<ChunkRenderer> _chunkRenderers = new();
+
+        private ChunkFactory _chunkFactory;
         private GeneratedTerrain _terrain;
         
 //======== ====== ==== ==
@@ -39,7 +41,20 @@ namespace TerrainGeneration.Rendering
         
         private void Awake()
         {
+            _chunkFactory.GetComponent<ChunkFactory>();
             _terrain = GetComponent<GeneratedTerrain>();
+        }
+
+        private void OnEnable()
+        {
+            _chunkFactory.OnChunkCreated += RegisterChunkRenderer;
+            _chunkFactory.OnChunkDestroyed += UnregisterChunkRenderer;
+        }
+        
+        private void OnDisable()
+        {
+            _chunkFactory.OnChunkCreated -= RegisterChunkRenderer;
+            _chunkFactory.OnChunkDestroyed -= UnregisterChunkRenderer;
         }
 
         private void Start() => LoadMaterials();
@@ -79,13 +94,26 @@ namespace TerrainGeneration.Rendering
         /// <summary>
         /// Register the chunk renderer for the terrain
         /// </summary>
-        /// <param name="chunkRenderer">The chunk renderer</param>
-        public void RegisterChunkRenderer(ChunkRenderer chunkRenderer)
+        /// <param name="chunk">The chunk</param>
+        public void RegisterChunkRenderer(Chunk chunk)
         {
+            var chunkRenderer = chunk.ChunkRenderer;
+            
             chunkRenderer.RenderMesh = _terrain.renderMesh;
             chunkRenderer.DisplayType = _terrain.displayType;
             chunkRenderer.SetMaterials(_materials);
             _chunkRenderers.Add(chunkRenderer);
+        }
+
+        /// <summary>
+        /// Unregisters the chunk renderer for the terrain
+        /// </summary>
+        /// <param name="chunk">The chunk</param>
+        public void UnregisterChunkRenderer(Chunk chunk)
+        {
+            var chunkRenderer = chunk.ChunkRenderer;
+
+            _chunkRenderers.Remove(chunkRenderer);
         }
     }
 }

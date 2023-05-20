@@ -1,4 +1,5 @@
-﻿using Code.Scripts.TerrainGeneration.Components;
+﻿using System;
+using Code.Scripts.TerrainGeneration.Components;
 using TerrainGeneration.Components;
 using TerrainGeneration.Rendering;
 using UnityEngine;
@@ -11,14 +12,13 @@ namespace Code.Scripts.TerrainGeneration.Generators
     /// </summary>
     public class ChunkFactory : MonoBehaviour
     {
+        public event Action<Chunk> OnChunkCreated;
+        public event Action<Chunk> OnChunkDestroyed;
+        
         private Transform _transform;
         
-        private GeneratedTerrain _terrain;
-
         private void Awake()
         {
-            _terrain = GetComponent<GeneratedTerrain>();
-            
             _transform = transform;
         }
 
@@ -50,7 +50,7 @@ namespace Code.Scripts.TerrainGeneration.Generators
             chunk.Init(xOffset, zOffset, cells);
 
             // Setup collider
-            chunkObj.AddComponent<ChunkCollider>();
+            var chunkCollider = chunkObj.AddComponent<ChunkCollider>();
             
             var rb = chunkObj.AddComponent<Rigidbody>();
             rb.isKinematic = true;
@@ -61,8 +61,12 @@ namespace Code.Scripts.TerrainGeneration.Generators
             
             // Setup renderer
             var chunkRenderer = chunkObj.AddComponent<ChunkRenderer>();
-            _terrain.Renderer.RegisterChunkRenderer(chunkRenderer);
+            
+            // Update the chunk's references
+            chunk.UpdateRefs(chunkRenderer, chunkCollider);
 
+            OnChunkCreated?.Invoke(chunk);
+            
             return chunk;
         }
 
@@ -80,12 +84,16 @@ namespace Code.Scripts.TerrainGeneration.Generators
 //======== ====== ==== ==
 //      CHUNK DECONSTRUCTION
 //======== ====== ==== ==
-        
+
         /// <summary>
         /// Destroys the specified chunk
         /// </summary>
         /// <param name="chunk">The chunk to destroy</param>
         // TODO Check if there is something more to do here
-        public void DestroyChunk(Chunk chunk) => Destroy(chunk.gameObject);
+        public void DestroyChunk(Chunk chunk)
+        {
+            OnChunkDestroyed?.Invoke(chunk);
+            Destroy(chunk.gameObject);
+        }
     }
 }

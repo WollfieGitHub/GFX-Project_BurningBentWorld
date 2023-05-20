@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using Code.Scripts.TerrainGeneration.Components;
 using Code.Scripts.TerrainGeneration.Generators;
 using Code.Scripts.TerrainGeneration.Loaders;
@@ -69,6 +72,19 @@ namespace Code.Scripts.TerrainGeneration
         private TerrainManager _manager;
         private TerrainRenderer _renderer;
         private TerrainGenerator _generator;
+        private ChunkFactory _chunkFactory;
+
+        private readonly ConcurrentDictionary<(int, int), Chunk> _chunks = new();
+
+        /// <summary>
+        /// Finds the chunk at coordinates (xChunk, zChunk) or null if
+        /// the chunk is not currently loaded
+        /// </summary>
+        /// <param name="xChunk">The X coordinate in the chunk's referential</param>
+        /// <param name="zChunk">The Z coordinate in the chunk's referential</param>
+        /// <returns>The chunk found or null if none is loaded</returns>
+        public Chunk GetChunkAt(int xChunk, int zChunk) => 
+            _chunks.GetValueOrDefault((xChunk, zChunk));
 
 // //======================================================================================\\
 // ||                                                                                      ||
@@ -78,7 +94,6 @@ namespace Code.Scripts.TerrainGeneration
 
         private void Awake()
         {
-            
             _manager = GetComponent<TerrainManager>();
             Renderer = GetComponent<TerrainRenderer>();
             _generator = GetComponent<TerrainGenerator>();
@@ -87,11 +102,25 @@ namespace Code.Scripts.TerrainGeneration
 
             _manager.PlayerPosition = playerTransform.position;
             _manager.ChunkDistance = chunkDistance;
+
+            _chunkFactory = GetComponent<ChunkFactory>();
+        }
+
+        private void OnEnable()
+        {
+            _chunkFactory.OnChunkCreated += RegisterChunk;
+            _chunkFactory.OnChunkDestroyed += UnregisterChunk;
         }
         
+        private void OnDisable()
+        {
+            _chunkFactory.OnChunkCreated -= RegisterChunk;
+            _chunkFactory.OnChunkDestroyed -= UnregisterChunk;
+        }
+
 // //======================================================================================\\
 // ||                                                                                      ||
-// ||                                       UTIL METHODS                                   ||
+// ||                                         LIFECYCLE                                    ||
 // ||                                                                                      ||
 // \\======================================================================================//
 
@@ -104,6 +133,12 @@ namespace Code.Scripts.TerrainGeneration
                 _manager.ChunkDistance = chunkDistance;
             }
         }
-        
+
+        private void RegisterChunk(Chunk chunk) => 
+            _chunks[(chunk.ChunkX, chunk.ChunkZ)] = chunk;
+
+        private void UnregisterChunk(Chunk chunk) => 
+            _chunks.Remove((chunk.ChunkX, chunk.ChunkZ), out _);
+
     }
 }
