@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Code.Scripts.TerrainGeneration.Components;
 using TerrainGeneration.Components;
 using UnityEngine;
 using UnityEngine.VFX;

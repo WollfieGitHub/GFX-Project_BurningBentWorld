@@ -1,9 +1,8 @@
 using System.Collections.Generic;
+using Code.Scripts.TerrainGeneration.Components;
+using Code.Scripts.TerrainGeneration.Generators;
 using TerrainGeneration.Rendering;
-using TerrainGeneration.Components;
 using UnityEngine;
-using TerrainGeneration.Generators;
-using UnityEngine.VFX;
 
 namespace FireSystem
 {
@@ -54,7 +53,7 @@ namespace FireSystem
         // Start is called before the first frame update
         void Start()
         {
-            terrainRenderer.OnGenerationFinished += StartFireSystem;
+            // terrainRenderer.OnGenerationFinished += StartFireSystem;
         }
 
         // Update is called once per frame
@@ -76,7 +75,7 @@ namespace FireSystem
         /// </summary>
         private void StartFireSystem()
         {
-            terrain = terrainRenderer.Terrain;
+            // TODO Put back the way to get cells terrain = terrainRenderer.Terrain;
             cells = new FireCell[terrain.Width, terrain.Height];
 
             for (int x = 0; x < terrain.Width; x++)
@@ -155,8 +154,8 @@ namespace FireSystem
             //Update chunks' textures
             foreach (var chunk in chunksToUpdateTextures)
             {
-                ChunkRenderer cr = terrainRenderer.GetChunkRenderer(chunk.ChunkX, chunk.ChunkZ);
-                //TODO: Waiting for Léo's modifications.
+                // ChunkRenderer cr = terrainRenderer.GetChunkRenderer(chunk.ChunkX, chunk.ChunkZ);
+                //TODO: Waiting for Lï¿½o's modifications.
                 //cr.GenerateTexture();
             }
 

@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using TerrainGeneration.Rendering;
 using TerrainGeneration.Components;
 using UnityEngine;
-using TerrainGeneration.Generators;
 using UnityEngine.VFX;
 
 public class testErase: MonoBehaviour {
