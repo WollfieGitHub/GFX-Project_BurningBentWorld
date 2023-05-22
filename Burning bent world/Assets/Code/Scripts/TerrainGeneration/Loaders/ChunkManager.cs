@@ -126,8 +126,6 @@ namespace Code.Scripts.TerrainGeneration.Loaders
             var diffX = Mathf.RoundToInt(diff.x);
             var diffZ = Mathf.RoundToInt(diff.z);
             
-            Debug.Log($"Diff = {diff}");
-            
             if (diffX != 0 || diffZ != 0) { MoveTowards(diffX, diffZ); }
         }
 

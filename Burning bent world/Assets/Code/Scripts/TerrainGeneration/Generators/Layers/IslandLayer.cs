@@ -34,7 +34,7 @@ namespace Code.Scripts.TerrainGeneration.Layers
                         };
                     }
                 }
-                
+
                 return cells;
             };
         }

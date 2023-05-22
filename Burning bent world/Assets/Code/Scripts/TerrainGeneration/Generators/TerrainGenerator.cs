@@ -1,5 +1,6 @@
 using System;
 using Code.Scripts.TerrainGeneration.Components;
+using Code.Scripts.TerrainGeneration.Generators.Layers;
 using Code.Scripts.TerrainGeneration.Layers;
 using TerrainGeneration;
 using TerrainGeneration.Layers;

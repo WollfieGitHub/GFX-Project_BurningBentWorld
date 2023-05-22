@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
 using Code.Scripts.TerrainGeneration.Components;
 using TerrainGeneration.Components;
 using TerrainGeneration.Rendering;
@@ -16,16 +19,46 @@ namespace Code.Scripts.TerrainGeneration.Generators
         public event Action<Chunk> OnChunkDestroyed;
         
         private Transform _transform;
-        
+
+        private readonly ConcurrentQueue<Task> _chunkCreationQueue = new();
+
+        private bool _busy;
+
+        private const int MaxTaskPerFrame = 32;
+
         private void Awake()
         {
             _transform = transform;
+        }
+        
+        // DONE Idea : Queue all creation tasks and run them in update loop 
+        // Return in CreateNew a Task<Chunk> and resolve the task once it has been
+        // processed by main loop
+
+        private void Update()
+        {
+            if (_chunkCreationQueue.IsEmpty || _busy) return;
+
+            EmptyTaskQueue();
+        }
+
+        private void EmptyTaskQueue()
+        {
+            var counter = 0;
+            while (!_chunkCreationQueue.IsEmpty && counter < MaxTaskPerFrame)
+            {
+                if (_chunkCreationQueue.TryDequeue(out var chunkCreationTask))
+                {
+                    chunkCreationTask.RunSynchronously();
+                }
+                counter++;
+            }
         }
 
 //======== ====== ==== ==
 //      CHUNK CONSTRUCTION
 //======== ====== ==== ==
-        
+
         /// <summary>
         /// Creates a new <see cref="Chunk"/> with the specified position offset
         /// in <see cref="Chunk"/>'s coordinates
@@ -35,39 +68,47 @@ namespace Code.Scripts.TerrainGeneration.Generators
         /// <param name="cells">The cells of the chunk, array of size
         /// <see cref="Chunk.Size"/> x <see cref="Chunk.Size"/></param>
         /// <returns>The newly created <see cref="Chunk"/></returns>
-        public Chunk CreateNew(
+        public async Task<Chunk> CreateNew(
             int xOffset, int zOffset, Cell[,] cells
         )
         {
-            // Create the new chunk game object
-            var chunkObj = new GameObject($"Chunk#{xOffset}#{zOffset}");
+            var chunkCreationTask = new Task<Chunk>(() =>
+            {
+                // DONE : Must be done on player thread, add component may be too
+                // Create the new chunk game object
+                var chunkObj = new GameObject($"Chunk#{xOffset}#{zOffset}");
 
-            // Setup transform
-            SetupChunkTransform(xOffset, zOffset, chunkObj);
+                // Setup transform
+                SetupChunkTransform(xOffset, zOffset, chunkObj);
 
-            // Setup chunk behaviours
-            var chunk = chunkObj.AddComponent<Chunk>();
-            chunk.Init(xOffset, zOffset, cells);
+                // Setup chunk behaviours
+                var chunk = chunkObj.AddComponent<Chunk>();
+                chunk.Init(xOffset, zOffset, cells);
 
-            // Setup collider
-            var chunkCollider = chunkObj.AddComponent<ChunkCollider>();
-            
-            var rb = chunkObj.AddComponent<Rigidbody>();
-            rb.isKinematic = true;
-            rb.useGravity = false;
-            
-            chunkObj.AddComponent<MeshRenderer>();
-            chunkObj.AddComponent<MeshFilter>();
-            
-            // Setup renderer
-            var chunkRenderer = chunkObj.AddComponent<ChunkRenderer>();
-            
-            // Update the chunk's references
-            chunk.UpdateRefs(chunkRenderer, chunkCollider);
+                // Setup collider
+                var chunkCollider = chunkObj.AddComponent<ChunkCollider>();
 
-            OnChunkCreated?.Invoke(chunk);
+                var rb = chunkObj.AddComponent<Rigidbody>();
+                rb.isKinematic = true;
+                rb.useGravity = false;
+
+                chunkObj.AddComponent<MeshRenderer>();
+                chunkObj.AddComponent<MeshFilter>();
+
+                // Setup renderer
+                var chunkRenderer = chunkObj.AddComponent<ChunkRenderer>();
+
+                // Update the chunk's references
+                chunk.UpdateRefs(chunkRenderer, chunkCollider);
+
+                OnChunkCreated?.Invoke(chunk);
+
+                return chunk;
+            });
             
-            return chunk;
+            _chunkCreationQueue.Enqueue(chunkCreationTask);
+            
+            return await chunkCreationTask;
         }
 
         /** Setup the object's transform */
@@ -89,11 +130,15 @@ namespace Code.Scripts.TerrainGeneration.Generators
         /// Destroys the specified chunk
         /// </summary>
         /// <param name="chunk">The chunk to destroy</param>
-        // TODO Check if there is something more to do here
         public void DestroyChunk(Chunk chunk)
         {
-            OnChunkDestroyed?.Invoke(chunk);
-            Destroy(chunk.gameObject);
+            var chunkDestructionTask = new Task(() =>
+            {
+                OnChunkDestroyed?.Invoke(chunk);
+                Destroy(chunk.gameObject);
+            });
+            
+            _chunkCreationQueue.Enqueue(chunkDestructionTask);
         }
     }
 }

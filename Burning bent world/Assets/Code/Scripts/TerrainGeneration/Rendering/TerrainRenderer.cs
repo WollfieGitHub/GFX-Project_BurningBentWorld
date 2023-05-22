@@ -41,7 +41,7 @@ namespace TerrainGeneration.Rendering
         
         private void Awake()
         {
-            _chunkFactory.GetComponent<ChunkFactory>();
+            _chunkFactory = GetComponent<ChunkFactory>();
             _terrain = GetComponent<GeneratedTerrain>();
         }
 

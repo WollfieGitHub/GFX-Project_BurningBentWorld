@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Code.Scripts.TerrainGeneration.Components;
+using Code.Scripts.TerrainGeneration.Generators.Layers.Smoothing;
 using TerrainGeneration;
 using UnityEngine;
 

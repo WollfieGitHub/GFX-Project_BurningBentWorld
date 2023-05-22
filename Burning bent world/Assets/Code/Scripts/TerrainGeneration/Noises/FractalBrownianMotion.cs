@@ -37,6 +37,7 @@ namespace TerrainGeneration.Noises
          * </summary>
          * <param name="offsetX">X coordinate between 0 and 1, which already contains a random offset</param>
          * <param name="offsetY">Y coordinate between 0 and 1, which already contains a random offset</param>
+         * <param name="seed">The seed for the FBM</param>
          * <returns>The value of the fractal brownian motion</returns>
          * <remarks><a href="https://rtouti.github.io/graphics/perlin-noise-algorithm">Source</a></remarks>
          */

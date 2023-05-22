@@ -128,17 +128,11 @@ namespace Code.Scripts.TerrainGeneration
         {
             _manager.PlayerPosition = playerTransform.position;
 
-            if (_needRefresh)
-            {
-                _manager.ChunkDistance = chunkDistance;
-            }
+            if (_needRefresh) { _manager.ChunkDistance = chunkDistance; }
         }
 
-        private void RegisterChunk(Chunk chunk) => 
-            _chunks[(chunk.ChunkX, chunk.ChunkZ)] = chunk;
-
-        private void UnregisterChunk(Chunk chunk) => 
-            _chunks.Remove((chunk.ChunkX, chunk.ChunkZ), out _);
+        private void RegisterChunk(Chunk chunk) => _chunks[(chunk.ChunkX, chunk.ChunkZ)] = chunk;
+        private void UnregisterChunk(Chunk chunk) => _chunks.Remove((chunk.ChunkX, chunk.ChunkZ), out _);
 
     }
 }

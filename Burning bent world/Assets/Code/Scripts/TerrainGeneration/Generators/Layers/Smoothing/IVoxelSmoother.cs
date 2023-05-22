@@ -1,7 +1,6 @@
 ﻿using Code.Scripts.TerrainGeneration.Components;
-using TerrainGeneration;
 
-namespace Code.Scripts.TerrainGeneration.Layers.Smoothing
+namespace Code.Scripts.TerrainGeneration.Generators.Layers.Smoothing
 {
     public interface IVoxelSmoother
     {

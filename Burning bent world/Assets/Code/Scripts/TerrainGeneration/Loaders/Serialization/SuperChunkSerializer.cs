@@ -25,13 +25,14 @@ namespace Code.Scripts.TerrainGeneration.Loaders.Serialization
 
         public object SetObjectData(object obj, SerializationInfo info, StreamingContext context, ISurrogateSelector selector)
         {
+            var superChunk = (SuperChunk)obj;
+            
             var xOffset = info.GetInt32(SuperChunkXLbl);
             var zOffset = info.GetInt32(SuperChunkZLbl);
 
             var cells = (Cell[,]) info.GetValue(SuperChunkCellsLbl, typeof(Cell[,]));
 
             // Load super chunk data
-            var superChunk = new SuperChunk();
             superChunk.Load(cells, xOffset, zOffset);
             
             return superChunk;

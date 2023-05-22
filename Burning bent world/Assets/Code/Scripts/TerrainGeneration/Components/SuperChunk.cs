@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 using Code.Scripts.TerrainGeneration.Generators;
 using Code.Scripts.TerrainGeneration.Loaders.Serialization;
+using Unity.VisualScripting;
 using UnityEngine;
 using static Utils.Utils;
 
@@ -37,7 +39,7 @@ namespace Code.Scripts.TerrainGeneration.Components
             );
         }
 
-        public bool Loaded = false;
+        private bool _loaded;
         private Task _cellLoader;
 
         public int XOffset;
@@ -86,7 +88,15 @@ namespace Code.Scripts.TerrainGeneration.Components
             ZOffset = zOffset;
             
             _cells = cells;
-            Loaded = true;
+            _loaded = true;
+        }
+
+        public SuperChunk() { }
+
+        public SuperChunk(int xOffset, int zOffset, TerrainGenerator generator)
+        {
+            _loaded = false;
+            _cellLoader = LoadAt(xOffset, zOffset, generator);
         }
 
         /// <summary>
@@ -104,7 +114,7 @@ namespace Code.Scripts.TerrainGeneration.Components
         /// </returns>
         public async Task<Cell[,]> GetChunkCells(int xChunk, int zChunk)
         {
-            if (!Loaded) { await _cellLoader; }
+            if (!_loaded) { await _cellLoader; }
             
             var result = new Cell[Chunk.Size, Chunk.Size];
 
@@ -139,7 +149,8 @@ namespace Code.Scripts.TerrainGeneration.Components
 
             return basePath;
         }
-
+        
+        
         /// <summary>
         /// Loads the super chunk of the specified coordinates from disk
         /// </summary>
@@ -149,17 +160,9 @@ namespace Code.Scripts.TerrainGeneration.Components
         ///  generate the <see cref="SuperChunk"/>'s cells in case no <see cref="SuperChunk"/>
         /// already exists with the specified coordinates</param>
         /// <returns>The loaded super chunk at the specified coordinates</returns>
-        public async Task LoadAt(
-            int xOffset, int zOffset, TerrainGenerator generator
-        )
+        private async Task LoadAt(int xOffset, int zOffset, TerrainGenerator generator)
         {
-            _cellLoader = LoadAtWrapper(xOffset, zOffset, generator);
-            await _cellLoader;
-        }
-        
-        private async Task LoadAtWrapper(int xOffset, int zOffset, TerrainGenerator generator)
-        {
-            try
+            try 
             {
                 var basePath = GetLoadedDirectoryPath();
 
@@ -174,6 +177,15 @@ namespace Code.Scripts.TerrainGeneration.Components
                 // The super chunk does not exist, create a new super chunk
                 await CreateNewAt(xOffset, zOffset, generator);
             }
+        }
+
+        /// <summary>
+        /// Purge all super chunks from the directory saved until now
+        /// </summary>
+        public static void PurgeSavedSuperChunks()
+        {
+            var basePath = GetLoadedDirectoryPath();
+            Directory.Delete(basePath, true);
         }
 
         /// <summary>
@@ -192,7 +204,9 @@ namespace Code.Scripts.TerrainGeneration.Components
                 () =>
                 {
                     var cells = new Cell[Size,Size];
-                    var info = generator.GenerateNew(xOffset, zOffset, Size, Size);
+                    var info = generator.GenerateNew(
+                        xOffset * Size, zOffset * Size, Size, Size
+                    );
                     for (var x = 0; x < Size; x++)
                     {
                         for (var z = 0; z < Size; z++)
@@ -202,14 +216,15 @@ namespace Code.Scripts.TerrainGeneration.Components
                     }
                     return cells;
                 }
-            );
+            // Return result on thread pool and not on player thread
+            ).ConfigureAwait(false);
             Load(cells, xOffset, zOffset);
         }
 
         /// <summary>
         /// Unloads the super chunk, saving it to disk
         /// </summary>
-        public async void Unload()
+        public async Task Unload()
         {
             var basePath = GetLoadedDirectoryPath();
 

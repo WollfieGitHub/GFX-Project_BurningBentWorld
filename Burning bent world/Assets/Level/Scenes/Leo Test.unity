@@ -587,7 +587,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerTransform: {fileID: 330585546}
-  chunkDistance: 8
+  chunkDistance: 16
   renderMesh: 1
   displayType: 0
   terrainMaterial: {fileID: 2100000, guid: cb5f560ca7afa4181b50a442821426c9, type: 2}

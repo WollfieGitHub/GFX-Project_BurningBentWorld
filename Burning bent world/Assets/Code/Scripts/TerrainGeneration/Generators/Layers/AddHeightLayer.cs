@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using Code.Scripts.TerrainGeneration.Components;
+﻿using Code.Scripts.TerrainGeneration.Generators.Layers.Smoothing;
 using Code.Scripts.TerrainGeneration.Layers.Smoothing;
-using Code.Scripts.TerrainGeneration;
 using TerrainGeneration;
 using UnityEngine;
 using Terrain = TerrainGeneration.Components.Terrain;
 
-namespace Code.Scripts.TerrainGeneration.Layers
+namespace Code.Scripts.TerrainGeneration.Generators.Layers
 {
     public class AddHeightLayer : TransformLayer
     {
