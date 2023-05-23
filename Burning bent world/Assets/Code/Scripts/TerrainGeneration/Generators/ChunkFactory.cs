@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Code.Scripts.TerrainGeneration.Components;
+using Code.Scripts.TerrainGeneration.Rendering;
+using Code.Scripts.TerrainGeneration.Vegetation.Plants.ProceduralGrass;
 using TerrainGeneration.Components;
 using TerrainGeneration.Rendering;
 using UnityEngine;
@@ -87,11 +89,12 @@ namespace Code.Scripts.TerrainGeneration.Generators
 
                 // Setup collider
                 var chunkCollider = chunkObj.AddComponent<ChunkCollider>();
+                // Setup grass
 
                 var rb = chunkObj.AddComponent<Rigidbody>();
                 rb.isKinematic = true;
                 rb.useGravity = false;
-
+                
                 chunkObj.AddComponent<MeshRenderer>();
                 chunkObj.AddComponent<MeshFilter>();
 

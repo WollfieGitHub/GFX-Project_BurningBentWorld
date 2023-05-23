@@ -28,11 +28,9 @@ namespace TerrainGeneration.Rendering
         private bool _renderMesh;
         public bool RenderMesh
         {
-            get => _renderMesh;
             set
             {
                 _renderMesh = value;
-                if (_chunk == null) { return; }
                 StartCoroutine(nameof(CalcNewMesh));
             }
         }
@@ -40,11 +38,9 @@ namespace TerrainGeneration.Rendering
         private ChunkTexture.DisplayType _displayType;
         public ChunkTexture.DisplayType DisplayType
         {
-            get => _displayType;
             set
             {
                 _displayType = value;
-                if (_chunk == null) { return; }
                 StartCoroutine(nameof(CalcNewTexture));
             }
         }

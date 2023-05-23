@@ -22,6 +22,7 @@ namespace Code.Scripts.TerrainGeneration.Vegetation.Plants.ProceduralGrass
 
         private Transform _cameraTransform;
         private Transform _transform;
+        private Chunk _chunk;
 
         private const int VisibilityThreshold = 50;
         
@@ -37,12 +38,12 @@ namespace Code.Scripts.TerrainGeneration.Vegetation.Plants.ProceduralGrass
 
             _transform = transform;
             _cameraTransform = Camera.main.transform;
+
+            _chunk = GetComponent<Chunk>();
         }
 
         private void Update()
         {
-            return;
-            // TODO
             var velocity = _windZone.transform.forward * _windZone.windMain;
             _grassMaterialInstance.SetVector("_WindVelocity", velocity);
             _grassMaterialInstance.SetFloat("_WindFrequency", _windZone.windPulseFrequency);
@@ -50,14 +51,17 @@ namespace Code.Scripts.TerrainGeneration.Vegetation.Plants.ProceduralGrass
             var visible = Vector3.Distance(_cameraTransform.position, _transform.position) < VisibilityThreshold;
             
             // Set if it should be displayed
-            // _renderer.materials[TerrainRenderer.GrassMaterialIdx] = visible ? _grassMaterialInstance : null;
+            _renderer.materials[TerrainRenderer.GrassMaterialIdx] = visible ? _grassMaterialInstance : null;
 
+        }
+
+        private void Start()
+        {
+            Init(_chunk);
         }
 
         public void Init(Chunk chunk)
         {
-            return;
-            // TODO
             _renderer = GetComponent<Renderer>();
 
             var baseTexture = CreateTexture(Chunk.Size, Chunk.Size, 
@@ -91,6 +95,11 @@ namespace Code.Scripts.TerrainGeneration.Vegetation.Plants.ProceduralGrass
             _grassMaterialInstance.SetInt("_ChunkZ", chunk.ChunkZ * Chunk.Size);
             
             _grassMaterialInstance.SetInt("_Visible", 0);
+        }
+
+        public void SetMaterial(Material material)
+        {
+            _grassMaterialInstance = material;
         }
     }
 }

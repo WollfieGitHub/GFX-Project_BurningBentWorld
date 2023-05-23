@@ -46,6 +46,7 @@ namespace Code.Scripts.TerrainGeneration
 
         [Header("Base")]
         [SerializeField] private Transform playerTransform;
+        [SerializeField] [Range(1, 32)] private float chunkColliderActivationDistance;
 
         [Header("Performance")] 
         [SerializeField] [Range(1, 32)] private int chunkDistance = 4;
@@ -104,6 +105,8 @@ namespace Code.Scripts.TerrainGeneration
             _manager.ChunkDistance = chunkDistance;
 
             _chunkFactory = GetComponent<ChunkFactory>();
+
+            ChunkCollider.Threshold = chunkColliderActivationDistance * Chunk.Size;
         }
 
         private void OnEnable()

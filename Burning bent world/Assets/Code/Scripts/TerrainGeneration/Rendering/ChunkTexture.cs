@@ -11,7 +11,7 @@ namespace Code.Scripts.TerrainGeneration.Rendering
     public static class ChunkTexture
     {
         //TODO: Check if this is a good way of doing this
-        public static Color burntColor = new Color(77, 29, 20);
+        public static Color burntColor = Color255(77, 29, 20);
 
         public enum DisplayType
         {
@@ -27,8 +27,8 @@ namespace Code.Scripts.TerrainGeneration.Rendering
         public static Texture2D From(Chunk chunk, DisplayType displayType)
         {
             // Compute the texture parameters
-            var width = Chunk.Size;
-            var height = Chunk.Size;
+            const int width = Chunk.Size;
+            const int height = Chunk.Size;
 
             return CreateTexture(width, height, (x, y) =>
             {
@@ -38,8 +38,8 @@ namespace Code.Scripts.TerrainGeneration.Rendering
                 return displayType switch
                 {
                     DisplayType.Default => cellInfo.Ocean || cellInfo.Biome.IsRiver ? Color.blue 
-                    : cell.burnt ? Color.Lerp(new Color(0.77f, 0.29f, 0.20f), cellInfo.Biome.Color, 0.2f)
-                    : cellInfo.Biome.Color,
+                        : cell.burnt ? Color.Lerp(new Color(0.77f, 0.29f, 0.20f), cellInfo.Biome.Color, 0.2f)
+                        : cellInfo.Biome.Color,
                     DisplayType.Temperature => GetTemperatureColor(cellInfo.Temperature),
                     DisplayType.Humidity => GetPrecipitationColor(cellInfo.Precipitation),
                     DisplayType.Height => GetHeightColor(cell.Height),
@@ -48,6 +48,7 @@ namespace Code.Scripts.TerrainGeneration.Rendering
                     _ => Color.magenta // Indicates a bug
                 };
             });
+            
         }
 
         private static Color GetBiomeColor(CellInfo cellInfo)

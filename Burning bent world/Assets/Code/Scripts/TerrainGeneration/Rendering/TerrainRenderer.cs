@@ -61,9 +61,9 @@ namespace TerrainGeneration.Rendering
 
         private void LoadMaterials()
         {
-            _materials = new Material[1/* TODO NbMaterials */];
+            _materials = new Material[1];
             _materials[TerrainMaterialIdx] = _terrain.terrainMaterial;
-            // TODO materials[GrassMaterialIdx] = _terrain.grassMaterial;
+            // _materials[GrassMaterialIdx] = _terrain.grassMaterial;
         }
         
         private void Update()
@@ -102,6 +102,7 @@ namespace TerrainGeneration.Rendering
             chunkRenderer.RenderMesh = _terrain.renderMesh;
             chunkRenderer.DisplayType = _terrain.displayType;
             chunkRenderer.SetMaterials(_materials);
+            
             _chunkRenderers.Add(chunkRenderer);
         }
 

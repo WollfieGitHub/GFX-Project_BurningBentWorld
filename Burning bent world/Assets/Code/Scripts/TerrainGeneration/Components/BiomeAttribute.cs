@@ -8,6 +8,7 @@ namespace Code.Scripts.TerrainGeneration.Components
     {
         private const float HillAmplitudeModifier = 5f;
         private const float OceanAmplitudeModifier = -2f;
+        private const float RiverAmplitudeModifier = -.5f;
         
         /** The biome concerned by this attribute */
         public Biome Biome;
@@ -27,6 +28,8 @@ namespace Code.Scripts.TerrainGeneration.Components
             var correctedFBm = baseFbm;
             
             if (IsOcean) { correctedFBm *= OceanAmplitudeModifier; }
+            else if (Biome.IsRiver) { correctedFBm *= RiverAmplitudeModifier; }
+            
             if (IsHill) { correctedFBm *= HillAmplitudeModifier; }
 
             if (IsShore) { correctedFBm = 0.001f; }

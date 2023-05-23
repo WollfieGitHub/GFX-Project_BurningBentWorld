@@ -139,8 +139,8 @@ Material:
     - _BladeWidthMin: 0.02
     - _Blend: 0
     - _BumpScale: 1
-    - _ChunkX: 0
-    - _ChunkZ: 0
+    - _ChunkX: 576
+    - _ChunkZ: 752
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
@@ -169,7 +169,7 @@ Material:
     - _TessellationFactor: 4
     - _TessellationGrassDistance: 0.11
     - _Visible: 0
-    - _WindFrequency: 0.0125
+    - _WindFrequency: 0.01
     - _WindStrength: 0.5
     - _WorkflowMode: 1
     - _ZWrite: 1
@@ -181,5 +181,5 @@ Material:
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _TipColor: {r: 0.47770557, g: 0.8962264, b: 0.48615223, a: 1}
     - _WindDirection: {r: 1, g: 0, b: 0, a: 0}
-    - _WindVelocity: {r: 0.2, g: 0, b: 0.15, a: 0}
+    - _WindVelocity: {r: 0, g: 0, b: 1, a: 0}
   m_BuildTextureStacks: []

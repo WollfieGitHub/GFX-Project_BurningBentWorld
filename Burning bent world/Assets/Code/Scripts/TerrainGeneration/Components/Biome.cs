@@ -60,8 +60,8 @@ namespace Code.Scripts.TerrainGeneration.Components
         public static readonly Biome SubtropicalDesert = new (12, "Subtropical Desert", Color255(233, 221, 199), new (0f, 0f, 0.05f, 0f));
 
         public static readonly Biome Shore = new (13, "Shore", Color255(255, 245, 150), new (0, 0, 0, 0), fbmFrequency: 0.005f, fbmAmplitude: 0.05f);
-        public static readonly Biome River = new(14, "River", Color255(150, 255, 250), new (0, 0, 0, 0), fbmFrequency: 0.005f, fbmAmplitude: 0.05f);
-        public static readonly Biome FrozenRiver = new (15, "FrozenRiver", Color255(217, 255, 253), new (0, 0, 0, 0), fbmFrequency: 0.005f, fbmAmplitude: 0.05f);
+        public static readonly Biome River = new(14, "River", Color255(150, 255, 250), new (0, 0, 0, 0), fbmFrequency: 0.005f, fbmAmplitude: 0.1f);
+        public static readonly Biome FrozenRiver = new (15, "FrozenRiver", Color255(217, 255, 253), new (0, 0, 0, 0), fbmFrequency: 0.005f, fbmAmplitude: 0.1f);
         
         public bool IsRiver => River.Equals(this) || FrozenRiver.Equals(this);
 

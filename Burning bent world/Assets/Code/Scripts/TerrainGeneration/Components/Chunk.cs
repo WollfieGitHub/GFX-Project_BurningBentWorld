@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Code.Scripts.TerrainGeneration.Rendering;
+using Code.Scripts.TerrainGeneration.Vegetation.Plants.ProceduralGrass;
 using TerrainGeneration.Rendering;
 using UnityEngine;
 using static Utils.Utils;

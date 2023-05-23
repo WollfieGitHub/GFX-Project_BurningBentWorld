@@ -1,13 +1,9 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Linq;
 using Code.Scripts.TerrainGeneration.Components;
-using TerrainGeneration.Components;
 using UnityEngine;
-using static Utils.Utils;
-using Terrain = TerrainGeneration.Components.Terrain;
 
-namespace TerrainGeneration.Rendering
+namespace Code.Scripts.TerrainGeneration.Rendering
 {
     public class ChunkCollider : MonoBehaviour
     {
@@ -15,6 +11,10 @@ namespace TerrainGeneration.Rendering
 
         private Transform _transform;
         private Chunk _chunk;
+
+        private Transform _cameraTransform;
+
+        public static float Threshold;
 
         private void OnValidate()
         {
@@ -29,6 +29,8 @@ namespace TerrainGeneration.Rendering
             
             _transform = transform;
             _chunk = GetComponent<Chunk>();
+
+            _cameraTransform = Camera.main.transform;
         }
 
         public bool ColliderEnabled
@@ -37,6 +39,27 @@ namespace TerrainGeneration.Rendering
             set {
                 if (value) { EnableCollider(); }
                 else { DisableCollider(); }
+            }
+        }
+
+        private Vector3 _currentPos;
+        private Vector3 _currentCamPos;
+        private float _currentDist;
+        
+        private void Update()
+        {
+            _currentPos = _transform.position;
+            _currentCamPos = _cameraTransform.position;
+
+            _currentDist = Mathf.Sqrt(
+                (_currentPos.x - _currentCamPos.x) * (_currentPos.x - _currentCamPos.x) +
+                (_currentPos.z - _currentCamPos.z) * (_currentPos.z - _currentCamPos.z)
+            );
+
+            switch (colliderEnabled)
+            {
+                case false when _currentDist <= Threshold: EnableCollider(); break;
+                case true when _currentDist > Threshold: DisableCollider(); break;
             }
         }
 
