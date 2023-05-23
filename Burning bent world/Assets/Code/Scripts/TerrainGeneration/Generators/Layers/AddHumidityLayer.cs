@@ -1,24 +1,29 @@
-﻿using Code.Scripts.TerrainGeneration;
-using Code.Scripts.TerrainGeneration.Components;
+﻿using Code.Scripts.TerrainGeneration.Components;
 using TerrainGeneration;
-using TerrainGeneration.Components;
 using UnityEngine;
 using Utils;
 
-namespace Code.Scripts.TerrainGeneration.Layers
+namespace Code.Scripts.TerrainGeneration.Generators.Layers
 {
     public class AddHumidityLayer : TransformLayer
     {
+        private int _xOffset;
+        private int _zOffset;
+
+        public override void InitWorldGenSeed(long seed)
+        {
+            base.InitWorldGenSeed(seed);
+            _xOffset = _worldGenRandom.Next(1000);
+            _zOffset = _worldGenRandom.Next(1000);
+        }
+
         private const float Frequency = 0.010f * 64; // Precipitation varies more than temperature
         
         public override CellMap Apply()
         {
             return (x, z, width, height) =>
             {
-                InitChunkSeed(x, z);
-                var xOffset = NextInt(1000);
-                var zOffset = NextInt(1000);
-                
+
                 var cells = ParentMap(x, z, width, height);
                 
                 for (var rX = 0; rX < width; rX++)
@@ -28,8 +33,8 @@ namespace Code.Scripts.TerrainGeneration.Layers
                         cells[rX,rZ].Precipitation = Mathf.Lerp(
                             Biome.MinPrecipitationCm, Biome.MaxPrecipitationCm,
                             Mathf.Clamp01(Mathf.PerlinNoise(
-                                Frequency * (rX + xOffset),
-                                Frequency * (rZ + zOffset)
+                                Frequency * (x + rX + _xOffset),
+                                Frequency * (z + rZ + _zOffset)
                             ))
                         );
                     }

@@ -1,5 +1,4 @@
-﻿using Code.Scripts.TerrainGeneration;
-using Code.Scripts.TerrainGeneration.Components;
+﻿using Code.Scripts.TerrainGeneration.Components;
 using TerrainGeneration;
 
 namespace Code.Scripts.TerrainGeneration.Layers
@@ -12,7 +11,7 @@ namespace Code.Scripts.TerrainGeneration.Layers
         {
             _fractionOfLand = fractionOfLand;
         }
-
+        
         /// <summary>
         /// Creates a white noise map with fraction of ones being the specified value
         /// </summary>
@@ -23,13 +22,13 @@ namespace Code.Scripts.TerrainGeneration.Layers
             {
                 var cells = new CellInfo[width, height];
 
-                for (var px = 0; px < width; px++)
+                for (var rX = 0; rX < width; rX++)
                 {
-                    for (var pz = 0; pz < height; pz++)
+                    for (var rZ = 0; rZ < height; rZ++)
                     {
-                        InitChunkSeed(x + px, z + pz);
-                        cells[px, pz] = new CellInfo
-                        {
+                        InitChunkSeed(x + rX, z + rZ);
+
+                        cells[rX, rZ] = new CellInfo {
                             Land = CoinFlip(true, false, _fractionOfLand)
                         };
                     }

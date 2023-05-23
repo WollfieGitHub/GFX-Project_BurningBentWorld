@@ -9,9 +9,11 @@ namespace Code.Scripts.TerrainGeneration.Layers.Smoothing
     public class GaussianBlur : IVoxelSmoother
     {
         private const int BlendRadius = 16;
-        
+
+        public int NecessaryNeighboursCount => BlendRadius;
+
         public float GetBiomeHeightAt(
-            int x, int y, int width, int height, CellInfo[,] cells
+            int globX, int globZ, int x, int z, int width, int height, CellInfo[,] cells
         ) {
             var cellHeight = 0f;
             
@@ -22,7 +24,7 @@ namespace Code.Scripts.TerrainGeneration.Layers.Smoothing
                 
                 for (var iy = 0; iy < BlendRadius*2+1; iy++)
                 {
-                    var idy = y + iy - BlendRadius;
+                    var idy = z + iy - BlendRadius;
 
                     if (!(0 <= idx && idx < width && 0 <= idy && idy < height)) { continue; }
                     // Biome at this square within the blending circle

@@ -1,26 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using Code.Scripts.TerrainGeneration.Components;
-using Code.Scripts.TerrainGeneration.Generators.Layers.Smoothing;
-using TerrainGeneration;
+﻿using Code.Scripts.TerrainGeneration.Components;
 using Unity.Mathematics;
 using UnityEngine;
 
-namespace Code.Scripts.TerrainGeneration.Layers.Smoothing
+namespace Code.Scripts.TerrainGeneration.Generators.Layers.Smoothing
 {
     public class BilinearInterpolation : IVoxelSmoother
     {
         private const int InterpolationDistance = 1;
-        
+
+        public int NecessaryNeighboursCount => InterpolationDistance;
+
         public float GetBiomeHeightAt(
-            int x, int y, int width, int height, CellInfo[,] cells
+            int globX, int globZ, int x, int z, int width, int height, CellInfo[,] cells
         )
         {
             var px = math.min(x + InterpolationDistance, width-1);
             var nx = math.max(x - InterpolationDistance, 0);
 
-            var py = math.min(y + InterpolationDistance, height - 1);
-            var ny = math.max(y - InterpolationDistance, 0);
+            var py = math.min(z + InterpolationDistance, height - 1);
+            var ny = math.max(z - InterpolationDistance, 0);
 
             var ne = cells[px, py].BiomeAttribute.FBm(px, py);
             var no = cells[nx, py].BiomeAttribute.FBm(nx, py);

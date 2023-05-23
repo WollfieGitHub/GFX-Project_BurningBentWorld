@@ -14,12 +14,10 @@ namespace Code.Scripts.TerrainGeneration.Layers
                 var resultCells = MapAllocator.GetNew(width, height);
 
                 // Increase map size to not be bothered with indices
-                var pX = x - 1;
-                var pZ = z - 1;
                 var parentWidth = width + 2;
                 var parentHeight = height + 2;
                 
-                var cells = ParentMap(pX, pZ, parentWidth, parentHeight);
+                var cells = ParentMap(x, z, parentWidth, parentHeight);
 
                 for (var rX = 0; rX < width; rX++)
                 {

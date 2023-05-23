@@ -128,7 +128,12 @@ namespace Code.Scripts.TerrainGeneration
         {
             _manager.PlayerPosition = playerTransform.position;
 
-            if (_needRefresh) { _manager.ChunkDistance = chunkDistance; }
+            if (_needRefresh)
+            {
+                _needRefresh = false;
+                _manager.ChunkDistance = chunkDistance;
+                Renderer.needMeshRefresh = true;
+            }
         }
 
         private void RegisterChunk(Chunk chunk) => _chunks[(chunk.ChunkX, chunk.ChunkZ)] = chunk;

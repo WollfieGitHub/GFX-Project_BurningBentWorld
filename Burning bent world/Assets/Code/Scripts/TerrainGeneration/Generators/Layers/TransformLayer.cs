@@ -1,6 +1,13 @@
-﻿using Code.Scripts.TerrainGeneration.Layers;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
+using Code.Scripts.TerrainGeneration.Layers;
 using Code.Scripts.TerrainGeneration;
+using Unity.VisualScripting;
 using UnityEngine;
+using Random = System.Random;
 
 namespace TerrainGeneration
 {
@@ -9,12 +16,11 @@ namespace TerrainGeneration
     /// </summary>
     public abstract class TransformLayer
     {
-        private static long Convolute(long x, long a) =>
-            x * (x * 6364136223846793005L + 1442695040888963407L) + a;
-        
         private readonly long _baseSeed;
         private long _worldGenSeed;
         private long _chunkSeed;
+
+        protected Random _worldGenRandom;
 
         protected TransformLayer Parent;
 
@@ -25,11 +31,15 @@ namespace TerrainGeneration
         protected TransformLayer(long baseSeed)
         {
             _baseSeed = baseSeed;
-            _baseSeed = Convolute(_baseSeed, _baseSeed);
-            _baseSeed = Convolute(_baseSeed, _baseSeed);
-            _baseSeed = Convolute(_baseSeed, _baseSeed);
+            _baseSeed *= _baseSeed * 6364136223846793005L + 1442695040888963407L;
+            _baseSeed += baseSeed;
+            _baseSeed *= _baseSeed * 6364136223846793005L + 1442695040888963407L;
+            _baseSeed += baseSeed;
+            _baseSeed *= _baseSeed * 6364136223846793005L + 1442695040888963407L;
+            _baseSeed += baseSeed;
 
             _worldGenSeed = 0;
+            _worldGenRandom = new Random((int)_worldGenSeed);
             _chunkSeed = 0;
         }
 
@@ -39,34 +49,56 @@ namespace TerrainGeneration
 
             Parent?.InitWorldGenSeed(seed);
 
-            _worldGenSeed = Convolute(_worldGenSeed, _baseSeed);
-            _worldGenSeed = Convolute(_worldGenSeed, _baseSeed);
-            _worldGenSeed = Convolute(_worldGenSeed, _baseSeed);
+            _worldGenSeed *= _worldGenSeed * 6364136223846793005L + 1442695040888963407L;
+            _worldGenSeed += _baseSeed;
+            _worldGenSeed *= _worldGenSeed * 6364136223846793005L + 1442695040888963407L;
+            _worldGenSeed += _baseSeed;
+            _worldGenSeed *= _worldGenSeed * 6364136223846793005L + 1442695040888963407L;
+            _worldGenSeed += _baseSeed;
+            
+            _worldGenRandom = new Random((int)_worldGenSeed);
         }
 
+        private bool _chunkSeedInitialized;
+        
         protected void InitChunkSeed(long x, long z)
         {
+            if (_worldGenSeed == 0)
+            {
+                Task.Run(() => Debug.Log("PPRRIINNTTT !"));
+            }
+
+            _chunkSeedInitialized = true;
+            
             _chunkSeed = _worldGenSeed;
-            _chunkSeed = Convolute(_chunkSeed, x);
-            _chunkSeed = Convolute(_chunkSeed, z);
-            _chunkSeed = Convolute(_chunkSeed, x);
-            _chunkSeed = Convolute(_chunkSeed, z);
+            _chunkSeed *= _chunkSeed * 6364136223846793005L + 1442695040888963407L;
+            _chunkSeed += x;
+            _chunkSeed *= _chunkSeed * 6364136223846793005L + 1442695040888963407L;
+            _chunkSeed += z;
+            _chunkSeed *= _chunkSeed * 6364136223846793005L + 1442695040888963407L;
+            _chunkSeed += x;
+            _chunkSeed *= _chunkSeed * 6364136223846793005L + 1442695040888963407L;
+            _chunkSeed += z;
         }
 
         public abstract CellMap Apply();
 
         protected int NextInt(int max)
         {
-            var i = _chunkSeed >> 24 % max;
+            if (!_chunkSeedInitialized)
+            {
+                throw new InvalidOperationException("Chunk Seed must be initialized"); 
+            }
+            
+            var i = (int)((_chunkSeed >> 24) % max);
 
             if (i < 0) { i += max; }
 
-            _chunkSeed = Convolute(_chunkSeed, _worldGenSeed);
-            return (int)i;
+            _chunkSeed *= _chunkSeed * 6364136223846793005L + 1442695040888963407L;
+            _chunkSeed += _worldGenSeed;
+            return i;
         }
-
-        private const int RandomResolution = 1000;
-
+        
         /// <summary>
         /// Returns true with a change of one in <see cref="odds"/>
         /// </summary>
@@ -83,7 +115,10 @@ namespace TerrainGeneration
         /// <typeparam name="T">Type of the object to return</typeparam>
         /// <returns>The result of the random event</returns>
         protected T CoinFlip<T>(T head, T tail, float headOdds) => 
-            NextInt(RandomResolution) <= headOdds * RandomResolution ? head : tail;
+            OneIn(Mathf.RoundToInt(1 / headOdds)) ? head : tail;
+
+        protected virtual T SelectRandom<T>(T[] collection) =>
+            collection[NextInt(collection.Length)];
 
         /// <summary>
         /// Draws a random result from a uniform distribution (50/50)

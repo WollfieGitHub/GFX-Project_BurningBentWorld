@@ -21,9 +21,6 @@ namespace Code.Scripts.TerrainGeneration.Layers
                 // Decoded and transformed from : 
                 // https://github.com/eldariamc/client/blob/master/src/main/java/net/minecraft/world/gen/layer/GenLayerVoronoiZoom.java
 
-                x -= ScaleFactor / 2;
-                z -= ScaleFactor / 2;
-                
                 var pX = x / ScaleFactor;
                 var pZ = z / ScaleFactor;
                 
@@ -40,17 +37,21 @@ namespace Code.Scripts.TerrainGeneration.Layers
                 {
                     for (var tZ = 0; tZ < pWidth - 1; ++tZ)
                     {
-                        var p1Z = (URandom.Next(Odds) / (double)Odds - 0.5) * Range;
-                        var p1X = (URandom.Next(Odds) / (double)Odds - 0.5) * Range;
+                        InitChunkSeed((pX + tX) * ScaleFactor, (pZ + tZ) * ScaleFactor);
+                        var p1Z = (NextInt(Odds) / (double)Odds - 0.5) * Range;
+                        var p1X = (NextInt(Odds) / (double)Odds - 0.5) * Range;
                         
-                        var p2Z = (URandom.Next(Odds) / (double)Odds - 0.5) * Range + ScaleFactor;
-                        var p2X = (URandom.Next(Odds) / (double)Odds - 0.5) * Range;
+                        InitChunkSeed((pX + tX + 1) * ScaleFactor, (pZ + tZ) * ScaleFactor);
+                        var p2Z = (NextInt(Odds) / (double)Odds - 0.5) * Range + ScaleFactor;
+                        var p2X = (NextInt(Odds) / (double)Odds - 0.5) * Range;
                         
-                        var p3Z = (URandom.Next(Odds) / (double)Odds - 0.5) * Range;
-                        var p3X = (URandom.Next(Odds) / (double)Odds - 0.5) * Range + ScaleFactor;
+                        InitChunkSeed((pX + tX) * ScaleFactor, (pZ + tZ + 1) * ScaleFactor);
+                        var p3Z = (NextInt(Odds) / (double)Odds - 0.5) * Range;
+                        var p3X = (NextInt(Odds) / (double)Odds - 0.5) * Range + ScaleFactor;
                         
-                        var p4Z = (URandom.Next(Odds) / (double)Odds - 0.5) * Range + ScaleFactor;
-                        var p4X = (URandom.Next(Odds) / (double)Odds - 0.5) * Range + ScaleFactor;
+                        InitChunkSeed((pX + tX + 1) * ScaleFactor, (pZ + tZ + 1) * ScaleFactor);
+                        var p4Z = (NextInt(Odds) / (double)Odds - 0.5) * Range + ScaleFactor;
+                        var p4X = (NextInt(Odds) / (double)Odds - 0.5) * Range + ScaleFactor;
 
                         var cell1 = pMap[tX, tZ];
                         var cell2 = pMap[tX+1, tZ];

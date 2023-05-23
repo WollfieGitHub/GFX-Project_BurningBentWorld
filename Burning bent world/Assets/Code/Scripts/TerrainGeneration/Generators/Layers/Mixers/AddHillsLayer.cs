@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Linq;
+using Code.Scripts.TerrainGeneration.Layers;
 using Code.Scripts.TerrainGeneration.Layers.Optimization;
-using Code.Scripts.TerrainGeneration;
-using TerrainGeneration;
 using Unity.VisualScripting;
 using UnityEngine;
-using static Utils.Utils;
 
-namespace Code.Scripts.TerrainGeneration.Layers
+namespace Code.Scripts.TerrainGeneration.Generators.Layers.Mixers
 {
     public class AddHillsLayer : MixLayer
     {
@@ -18,12 +16,10 @@ namespace Code.Scripts.TerrainGeneration.Layers
                 var resultCells = MapAllocator.GetNew(width, height);
 
                 // Increase map size to not be bothered with indices
-                var pX = x - 1;
-                var pZ = z - 1;
                 var parentWidth = width + 2;
                 var parentHeight = height + 2;
                 
-                var baseCells = ParentMap(pX, pZ, parentWidth, parentHeight);
+                var baseCells = ParentMap(x, z, parentWidth, parentHeight);
                 var riverCells = FilterMap(x, z, width, height);
 
                 for (var rX = 0; rX < width; rX++)

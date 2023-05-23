@@ -13,14 +13,11 @@ namespace TerrainGeneration.Layers
             {
                 var resultCells = MapAllocator.GetNew(width, height);
 
-                var pX = x - 1;
-                var pZ = z - 1;
-
                 // Increase by one maps' dimension to not be bothered by maps limit
                 var parentWidth = width + 2;
                 var parentHeight = height + 2;
                 
-                var cells = ParentMap(pX, pZ, parentWidth, parentHeight);
+                var parentCells = ParentMap(x, z, parentWidth, parentHeight);
 
                 for (var rX = 0; rX < width; rX++)
                 {
@@ -28,11 +25,12 @@ namespace TerrainGeneration.Layers
                     {
                         InitChunkSeed(x + rX, z + rZ);
                         
-                        var north = cells[rX + 1, rZ + 2];
-                        var east = cells[rX + 2, rZ + 1];
-                        var south = cells[rX + 1, rZ];
-                        var west = cells[rX, rZ + 1];
-                        var center = cells[rX + 1, rZ + 1];
+                        var north = parentCells[rX + 1, rZ + 2];
+                        var east = parentCells[rX + 2, rZ + 1];
+                        var south = parentCells[rX + 1, rZ];
+                        var west = parentCells[rX, rZ + 1];
+                        
+                        var center = parentCells[rX, rZ];
 
                         if (!north.Land && !east.Land && !south.Land && !west.Land && !center.Land)
                         {

@@ -26,11 +26,16 @@ namespace TerrainGeneration
 
         public TransformLayer GetLast() => Layers.Last();
 
-        public CellMap Apply(int worldSeed)
+        public CellMap Apply()
+        {
+            var lastLayer = GetLast();
+            return lastLayer.Apply();
+        }
+
+        public void InitWorldSeed(int worldSeed)
         {
             var lastLayer = GetLast();
             lastLayer.InitWorldGenSeed(worldSeed);
-            return lastLayer.Apply();
         }
     }
 }

@@ -18,12 +18,10 @@ namespace TerrainGeneration.Layers
                 var resultCells = MapAllocator.GetNew(width, height);
 
                 // Increase map size to not be bothered with indices
-                var pX = x - 1;
-                var pZ = z - 1;
                 var parentWidth = width + 2;
                 var parentHeight = height + 2;
                 
-                var cells = ParentMap(pX, pZ, parentWidth, parentHeight);
+                var parentCells = ParentMap(x, z, parentWidth, parentHeight);
 
                 for (var rX = 0; rX < width; rX++)
                 {
@@ -31,12 +29,12 @@ namespace TerrainGeneration.Layers
                     {
                         InitChunkSeed(x + rX, z + rZ);
                         // Find neighbours
-                        var north = cells[rX + 1, rZ + 2];
-                        var east = cells[rX + 2, rZ + 1];
-                        var south = cells[rX + 1, rZ];
-                        var west = cells[rX, rZ + 1];
+                        var north = parentCells[rX + 1, rZ + 2];
+                        var east = parentCells[rX + 2, rZ + 1];
+                        var south = parentCells[rX + 1, rZ];
+                        var west = parentCells[rX, rZ + 1];
                         // Center  cell
-                        var center = cells[rX + 1, rZ + 1];
+                        var center = parentCells[rX + 1, rZ + 1];
                         
                         var neighbours = new []{ north, east, south, west };
                         
@@ -56,30 +54,30 @@ namespace TerrainGeneration.Layers
                         {
                             var oddsOfChange = 1;
                             var changedCell = center;
-
+                        
                             if (north.Land)
                             {
-                                if (OneIn(oddsOfChange)) { changedCell = north; }
+                                if (OneIn(oddsOfChange)) { changedCell.Land = north.Land; }
                                 oddsOfChange++;
                             }
-
+                        
                             if (east.Land)
                             {
-                                if (OneIn(oddsOfChange)) { changedCell = east; }
+                                if (OneIn(oddsOfChange)) { changedCell.Land = east.Land; }
                                 oddsOfChange++;
                             }
-
+                        
                             if (south.Land)
                             {
-                                if (OneIn(oddsOfChange)) { changedCell = south; }
+                                if (OneIn(oddsOfChange)) { changedCell.Land = south.Land; }
                                 oddsOfChange++;
                             }
-
+                        
                             if (west.Land)
                             {
-                                if (OneIn(oddsOfChange)) { changedCell = west; }
+                                if (OneIn(oddsOfChange)) { changedCell.Land = west.Land; }
                             }
-
+                        
                             if (OneIn(3)) { resultCells[rX, rZ] = changedCell; }
                             else { resultCells[rX, rZ] = center; }
                         }

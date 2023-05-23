@@ -1,25 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Net;
-using System.Xml;
+﻿using Code.Scripts.TerrainGeneration.Components;
 using Code.Scripts.TerrainGeneration.Layers.Optimization;
-using Code.Scripts.TerrainGeneration;
-using Code.Scripts.TerrainGeneration.Components;
-using TerrainGeneration.Noises;
-using UnityEngine;
-using static Utils.Utils;
+using TerrainGeneration;
 
-namespace TerrainGeneration.Layers
+namespace Code.Scripts.TerrainGeneration.Generators.Layers.Zooms
 {
     public class Zoom2Layer : TransformLayer
     {
         private const int ScaleFactor = 2;
-
-        private readonly bool _fuzzy;
-
-        public Zoom2Layer(long seed) : base(seed) { _fuzzy = false; }
-
-        public Zoom2Layer(long seed, bool fuzzy) : base(seed) { _fuzzy = fuzzy; }
-
+        
+        public Zoom2Layer(long seed) : base(seed) { }
+        
         public override CellMap Apply()
         {
             return (x, z, width, height) =>
@@ -27,8 +17,8 @@ namespace TerrainGeneration.Layers
                 var parentX = x / ScaleFactor;
                 var parentZ = z / ScaleFactor;
 
-                var parentWidth = (width / ScaleFactor) + 2;
-                var parentHeight = (height / ScaleFactor) + 2;
+                var parentWidth = width / ScaleFactor + 2;
+                var parentHeight = height / ScaleFactor + 2;
 
                 var parentArray = ParentMap(parentX, parentZ, parentWidth, parentHeight);
 
@@ -41,16 +31,15 @@ namespace TerrainGeneration.Layers
                 {
                     for (var rZ = 0; rZ < parentHeight - 1; rZ++)
                     {
-                        // Init chunk seed
+                        // Init chunk seed 
                         InitChunkSeed((parentX + rX) * 2, (parentZ + rZ) * 2);
-                        
                         tempArray[rX * ScaleFactor, rZ * ScaleFactor] = parentArray[rX, rZ];
 
                         tempArray[rX * ScaleFactor + 1, rZ * ScaleFactor] =
-                            CoinFlip(parentArray[rX + 1, rZ], parentArray[rX, rZ], 0.5f);
+                            SelectRandom(new[] { parentArray[rX, rZ], parentArray[rX + 1, rZ] });
 
                         tempArray[rX * ScaleFactor, rZ * ScaleFactor + 1] =
-                            CoinFlip(parentArray[rX, rZ + 1], parentArray[rX, rZ], 0.5f);
+                            SelectRandom(new[] { parentArray[rX, rZ], parentArray[rX, rZ + 1] });
 
                         tempArray[rX * ScaleFactor + 1, rZ * ScaleFactor + 1] = LastSelection(
                             parentArray[rX, rZ],
@@ -73,7 +62,7 @@ namespace TerrainGeneration.Layers
                         resultArray[rx - startX, rZ - startZ] = tempArray[rx, rZ];
                     }
                 }
-
+                
                 return resultArray;
             };
         }
@@ -95,23 +84,27 @@ namespace TerrainGeneration.Layers
             if (c3.Equals(c4) && !c1.Equals(c2)) { return c3; }
 
             // I know I could have written a function but it's fun to write it like that
-            return CoinFlip(
-                CoinFlip(c1, c2, 0.5f),
-                CoinFlip(c3, c4, 0.5f),
-            0.5f);
+            return SelectRandom(new[] { c1, c2, c3, c4 });
         }
     }
 
     public class FuzzyZoom2Layer : Zoom2Layer
     {
-        public FuzzyZoom2Layer(long seed) : base(seed, true) { }
+        public FuzzyZoom2Layer(long seed) : base(seed) { }
 
         protected override CellInfo LastSelection(CellInfo c1, CellInfo c2, CellInfo c3, CellInfo c4)
         {
-            return CoinFlip(
-                CoinFlip(c1, c2, 0.5f),
-                CoinFlip(c3, c4, 0.5f), 
-            0.5f);
+            return SelectRandom(new[] { c1, c2, c3, c4 });
         }
+    }
+
+    // Perfect zoom
+    public class DebugZoom2Layer : Zoom2Layer
+    {
+        public DebugZoom2Layer(long seed) : base(seed) { }
+
+        protected override CellInfo LastSelection(CellInfo c1, CellInfo c2, CellInfo c3, CellInfo c4) => c1;
+
+        protected override T SelectRandom<T>(T[] collection) => collection[0];
     }
 }

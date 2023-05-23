@@ -1,8 +1,7 @@
 ﻿using Code.Scripts.TerrainGeneration.Components;
 using TerrainGeneration;
-using UnityEngine;
 
-namespace Code.Scripts.TerrainGeneration.Layers
+namespace Code.Scripts.TerrainGeneration.Generators.Layers
 {
     public class AddBiomesLayer : TransformLayer
     {

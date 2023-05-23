@@ -15,7 +15,7 @@ namespace Code.Scripts.TerrainGeneration.Rendering
 
         public enum DisplayType
         {
-            Default, Temperature, Humidity, Height, Biome, Dist
+            Default, Temperature, Humidity, Height, Biome, Ocean
         }
         
         /// <summary>
@@ -43,7 +43,7 @@ namespace Code.Scripts.TerrainGeneration.Rendering
                     DisplayType.Temperature => GetTemperatureColor(cellInfo.Temperature),
                     DisplayType.Humidity => GetPrecipitationColor(cellInfo.Precipitation),
                     DisplayType.Height => GetHeightColor(cell.Height),
-                    DisplayType.Dist => GetDistColor(cellInfo.Dist),
+                    DisplayType.Ocean => GetOceanColor(cellInfo.Ocean),
                     DisplayType.Biome => GetBiomeColor(cellInfo),
                     _ => Color.magenta // Indicates a bug
                 };
@@ -58,9 +58,9 @@ namespace Code.Scripts.TerrainGeneration.Rendering
             );
         }
 
-        private static Color GetDistColor(float infoDist)
+        private static Color GetOceanColor(bool ocean)
         {
-            return Color.black.Mix(Color.white, infoDist);
+            return ocean ? Color.blue : Color.yellow;
         }
 
         private static Color GetHeightColor(float cellHeight)
