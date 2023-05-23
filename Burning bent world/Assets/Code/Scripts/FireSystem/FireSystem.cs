@@ -156,7 +156,7 @@ namespace FireSystem
             foreach (var chunk in chunksToUpdateTextures)
             {
                 ChunkRenderer cr = terrainRenderer.GetChunkRenderer(chunk.ChunkX, chunk.ChunkZ);
-                //TODO: Waiting for Léo's modifications.
+                //TODO: Waiting for Lï¿½o's modifications.
                 //cr.GenerateTexture();
             }
 
