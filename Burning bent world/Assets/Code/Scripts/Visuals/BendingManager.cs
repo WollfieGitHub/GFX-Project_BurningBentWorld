@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 
-[ExecuteAlways]
+// [ExecuteAlways]
 public class BendingManager : MonoBehaviour
 {
   #region Constants
