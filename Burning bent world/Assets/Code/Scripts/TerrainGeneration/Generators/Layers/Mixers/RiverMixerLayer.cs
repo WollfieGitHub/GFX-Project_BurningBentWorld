@@ -1,33 +1,31 @@
-﻿using Code.Scripts.TerrainGeneration.Layers.Optimization;
-using Code.Scripts.TerrainGeneration;
-using Code.Scripts.TerrainGeneration.Components;
-using TerrainGeneration;
-using TerrainGeneration.Components;
+﻿using Code.Scripts.TerrainGeneration.Components;
+using Code.Scripts.TerrainGeneration.Layers;
+using Code.Scripts.TerrainGeneration.Layers.Optimization;
 
-namespace Code.Scripts.TerrainGeneration.Layers
+namespace Code.Scripts.TerrainGeneration.Generators.Layers.Mixers
 {
     public class RiverMixerLayer : MixLayer
     {
         public override CellMap Apply()
         {
-            return (x, y, width, height) =>
+            return (x, z, width, height) =>
             {
                 var resultCells = MapAllocator.GetNew(width, height);
 
-                var baseCells = ParentMap(x, y, width, height);
-                var riverCells = FilterMap(x, y, width, height);
+                var baseCells = ParentMap(x, z, width, height);
+                var riverCells = FilterMap(x, z, width, height);
 
                 for (var rX = 0; rX < width; rX++)
                 {
-                    for (var rY = 0; rY < height; rY++)
+                    for (var rZ = 0; rZ < height; rZ++)
                     {
-                        var cell = baseCells[rX, rY];
+                        var cell = baseCells[rX, rZ];
                         
                         // Only change if land
-                        if (baseCells[rX, rY].Land)
+                        if (baseCells[rX, rZ].Land)
                         {
                             // And the river cell is river and not null
-                            if (Biome.River.Equals(riverCells[rX, rY].Biome))
+                            if (Biome.River.Equals(riverCells[rX, rZ].Biome))
                             {
                                 // Then put a river
                                 cell.Biome = cell.Temperature < Biome.WaterFreezingTemperature 
@@ -36,7 +34,7 @@ namespace Code.Scripts.TerrainGeneration.Layers
                             }
                         }
 
-                        resultCells[rX, rY] = cell;
+                        resultCells[rX, rZ] = cell;
                     }
                 }
 

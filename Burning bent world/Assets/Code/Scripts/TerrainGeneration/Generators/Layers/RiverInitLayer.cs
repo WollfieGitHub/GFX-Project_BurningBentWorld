@@ -1,9 +1,8 @@
-﻿using Code.Scripts.TerrainGeneration;
-using Code.Scripts.TerrainGeneration.Components;
+﻿using Code.Scripts.TerrainGeneration.Components;
 using TerrainGeneration;
 using Utils;
 
-namespace Code.Scripts.TerrainGeneration.Layers
+namespace Code.Scripts.TerrainGeneration.Generators.Layers
 {
     public class RiverInitLayer : TransformLayer
     {
@@ -23,7 +22,7 @@ namespace Code.Scripts.TerrainGeneration.Layers
 
                         if (cells[rX, rZ].Land)
                         {
-                            cell.RiverIndicator = Constants.URandom.Next(299999) + 2;
+                            cell.RiverIndicator = NextInt(299999) + 2;
                         }
                         else
                         {

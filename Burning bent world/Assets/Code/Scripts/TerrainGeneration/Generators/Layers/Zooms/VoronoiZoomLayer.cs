@@ -21,6 +21,9 @@ namespace Code.Scripts.TerrainGeneration.Layers
                 // Decoded and transformed from : 
                 // https://github.com/eldariamc/client/blob/master/src/main/java/net/minecraft/world/gen/layer/GenLayerVoronoiZoom.java
 
+                x -= ScaleFactor / 2;
+                z -= ScaleFactor / 2;
+
                 var pX = x / ScaleFactor;
                 var pZ = z / ScaleFactor;
                 
