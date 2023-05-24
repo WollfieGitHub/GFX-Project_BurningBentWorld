@@ -61,6 +61,7 @@ namespace Code.Scripts.TerrainGeneration
         [SerializeField] public bool renderMesh = true;
         [SerializeField] public ChunkTexture.DisplayType displayType;
         [SerializeField] public Material terrainMaterial;
+        [SerializeField] public Material waterMaterial;
         [SerializeField] public Material grassMaterial;
 
         private bool _needRefresh;
