@@ -135,9 +135,7 @@ namespace Code.Scripts.TerrainGeneration.Components
         private void Start()
         {
             NotifyNeighbour(ChunkX - 1, ChunkZ);
-            NotifyNeighbour(ChunkX + 1, ChunkZ);
             NotifyNeighbour(ChunkX, ChunkZ - 1);
-            NotifyNeighbour(ChunkX, ChunkZ + 1);
         }
         
         private void NotifyNeighbour(int neighbourX, int neighbourZ)
