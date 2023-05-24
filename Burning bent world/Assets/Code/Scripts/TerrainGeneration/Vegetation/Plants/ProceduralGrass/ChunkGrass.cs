@@ -17,7 +17,6 @@ namespace Code.Scripts.TerrainGeneration.Vegetation.Plants.ProceduralGrass
         private WindZone _windZone;
         private Renderer _renderer;
 
-        private static bool _noWindZoneWarningDisplayed;
         private Material _grassMaterialInstance;
 
         private Transform _cameraTransform;
@@ -25,15 +24,15 @@ namespace Code.Scripts.TerrainGeneration.Vegetation.Plants.ProceduralGrass
         private Chunk _chunk;
 
         private const int VisibilityThreshold = 50;
-        
+
         private void Awake()
         {
             _windZone = FindObjectOfType<WindZone>();
             
-            if (!_noWindZoneWarningDisplayed && _windZone == null)
+            if (_windZone == null)
             {
-                Debug.LogWarning("No wind zone found");
-                _noWindZoneWarningDisplayed = true;
+                var windZone = new GameObject { name = "WindZone" };
+                _windZone = windZone.AddComponent<WindZone>();
             }
 
             _transform = transform;
@@ -55,12 +54,9 @@ namespace Code.Scripts.TerrainGeneration.Vegetation.Plants.ProceduralGrass
 
         }
 
-        private void Start()
-        {
-            Init(_chunk);
-        }
+        private void Start() { Init(_chunk); }
 
-        public void Init(Chunk chunk)
+        private void Init(Chunk chunk)
         {
             _renderer = GetComponent<Renderer>();
 

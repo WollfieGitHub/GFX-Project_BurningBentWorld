@@ -123,7 +123,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _AlphaClip: 0
-    - _BendDelta: 0.9
+    - _BendDelta: 0.15
     - _BladeBendCurve: 4
     - _BladeBendDistance: 0.39
     - _BladeCurve: 2
@@ -139,8 +139,8 @@ Material:
     - _BladeWidthMin: 0.02
     - _Blend: 0
     - _BumpScale: 1
-    - _ChunkX: 576
-    - _ChunkZ: 752
+    - _ChunkX: 32
+    - _ChunkZ: -48
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
@@ -167,7 +167,7 @@ Material:
     - _TesselationFactor: 4
     - _TessellationEdgeLength: 0.25
     - _TessellationFactor: 4
-    - _TessellationGrassDistance: 0.11
+    - _TessellationGrassDistance: 0.2
     - _Visible: 0
     - _WindFrequency: 0.01
     - _WindStrength: 0.5

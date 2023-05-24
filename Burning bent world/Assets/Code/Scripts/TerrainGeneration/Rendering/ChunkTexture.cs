@@ -21,7 +21,7 @@ namespace Code.Scripts.TerrainGeneration.Rendering
 
         public enum DisplayType
         {
-            Default, Temperature, Humidity, Height, Biome, Ocean
+            Default, Temperature, Humidity, Height, Biome, Ocean, Cell
         }
         
         /// <summary>
@@ -36,9 +36,18 @@ namespace Code.Scripts.TerrainGeneration.Rendering
             const int width = Chunk.Size;
             const int height = Chunk.Size;
 
-            return CreateTexture(width*2, height*2, (x, y) =>
+            // Add 2 to be able to represent neighbours' color
+            return CreateTexture((width + 2)*2, (height + 2)*2, (x, y) =>
             {
-                var cell = chunk.GetCellAt(x/2, y/2);
+                var dx = x/2;
+                var dy = y/2;
+                // If one of the neighbour
+                if (dx == 0 || dy == 0 || dx == width+1 || dy == height+1) { return Color.black; }
+
+                dx -= 1;
+                dy -= 1;
+                
+                var cell = chunk.GetCellAt(dx, dy);
                 var cellInfo = cell.Info;
 
                 var color = displayType switch
@@ -51,6 +60,7 @@ namespace Code.Scripts.TerrainGeneration.Rendering
                     DisplayType.Height => GetHeightColor(cell.Height),
                     DisplayType.Ocean => GetOceanColor(cellInfo.Ocean),
                     DisplayType.Biome => GetBiomeColor(cellInfo),
+                    DisplayType.Cell => (dx + dy) % 2 == 0 ? Color.black : Color.magenta,
                     _ => Color.magenta // Indicates a bug
                 };
 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Code.Scripts.TerrainGeneration.Loaders;
 using Code.Scripts.TerrainGeneration.Rendering;
+using Code.Scripts.TerrainGeneration.Vegetation.Plants.ProceduralGrass;
 using Code.Scripts.Utils;
 using TerrainGeneration.Rendering;
 using UnityEngine;
@@ -107,6 +108,7 @@ namespace Code.Scripts.TerrainGeneration.Components
 
         public ChunkRenderer ChunkRenderer { private set; get; }
         public ChunkCollider ChunkCollider { private set; get; }
+        public ChunkGrass ChunkGrass       { private set; get; }
 
         /// <summary>
         /// Updates the reference to the chunk's objects
@@ -114,13 +116,16 @@ namespace Code.Scripts.TerrainGeneration.Components
         /// </summary>
         /// <param name="chunkRenderer">Chunk Renderer</param>
         /// <param name="chunkCollider">Chunk Collider</param>
+        /// <param name="chunkGrass">Chunk Grass</param>
         public void UpdateRefs(
             ChunkRenderer chunkRenderer,
-            ChunkCollider chunkCollider
+            ChunkCollider chunkCollider,
+            ChunkGrass chunkGrass
         )
         {
             ChunkRenderer = chunkRenderer;
             ChunkCollider = chunkCollider;
+            ChunkGrass = chunkGrass;
         }
 
 //======== ====== ==== ==

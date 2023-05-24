@@ -58,7 +58,7 @@ namespace Code.Scripts.TerrainGeneration.Rendering
                 _displayType = value;
                 if (_started)
                 {
-                    StartCoroutine(nameof(CalcNewMesh));
+                    StartCoroutine(nameof(CalcNewTexture));
                 }
             }
         }

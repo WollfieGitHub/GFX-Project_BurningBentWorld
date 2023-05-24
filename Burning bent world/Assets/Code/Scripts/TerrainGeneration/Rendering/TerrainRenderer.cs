@@ -61,9 +61,11 @@ namespace TerrainGeneration.Rendering
 
         private void LoadMaterials()
         {
-            _materials = new Material[1];
-            _materials[TerrainMaterialIdx] = _terrain.terrainMaterial;
-            // _materials[GrassMaterialIdx] = _terrain.grassMaterial;
+            var materials = new List<Material> { _terrain.terrainMaterial };
+
+            if (_terrain.renderGrass) { materials.Add(_terrain.grassMaterial); }
+
+            _materials = materials.ToArray();
         }
         
         private void Update()
@@ -102,6 +104,14 @@ namespace TerrainGeneration.Rendering
             chunkRenderer.RenderMesh = _terrain.renderMesh;
             chunkRenderer.DisplayType = _terrain.displayType;
             chunkRenderer.SetMaterials(_materials);
+
+            var chunkGrass = chunk.ChunkGrass;
+
+            if (_terrain.renderGrass)
+            {
+                chunkGrass.SetMaterial(_terrain.grassMaterial);
+                
+            } else { chunkGrass.enabled = false; }
             
             _chunkRenderers.Add(chunkRenderer);
         }

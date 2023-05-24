@@ -101,9 +101,11 @@ namespace Code.Scripts.TerrainGeneration.Generators
 
                 // Setup renderer
                 var chunkRenderer = chunkObj.AddComponent<ChunkRenderer>();
+                // Setup grass
+                var chunkGrass = chunkObj.AddComponent<ChunkGrass>();
 
                 // Update the chunk's references
-                chunk.UpdateRefs(chunkRenderer, chunkCollider);
+                chunk.UpdateRefs(chunkRenderer, chunkCollider, chunkGrass);
 
                 OnChunkCreated?.Invoke(chunk);
 

@@ -248,14 +248,17 @@ Shader "Custom/ChunkGrass"
 			// It interpolates the properties of the vertices (position, normal, etc.)
 			// to create new vertices.
 			[domain("tri")]
-			VertexOutput domain(TessellationFactors factors, OutputPatch<VertexInput, 3> patch, float3 barycentricCoordinates : SV_DomainLocation)
-			{
+			VertexOutput domain(
+				TessellationFactors factors,
+				const OutputPatch<VertexInput, 3> patch,
+				float3 barycentricCoordinates : SV_DomainLocation
+			) {
 				VertexInput i;
 
-				#define INTERPOLATE(fieldname) i.fieldname = \
-					patch[0].fieldname * barycentricCoordinates.x + \
-					patch[1].fieldname * barycentricCoordinates.y + \
-					patch[2].fieldname * barycentricCoordinates.z;
+				#define INTERPOLATE(field_name) i.field_name = \
+					patch[0].field_name * barycentricCoordinates.x + \
+					patch[1].field_name * barycentricCoordinates.y + \
+					patch[2].field_name * barycentricCoordinates.z;
 
 				INTERPOLATE(vertex)
 				INTERPOLATE(normal)
@@ -270,13 +273,17 @@ Shader "Custom/ChunkGrass"
 
 			// This function applies a transformation (during the geometry shader),
 			// converting to clip space in the process.
-			GeomData TransformGeomToClip(float3 pos, float3 offset, float3x3 transformationMatrix, float2 uv)
-			{
+			GeomData transform_geom_to_clip(
+				const float3 pos,
+				const float3 offset,
+				const float3x3 transformation_matrix,
+				const float2 uv
+			){
 				GeomData o;
 
-				o.pos = TransformObjectToHClip(pos + mul(transformationMatrix, offset));
+				o.pos = TransformObjectToHClip(pos + mul(transformation_matrix, offset));
 				o.uv = uv;
-				o.worldPos = TransformObjectToWorld(pos + mul(transformationMatrix, offset));
+				o.worldPos = TransformObjectToWorld(pos + mul(transformation_matrix, offset));
 
 				return o;
 			}
@@ -286,10 +293,10 @@ Shader "Custom/ChunkGrass"
 			[maxvertexcount(BLADE_SEGMENTS * 2 + 1)]
 			void geom(point VertexOutput input[1], inout TriangleStream<GeomData> triStream)
 			{
-				float grassVisibility = tex2Dlod(_GrassMap, float4(input[0].uv, 0, 0)).r;
+				const float grass_visibility = tex2Dlod(_GrassMap, float4(input[0].uv, 0, 0)).r;
 
 				// Make sure the normal of the triangle is pointing upward to put grass
-				if (grassVisibility >= _GrassThreshold && input[0].normal.y > 0.5f)
+				if (grass_visibility >= _GrassThreshold && input[0].normal.y > 0.99f)
 				{
 					float3 pos = input[0].vertex.xyz;
 
@@ -297,7 +304,7 @@ Shader "Custom/ChunkGrass"
 					float4 tangent = input[0].tangent;
 					float3 bitangent = cross(normal, tangent.xyz) * tangent.w;
 
-					float3x3 tangentToLocal = float3x3
+					const float3x3 tangent_to_local = float3x3
 					(
 						tangent.x, bitangent.x, normal.x,
 						tangent.y, bitangent.y, normal.y,
@@ -305,24 +312,24 @@ Shader "Custom/ChunkGrass"
 					);
 
 					// Rotate around the y-axis a random amount.
-					float3x3 randRotMatrix = angleAxis3x3(rand(pos) * UNITY_TWO_PI, float3(0, 0, 1.0f));
+					const float3x3 rand_rot_matrix = angleAxis3x3(rand(pos) * UNITY_TWO_PI, float3(0, 0, 1.0f));
 
 					// Rotate around the bottom of the blade a random amount.
-					float3x3 randBendMatrix = angleAxis3x3(rand(pos.zzx) * _BendDelta * UNITY_PI * 0.5f, float3(-1.0f, 0, 0));
+					const float3x3 rand_bend_matrix = angleAxis3x3(rand(pos.zzx) * _BendDelta * UNITY_PI * 0.5f, float3(-1.0f, 0, 0));
 
-					float2 windUV = pos.xz * _WindMap_ST.xy + _WindMap_ST.zw + normalize(_WindVelocity.xzy) * _WindFrequency * _Time.y;
-					float2 windSample = (tex2Dlod(_WindMap, float4(windUV, 0, 0)).xy * 2 - 1) * length(_WindVelocity);
+					float2 wind_uv = pos.xz * _WindMap_ST.xy + _WindMap_ST.zw + normalize(_WindVelocity.xzy) * _WindFrequency * _Time.y;
+					float2 wind_sample = (tex2Dlod(_WindMap, float4(wind_uv, 0, 0)).xy * 2 - 1) * length(_WindVelocity);
 
-					float3 windAxis = normalize(float3(windSample.x, windSample.y, 0));
-					float3x3 windMatrix = angleAxis3x3(UNITY_PI * windSample, windAxis);
+					const float3 wind_axis = normalize(float3(wind_sample.x, wind_sample.y, 0));
+					const float3x3 wind_matrix = angleAxis3x3(UNITY_PI * wind_sample, wind_axis);
 
 					// Transform the grass blades to the correct tangent space.
-					float3x3 baseTransformationMatrix = mul(tangentToLocal, randRotMatrix);
-					float3x3 tipTransformationMatrix = mul(mul(mul(tangentToLocal, windMatrix), randBendMatrix), randRotMatrix);
+					const float3x3 base_transformation_matrix = mul(tangent_to_local, rand_rot_matrix);
+					const float3x3 tip_transformation_matrix = mul(mul(mul(tangent_to_local, wind_matrix), rand_bend_matrix), rand_rot_matrix);
 
-					float falloff = smoothstep(_GrassThreshold, _GrassThreshold + _GrassFalloff, grassVisibility);
+					const float falloff = smoothstep(_GrassThreshold, _GrassThreshold + _GrassFalloff, grass_visibility);
 
-					float width  = lerp(_BladeWidthMin, _BladeWidthMax, rand(pos.xzy) * falloff);
+					const float width  = lerp(_BladeWidthMin, _BladeWidthMax, rand(pos.xzy) * falloff);
 					float height = lerp(_BladeHeightMin, _BladeHeightMax, rand(pos.zyx) * falloff);
 					float forward = rand(pos.yyz) * _BladeBendDistance;
 
@@ -332,14 +339,14 @@ Shader "Custom/ChunkGrass"
 						float t = i / (float)BLADE_SEGMENTS;
 						float3 offset = float3(width * (1 - t), pow(t, _BladeBendCurve) * forward, height * t);
 
-						float3x3 transformationMatrix = (i == 0) ? baseTransformationMatrix : tipTransformationMatrix;
+						const float3x3 transformation_matrix = i == 0 ? base_transformation_matrix : tip_transformation_matrix;
 
-						triStream.Append(TransformGeomToClip(pos, float3( offset.x, offset.y, offset.z), transformationMatrix, float2(0, t)));
-						triStream.Append(TransformGeomToClip(pos, float3(-offset.x, offset.y, offset.z), transformationMatrix, float2(1, t)));
+						triStream.Append(transform_geom_to_clip(pos, float3( offset.x, offset.y, offset.z), transformation_matrix, float2(0, t)));
+						triStream.Append(transform_geom_to_clip(pos, float3(-offset.x, offset.y, offset.z), transformation_matrix, float2(1, t)));
 					}
 
 					// Add the final vertex at the tip of the grass blade.
-					triStream.Append(TransformGeomToClip(pos, float3(0, forward, height), tipTransformationMatrix, float2(0.5, 1)));
+					triStream.Append(transform_geom_to_clip(pos, float3(0, forward, height), tip_transformation_matrix, float2(0.5, 1)));
 
 					triStream.RestartStrip();
 				}

@@ -56,7 +56,8 @@ namespace Code.Scripts.TerrainGeneration
         [Header("Performance")] 
         [SerializeField] [Range(1, 32)] private int chunkDistance = 4;
 
-        [Header("Appearance")]
+        [Header("Appearance")] 
+        [SerializeField] public bool renderGrass;
         [SerializeField] public bool renderMesh = true;
         [SerializeField] public ChunkTexture.DisplayType displayType;
         [SerializeField] public Material terrainMaterial;
