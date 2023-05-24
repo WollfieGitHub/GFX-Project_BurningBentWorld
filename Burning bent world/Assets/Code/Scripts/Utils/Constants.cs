@@ -50,5 +50,7 @@ namespace Utils
 
         public const int NbSidesInSquare = 4;
 
+        public const int NbChunkNeighbours = 4;
+
     }
 }

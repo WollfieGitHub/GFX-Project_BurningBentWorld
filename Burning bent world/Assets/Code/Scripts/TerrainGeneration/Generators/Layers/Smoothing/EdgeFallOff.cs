@@ -1,11 +1,9 @@
 ﻿using Code.Scripts.TerrainGeneration.Components;
-using Code.Scripts.TerrainGeneration.Generators.Layers.Smoothing;
-using TerrainGeneration;
-using Unity.VisualScripting;
+using Code.Scripts.Utils;
 using UnityEngine;
 using static Utils.Utils;
 
-namespace Code.Scripts.TerrainGeneration.Layers.Smoothing
+namespace Code.Scripts.TerrainGeneration.Generators.Layers.Smoothing
 {
     public class EdgeFallOff : IVoxelSmoother
     {
@@ -19,7 +17,8 @@ namespace Code.Scripts.TerrainGeneration.Layers.Smoothing
             return sin * sin;
         }
 
-        public float GetBiomeHeightAt(int globX, int globZ, int x, int z, int width, int height, CellInfo[,] cells)
+        public float GetBiomeHeightAt(
+            int globX, int globZ, int x, int z, int width, int height, Efficient2DArray<CellInfo> cells)
         {
             var spiral = Spiral(Distance);
 

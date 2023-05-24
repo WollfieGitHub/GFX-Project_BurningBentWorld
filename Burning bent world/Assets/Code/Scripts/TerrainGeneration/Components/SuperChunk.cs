@@ -6,6 +6,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 using Code.Scripts.TerrainGeneration.Generators;
 using Code.Scripts.TerrainGeneration.Loaders.Serialization;
+using Code.Scripts.Utils;
 using Unity.VisualScripting;
 using UnityEngine;
 using static Utils.Utils;
@@ -112,11 +113,11 @@ namespace Code.Scripts.TerrainGeneration.Components
         /// An array of <see cref="CellInfo"/> of dimensions <see cref="Chunk.Size"/>
         /// by <see cref="Chunk.Size"/>
         /// </returns>
-        public async Task<Cell[,]> GetChunkCells(int xChunk, int zChunk)
+        public async Task<Efficient2DArray<Cell>> GetChunkCells(int xChunk, int zChunk)
         {
             if (!_loaded) { await _cellLoader; }
             
-            var result = new Cell[Chunk.Size, Chunk.Size];
+            var result = new Efficient2DArray<Cell>(Chunk.Size, Chunk.Size);
 
             xChunk = MathModulus(xChunk, Size / Chunk.Size);
             zChunk = MathModulus(zChunk, Size / Chunk.Size);

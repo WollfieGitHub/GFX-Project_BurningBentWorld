@@ -6,6 +6,7 @@ using Code.Scripts.TerrainGeneration.Generators.Layers;
 using Code.Scripts.TerrainGeneration.Generators.Layers.Mixers;
 using Code.Scripts.TerrainGeneration.Generators.Layers.Zooms;
 using Code.Scripts.TerrainGeneration.Layers;
+using Code.Scripts.Utils;
 using TerrainGeneration;
 using TerrainGeneration.Layers;
 using UnityEngine;
@@ -149,7 +150,7 @@ namespace Code.Scripts.TerrainGeneration.Generators
         /// <param name="width">The width of the terrain to generate</param>
         /// <param name="height">The height of the terrain to generate</param>
         /// <returns>The newly generated terrain</returns>
-        public CellInfo[,] GenerateNew(int xOffset, int zOffset, int width, int height)
+        public Efficient2DArray<CellInfo> GenerateNew(int xOffset, int zOffset, int width, int height)
         {
             // Cannot make threads interleave on the generation stack
             lock (this) { return _map(xOffset, zOffset, width, height); }

@@ -31,13 +31,17 @@ namespace TerrainGeneration.Layers
                 {
                     for (var rZ = 0; rZ < height; rZ++)
                     {
-                        cells[rX,rZ].Temperature = Mathf.Lerp(
+                        var cell = cells[rX, rZ];
+                        
+                        cell.Temperature = Mathf.Lerp(
                             Biome.MinTemperatureDeg, Biome.MaxTemperatureDeg,
                             Mathf.Clamp01(Mathf.PerlinNoise(
                                 Frequency * (x + rX + _xOffset),
                                 Frequency * (z + rZ + _zOffset)
                             ))
                         );
+
+                        cells[rX, rZ] = cell;
                     }
                 }
                 return cells;

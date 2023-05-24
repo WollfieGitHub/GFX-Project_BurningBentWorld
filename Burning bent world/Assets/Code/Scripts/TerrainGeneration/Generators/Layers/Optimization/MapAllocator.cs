@@ -1,9 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Code.Scripts.TerrainGeneration.Components;
-using TerrainGeneration;
+using Code.Scripts.Utils;
 
-namespace Code.Scripts.TerrainGeneration.Layers.Optimization
+namespace Code.Scripts.TerrainGeneration.Generators.Layers.Optimization
 {
     public static class MapAllocator
     {
@@ -24,11 +24,11 @@ namespace Code.Scripts.TerrainGeneration.Layers.Optimization
         /// <param name="width">The width of the desired array</param>
         /// <param name="height">The height of the desired array</param>
         /// <returns>The new array (either allocated or reused from unused arrays)</returns>
-        public static CellInfo[,] GetNew(int width, int height)
+        public static Efficient2DArray<CellInfo> GetNew(int width, int height)
         {
-            return new CellInfo[width,height];
+            return new Efficient2DArray<CellInfo>(width,height);
 
-            CellInfo[,] result;
+            Efficient2DArray<CellInfo> result;
             
             AllocatedArray array = null;
             var arraysExistForDimension = false;
@@ -57,7 +57,7 @@ namespace Code.Scripts.TerrainGeneration.Layers.Optimization
             // If no suitable array is found, allocate a new one
             if (!arrayFound)
             {
-                result = new CellInfo[width, height];
+                result = new Efficient2DArray<CellInfo>(width, height);
                 array = new AllocatedArray { Array = result, Lifespan = ArrayLifespan};
                 // And add it to the list of arrays
                 AllocatedArraysByDimension[(width, height)].Add(array);
@@ -65,12 +65,11 @@ namespace Code.Scripts.TerrainGeneration.Layers.Optimization
             // Otherwise extract the result from the array found
             } else { result = array.Array; }
             
-            return result;
         }
 
         private class AllocatedArray
         {
-            public CellInfo[,] Array;
+            public Efficient2DArray<CellInfo> Array;
             
             /// <summary>
             /// Index goes from <see cref="MapAllocator.ArrayLifespan"/> to

@@ -2,15 +2,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using Code.Scripts.TerrainGeneration.Rendering;
-using Code.Scripts.TerrainGeneration.Vegetation.Plants.ProceduralGrass;
+using Code.Scripts.Utils;
 using TerrainGeneration.Rendering;
 using UnityEngine;
+using Utils;
 using static Utils.Utils;
 
 namespace Code.Scripts.TerrainGeneration.Components
 {
     public class Chunk : MonoBehaviour, IEnumerable<Cell>
     {
+//======== ====== ==== ==
+//      EVENTS
+//======== ====== ==== ==
+
+        public event Action NeighbourStateChanged;
+
 //======== ====== ==== ==
 //      PROPERTIES
 //======== ====== ==== ==
@@ -19,12 +26,34 @@ namespace Code.Scripts.TerrainGeneration.Components
         public const int Size = 16;
         
         /** Cells from this chunk */
-        private Cell[,] _cells;
+        private Efficient2DArray<Cell> _cells;
         
         /** X Coordinate relative to parent terrain's origin in number of chunks */
         [NonSerialized] public int ChunkX;
         /** Y Coordinate relative to parent terrain's origin in number of chunks */
         [NonSerialized] public int ChunkZ;
+
+        public struct NeighbouringChunk
+        {
+            public Chunk Chunk;
+            public bool Loaded;
+
+            public static NeighbouringChunk Of(Chunk chunk)
+            {
+                return new NeighbouringChunk { Chunk = chunk, Loaded = true };
+            }
+
+            public static NeighbouringChunk None => new() { Loaded = false };
+        }
+
+        /// <summary>
+        /// Convention :
+        /// 0 -> North
+        /// 1 -> East
+        /// 2 -> South
+        /// 3 -> West
+        /// </summary>
+        public NeighbouringChunk[] NeighbouringChunks = new NeighbouringChunk[Constants.NbChunkNeighbours];
 
         private readonly ChunkMap _mapGenerator;
 
@@ -32,7 +61,7 @@ namespace Code.Scripts.TerrainGeneration.Components
 //      CONSTRUCTOR
 //======== ====== ==== ==
 
-        public void Init(int xChunk, int zChunk, Cell[,] cells)
+        public void Init(int xChunk, int zChunk, Efficient2DArray<Cell> cells)
         {
             ChunkX = xChunk;
             ChunkZ = zChunk;
@@ -82,6 +111,39 @@ namespace Code.Scripts.TerrainGeneration.Components
         /// <returns>The height of the terrain at the specified coordinates</returns>
         public float GetHeightAtOrDefault(int x, int z, float fallback) =>
             IsInBounds(x, z, Size, Size) ? GetCellAt(x, z).Height : fallback;
+        
+        /// <summary>
+        /// A neighbouring chunk has just been loaded
+        /// </summary>
+        /// <param name="chunk">The loaded chunk</param>
+        /// <param name="loaded">True if the chunk is getting loaded, false if it is
+        ///  getting unloaded</param>
+        public void OnNeighbourLoadingStateChanged(Chunk chunk, bool loaded)
+        {
+            var index = (int)IndexFromCoordinates(
+                ChunkX - chunk.ChunkX,
+                ChunkZ - chunk.ChunkZ
+            );
+
+            NeighbouringChunks[index] = loaded ? NeighbouringChunk.Of(chunk) : NeighbouringChunk.None; 
+            // Notify modules that a neighbour's state has changed
+            NeighbourStateChanged?.Invoke();
+        }
+
+        private static Direction IndexFromCoordinates(int x, int z)
+        {
+            return z switch
+            {
+                > 0 => Direction.North,
+                < 0 => Direction.South,
+                _ => x switch
+                {
+                    > 0 => Direction.East,
+                    < 0 => Direction.West,
+                    _ => throw new ArgumentException("The chunk should not be identical")
+                }
+            };
+        }
 
 //======== ====== ==== ==
 //      OVERRIDES
@@ -101,7 +163,7 @@ namespace Code.Scripts.TerrainGeneration.Components
         }
 
         IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
-
+        
         
 //======== ====== ==== ==
 //      HELPERS
@@ -117,6 +179,5 @@ namespace Code.Scripts.TerrainGeneration.Components
         public static (int, int) GetChunkCoordinatesOf(
             int cellX, int cellZ
         ) =>  (cellX / Size, cellZ / Size);
-
     }
 }

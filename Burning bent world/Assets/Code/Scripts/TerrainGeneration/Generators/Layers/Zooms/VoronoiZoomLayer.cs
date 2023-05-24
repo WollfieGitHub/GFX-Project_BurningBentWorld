@@ -1,6 +1,6 @@
 ﻿using System;
-using Code.Scripts.TerrainGeneration.Layers.Optimization;
 using Code.Scripts.TerrainGeneration;
+using Code.Scripts.TerrainGeneration.Generators.Layers.Optimization;
 using TerrainGeneration;
 using UnityEngine;
 using static Utils.Constants;

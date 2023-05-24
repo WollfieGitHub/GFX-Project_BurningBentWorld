@@ -1,4 +1,5 @@
 ﻿using Code.Scripts.TerrainGeneration.Components;
+using Code.Scripts.Utils;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ namespace Code.Scripts.TerrainGeneration.Generators.Layers.Smoothing
         public int NecessaryNeighboursCount => InterpolationDistance;
 
         public float GetBiomeHeightAt(
-            int globX, int globZ, int x, int z, int width, int height, CellInfo[,] cells
+            int globX, int globZ, int x, int z, int width, int height, Efficient2DArray<CellInfo> cells
         )
         {
             var px = math.min(x + InterpolationDistance, width-1);

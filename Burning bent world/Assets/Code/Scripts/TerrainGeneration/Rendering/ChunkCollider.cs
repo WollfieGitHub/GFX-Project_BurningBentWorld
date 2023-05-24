@@ -68,9 +68,7 @@ namespace Code.Scripts.TerrainGeneration.Rendering
 
         private void EnableCollider()
         {
-            Debug.Log("WTF1");
             if (colliderEnabled && _collidersLoaded) { return; }
-            Debug.Log("WTF2");
 
             colliderEnabled = true;
             _collidersLoaded = true;

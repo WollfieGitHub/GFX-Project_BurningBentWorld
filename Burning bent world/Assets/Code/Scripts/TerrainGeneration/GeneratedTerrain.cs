@@ -6,6 +6,7 @@ using Code.Scripts.TerrainGeneration.Components;
 using Code.Scripts.TerrainGeneration.Generators;
 using Code.Scripts.TerrainGeneration.Loaders;
 using Code.Scripts.TerrainGeneration.Rendering;
+using Code.Scripts.Utils;
 using TerrainGeneration.Rendering;
 using UnityEngine;
 
@@ -17,7 +18,7 @@ namespace Code.Scripts.TerrainGeneration
 // ||                                                                                      ||
 // \\======================================================================================//
 
-    public delegate CellInfo[,] CellMap(int x, int z, int width, int height);
+    public delegate Efficient2DArray<CellInfo> CellMap(int x, int z, int width, int height);
 
     public delegate CellInfo ChunkMap(int x, int z);
     

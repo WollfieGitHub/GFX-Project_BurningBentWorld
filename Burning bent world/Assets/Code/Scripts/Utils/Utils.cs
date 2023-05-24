@@ -8,6 +8,14 @@ namespace Utils
 {
     public static class Utils
     {
+        public enum Direction
+        {
+            North = 0,
+            East = 1,
+            South = 2,
+            West = 3,
+        }
+        
         /// <summary>
         /// Generates a perlin noise value, rounded to an int, which distribution
         /// is between min and max

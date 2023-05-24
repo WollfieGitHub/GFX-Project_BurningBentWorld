@@ -1,24 +1,27 @@
 using UnityEngine;
 
-public class SimpleCameraController : MonoBehaviour
+namespace Code.Scripts.Gameplay
 {
-    [SerializeField] private float speed = 10f;
-
-    private Vector2 input;
-    private void Update()
+    public class SimpleCameraController : MonoBehaviour
     {
-        input = new Vector2(
-            Input.GetAxis("Horizontal"),
-            Input.GetAxis("Vertical")
-        );
-        if (input.x != 0)
-        {
-            transform.position += Vector3.right * (input.x * speed * Time.deltaTime);
-        }
+        [SerializeField] private float speed = 10f;
 
-        if (input.y != 0)
+        private Vector2 _input;
+        private void Update()
         {
-            transform.position += Vector3.forward * (input.y * speed * Time.deltaTime);
+            _input = new Vector2(
+                Input.GetAxis("Horizontal"),
+                Input.GetAxis("Vertical")
+            );
+            if (_input.x != 0)
+            {
+                transform.position += Vector3.right * (_input.x * speed * Time.deltaTime);
+            }
+
+            if (_input.y != 0)
+            {
+                transform.position += Vector3.forward * (_input.y * speed * Time.deltaTime);
+            }
         }
     }
 }

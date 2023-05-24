@@ -24,7 +24,9 @@ namespace Code.Scripts.TerrainGeneration.Generators.Layers
                             cell.Precipitation
                         );
 
-                        cells[rX, rZ].Biome = biome;
+                        cell.Biome = biome;
+
+                        cells[rX, rZ] = cell;
                     }
                 }
 

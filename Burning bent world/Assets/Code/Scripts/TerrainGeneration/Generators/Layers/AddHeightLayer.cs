@@ -1,7 +1,6 @@
 ﻿using Code.Scripts.TerrainGeneration.Components;
+using Code.Scripts.TerrainGeneration.Generators.Layers.Optimization;
 using Code.Scripts.TerrainGeneration.Generators.Layers.Smoothing;
-using Code.Scripts.TerrainGeneration.Layers.Optimization;
-using Code.Scripts.TerrainGeneration.Layers.Smoothing;
 using TerrainGeneration;
 using UnityEngine;
 using Terrain = TerrainGeneration.Components.Terrain;

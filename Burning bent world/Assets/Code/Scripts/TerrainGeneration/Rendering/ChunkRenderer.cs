@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using Code.Scripts.TerrainGeneration.Components;
-using Code.Scripts.TerrainGeneration.Rendering;
-using Code.Scripts.TerrainGeneration.Vegetation.Plants.ProceduralGrass;
-using TerrainGeneration.Components;
-using TerrainGeneration.Vegetation;
 using Unity.VisualScripting;
 using UnityEngine;
 
-namespace TerrainGeneration.Rendering
+namespace Code.Scripts.TerrainGeneration.Rendering
 {
     [RequireComponent(typeof(Renderer))]
     [RequireComponent(typeof(MeshFilter))]
     [RequireComponent(typeof(ChunkCollider))]
     public class ChunkRenderer : MonoBehaviour
     {
+        
+//======== ====== ==== ==
+//      PROPERTIES
+//======== ====== ==== ==
         
         private Texture2D _texture;
         private Renderer _rend;
@@ -25,7 +25,12 @@ namespace TerrainGeneration.Rendering
 
         private Chunk _chunk;
 
+        /// <summary>
+        /// Whether the mesh should be rendered using the cell's heights in the chunk
+        /// or as a planar mesh if set to false
+        /// </summary>
         private bool _renderMesh;
+        ///<summary><inheritdoc cref="_displayType"/></summary>
         public bool RenderMesh
         {
             set
@@ -35,7 +40,12 @@ namespace TerrainGeneration.Rendering
             }
         }
 
+        /// <summary>
+        /// The <see cref="ChunkTexture.DisplayType"/> that
+        /// the renderer should use to display the chunk
+        /// </summary>
         private ChunkTexture.DisplayType _displayType;
+        ///<summary><inheritdoc cref="_displayType"/></summary>
         public ChunkTexture.DisplayType DisplayType
         {
             set
@@ -44,6 +54,10 @@ namespace TerrainGeneration.Rendering
                 StartCoroutine(nameof(CalcNewTexture));
             }
         }
+        
+//======== ====== ==== ==
+//      LIFECYCLE
+//======== ====== ==== ==
 
         private void Awake()
         {
@@ -54,13 +68,27 @@ namespace TerrainGeneration.Rendering
             _meshFilter = GetComponent<MeshFilter>();
             _chunkCollider = GetComponent<ChunkCollider>();
         }
-        
+
+        private void OnEnable() => _chunk.NeighbourStateChanged += OnNeighbourChanged;
+        private void OnDisable() => _chunk.NeighbourStateChanged -= OnNeighbourChanged;
+
+        /// <summary>
+        /// A neighbour's state has changed, we must recompute the
+        /// mesh so that the boundaries adapt to the neighbouring chunk's bound appearance
+        /// </summary>
+        private void OnNeighbourChanged() => 
+            StartCoroutine(nameof(CalcNewMesh));
+
         private void Start()
         {
             // Set up the texture.
             CalcNewTexture();
             CalcNewMesh();
         }
+        
+//======== ====== ==== ==
+//      CONTROLS
+//======== ====== ==== ==
 
         private void CalcNewMesh()
         {
@@ -72,10 +100,36 @@ namespace TerrainGeneration.Rendering
             
             _chunkCollider.Recalculate();
         }
-
-        private Mesh GeneratePlanarMesh()
+        /// <summary>
+        /// Recomputes the new texture for the mesh given the <see cref="_displayType"/>
+        /// </summary>
+        private void CalcNewTexture()
         {
-            Mesh mesh = new Mesh();
+            if (_texture != null && !_texture.IsDestroyed()) { Destroy(_texture); }
+            
+            _texture = ChunkTexture.From(_chunk, _displayType);
+            _rend.material.mainTexture = _texture;
+        }
+
+        /// <summary>
+        /// Set the materials of the renderer
+        /// </summary>
+        /// <param name="materials">The materials that the renderer should use</param>
+        public void SetMaterials(IEnumerable<Material> materials) => 
+            _rend.SetMaterials(new List<Material>(materials));
+        
+//======== ====== ==== ==
+//      HELPERS
+//======== ====== ==== ==
+        
+        /// <summary>
+        /// Generate a planar mesh which size is the same
+        /// as the chunk's
+        /// </summary>
+        /// <returns>The newly created plane mesh</returns>
+        private static Mesh GeneratePlanarMesh()
+        {
+            var mesh = new Mesh();
             var vertices = new [] {
                 new Vector3(0.0f, 0.0f, 0.0f),
                 new Vector3(Chunk.Size, 0.0f, 0.0f),
@@ -105,17 +159,12 @@ namespace TerrainGeneration.Rendering
             return mesh;
         }
 
-        private Mesh GenerateChunkMesh(Chunk chunk) => ChunkMesh.From(chunk);
+        /// <summary>
+        /// Generates a mesh for the chunk using se <see cref="ChunkMesh"/> class
+        /// </summary>
+        /// <param name="chunk">The chunk for which we generate the mesh</param>
+        /// <returns>The newly created chunk mesh</returns>
+        private static Mesh GenerateChunkMesh(Chunk chunk) => ChunkMesh.From(chunk);
 
-        private void CalcNewTexture()
-        {
-            if (_texture != null && !_texture.IsDestroyed()) { Destroy(_texture); }
-            
-            _texture = ChunkTexture.From(_chunk, _displayType);
-            _rend.material.mainTexture = _texture;
-        }
-
-        public void SetMaterials(IEnumerable<Material> materials) => 
-            _rend.SetMaterials(new List<Material>(materials));
     }
 }

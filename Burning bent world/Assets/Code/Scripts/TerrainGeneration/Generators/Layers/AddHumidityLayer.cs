@@ -30,13 +30,17 @@ namespace Code.Scripts.TerrainGeneration.Generators.Layers
                 {
                     for (var rZ = 0; rZ < height; rZ++)
                     {
-                        cells[rX,rZ].Precipitation = Mathf.Lerp(
+                        var cell = cells[rX, rZ];
+                        
+                        cell.Precipitation = Mathf.Lerp(
                             Biome.MinPrecipitationCm, Biome.MaxPrecipitationCm,
                             Mathf.Clamp01(Mathf.PerlinNoise(
                                 Frequency * (x + rX + _xOffset),
                                 Frequency * (z + rZ + _zOffset)
                             ))
                         );
+
+                        cells[rX, rZ] = cell;
                     }
                 }
 

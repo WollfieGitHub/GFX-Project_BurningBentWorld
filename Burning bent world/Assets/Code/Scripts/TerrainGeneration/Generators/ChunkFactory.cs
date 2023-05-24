@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Code.Scripts.TerrainGeneration.Components;
 using Code.Scripts.TerrainGeneration.Rendering;
 using Code.Scripts.TerrainGeneration.Vegetation.Plants.ProceduralGrass;
+using Code.Scripts.Utils;
 using TerrainGeneration.Components;
 using TerrainGeneration.Rendering;
 using UnityEngine;
@@ -71,7 +72,7 @@ namespace Code.Scripts.TerrainGeneration.Generators
         /// <see cref="Chunk.Size"/> x <see cref="Chunk.Size"/></param>
         /// <returns>The newly created <see cref="Chunk"/></returns>
         public async Task<Chunk> CreateNew(
-            int xOffset, int zOffset, Cell[,] cells
+            int xOffset, int zOffset, Efficient2DArray<Cell> cells
         )
         {
             var chunkCreationTask = new Task<Chunk>(() =>

@@ -123,7 +123,6 @@ namespace Code.Scripts.TerrainGeneration.Loaders
             // Create a chunk and a reference in the list of loaded chunks
             var chunk = await _chunkFactory.CreateNew(xChunk, zChunk, cells);
 
-
             _loadedChunks[(xChunk, zChunk)] = chunk;
 
             // Add this chunk to the list of referencing chunks of the super chunk
@@ -133,8 +132,27 @@ namespace Code.Scripts.TerrainGeneration.Loaders
                 _referencingChunks[(xSChunk, zSChunk)] = chunkList;
             }
             chunkList.Add(chunk);
-            
-            // TODO Rest
+
+            // Notify all neighbours if they exist that the chunk just got loaded
+            NotifyNeighbour((xChunk, zChunk - 1), chunk, true);
+            NotifyNeighbour((xChunk - 1, zChunk), chunk, true);
+            NotifyNeighbour((xChunk, zChunk + 1), chunk, true);
+            NotifyNeighbour((xChunk + 1, zChunk), chunk, true);
+        }
+
+        /// <summary>
+        /// Notify a chunk that a new neighbour has been loaded
+        /// </summary>
+        /// <param name="neighbourCoordinates">The coordinates of the chunk to notify</param>
+        /// <param name="chunk">The new neighbour which just got loaded</param>
+        /// <param name="loaded">True if the chunk is getting loaded, false if it is
+        ///  getting unloaded</param>
+        private void NotifyNeighbour((int, int) neighbourCoordinates, Chunk chunk, bool loaded)
+        {
+            if (_loadedChunks.TryGetValue(neighbourCoordinates, out var neighbour))
+            {
+                neighbour.OnNeighbourLoadingStateChanged(chunk, loaded);
+            }
         }
 
         /// <summary>

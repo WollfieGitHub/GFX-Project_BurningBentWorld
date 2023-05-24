@@ -1,4 +1,5 @@
 ﻿using Code.Scripts.TerrainGeneration.Components;
+using Code.Scripts.TerrainGeneration.Generators.Layers.Optimization;
 using TerrainGeneration;
 
 namespace Code.Scripts.TerrainGeneration.Layers
@@ -20,7 +21,7 @@ namespace Code.Scripts.TerrainGeneration.Layers
         {
             return (x, z, width, height) =>
             {
-                var cells = new CellInfo[width, height];
+                var cells = MapAllocator.GetNew(width, height);
 
                 for (var rX = 0; rX < width; rX++)
                 {

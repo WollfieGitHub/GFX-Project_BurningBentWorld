@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using Code.Scripts.TerrainGeneration.Layers.Optimization;
 using Code.Scripts.TerrainGeneration;
+using Code.Scripts.TerrainGeneration.Generators.Layers.Optimization;
 using UnityEngine;
 using static Utils.Utils;
 using Debug = UnityEngine.Debug;

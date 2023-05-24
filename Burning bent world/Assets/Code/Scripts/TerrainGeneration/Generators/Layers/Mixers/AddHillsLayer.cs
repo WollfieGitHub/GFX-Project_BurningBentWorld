@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
+using Code.Scripts.TerrainGeneration.Generators.Layers.Optimization;
 using Code.Scripts.TerrainGeneration.Layers;
-using Code.Scripts.TerrainGeneration.Layers.Optimization;
 using Unity.VisualScripting;
 using UnityEngine;
 

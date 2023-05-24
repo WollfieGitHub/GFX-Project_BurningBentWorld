@@ -1,6 +1,6 @@
 ﻿using Code.Scripts.TerrainGeneration.Components;
+using Code.Scripts.TerrainGeneration.Generators.Layers.Optimization;
 using Code.Scripts.TerrainGeneration.Layers;
-using Code.Scripts.TerrainGeneration.Layers.Optimization;
 
 namespace Code.Scripts.TerrainGeneration.Generators.Layers.Mixers
 {

@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using Code.Scripts.TerrainGeneration.Components;
-using Code.Scripts.TerrainGeneration.Generators.Layers.Smoothing;
-using TerrainGeneration;
-using UnityEngine;
+﻿using Code.Scripts.TerrainGeneration.Components;
+using Code.Scripts.Utils;
 
-namespace Code.Scripts.TerrainGeneration.Layers.Smoothing
+namespace Code.Scripts.TerrainGeneration.Generators.Layers.Smoothing
 {
     public class GaussianBlur : IVoxelSmoother
     {
@@ -13,7 +10,7 @@ namespace Code.Scripts.TerrainGeneration.Layers.Smoothing
         public int NecessaryNeighboursCount => BlendRadius;
 
         public float GetBiomeHeightAt(
-            int globX, int globZ, int x, int z, int width, int height, CellInfo[,] cells
+            int globX, int globZ, int x, int z, int width, int height, Efficient2DArray<CellInfo> cells
         ) {
             var cellHeight = 0f;
             
