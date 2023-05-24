@@ -132,27 +132,6 @@ namespace Code.Scripts.TerrainGeneration.Loaders
                 _referencingChunks[(xSChunk, zSChunk)] = chunkList;
             }
             chunkList.Add(chunk);
-
-            // Notify all neighbours if they exist that the chunk just got loaded
-            NotifyNeighbour((xChunk, zChunk - 1), chunk, true);
-            NotifyNeighbour((xChunk - 1, zChunk), chunk, true);
-            NotifyNeighbour((xChunk, zChunk + 1), chunk, true);
-            NotifyNeighbour((xChunk + 1, zChunk), chunk, true);
-        }
-
-        /// <summary>
-        /// Notify a chunk that a new neighbour has been loaded
-        /// </summary>
-        /// <param name="neighbourCoordinates">The coordinates of the chunk to notify</param>
-        /// <param name="chunk">The new neighbour which just got loaded</param>
-        /// <param name="loaded">True if the chunk is getting loaded, false if it is
-        ///  getting unloaded</param>
-        private void NotifyNeighbour((int, int) neighbourCoordinates, Chunk chunk, bool loaded)
-        {
-            if (_loadedChunks.TryGetValue(neighbourCoordinates, out var neighbour))
-            {
-                neighbour.OnNeighbourLoadingStateChanged(chunk, loaded);
-            }
         }
 
         /// <summary>
@@ -192,7 +171,18 @@ namespace Code.Scripts.TerrainGeneration.Loaders
             _loadedSuperChunks.Remove((xSChunk, zSChunk), out _);
 
             _referencingChunks.Remove((xSChunk, zSChunk), out _);
+        }
 
+        /// <summary>
+        /// Tries to find a loaded chunk at the specified coordinates.
+        /// </summary>
+        /// <param name="x">The X coordinate</param>
+        /// <param name="z">The Z coordinate</param>
+        /// <param name="chunk">The chunk found if any</param>
+        /// <returns>True if a loaded chunk is found, false otherwise</returns>
+        public bool TryGetChunkAt(int x, int z, out Chunk chunk)
+        {
+            return _loadedChunks.TryGetValue((x, z), out chunk);
         }
         
     }

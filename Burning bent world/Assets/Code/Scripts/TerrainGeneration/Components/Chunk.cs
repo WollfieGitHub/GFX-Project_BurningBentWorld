@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Code.Scripts.TerrainGeneration.Loaders;
 using Code.Scripts.TerrainGeneration.Rendering;
 using Code.Scripts.Utils;
 using TerrainGeneration.Rendering;
 using UnityEngine;
+using UnityEngine.Rendering.UI;
 using Utils;
 using static Utils.Utils;
 
@@ -44,6 +47,17 @@ namespace Code.Scripts.TerrainGeneration.Components
             }
 
             public static NeighbouringChunk None => new() { Loaded = false };
+
+            public bool GetIfLoaded(out Chunk chunk)
+            {
+                if (Loaded)
+                {
+                    chunk = Chunk;
+                    return true;
+                }
+                chunk = null;
+                return false;
+            }
         }
 
         /// <summary>
@@ -53,12 +67,33 @@ namespace Code.Scripts.TerrainGeneration.Components
         /// 2 -> South
         /// 3 -> West
         /// </summary>
-        public NeighbouringChunk[] NeighbouringChunks = new NeighbouringChunk[Constants.NbChunkNeighbours];
+        public DirIndexArray<NeighbouringChunk> NeighbouringChunks
+        {
+            get
+            {
+                var result = new DirIndexArray<NeighbouringChunk>
+                {
+                    [Direction.North] = _terrainManager.TryGetChunkAt(ChunkX, ChunkZ+1, out var neighbour) 
+                        ? NeighbouringChunk.Of(neighbour) 
+                        : NeighbouringChunk.None,
+                    [Direction.East] = _terrainManager.TryGetChunkAt(ChunkX+1, ChunkZ, out neighbour) 
+                        ? NeighbouringChunk.Of(neighbour) 
+                        : NeighbouringChunk.None,
+                    [Direction.South] = _terrainManager.TryGetChunkAt(ChunkX, ChunkZ-1, out neighbour) 
+                        ? NeighbouringChunk.Of(neighbour) 
+                        : NeighbouringChunk.None,
+                    [Direction.West] = _terrainManager.TryGetChunkAt(ChunkX-1, ChunkZ, out neighbour) 
+                        ? NeighbouringChunk.Of(neighbour) 
+                        : NeighbouringChunk.None
+                };
+                return result;
+            }
+        }
 
-        private readonly ChunkMap _mapGenerator;
+        private TerrainManager _terrainManager;
 
 //======== ====== ==== ==
-//      CONSTRUCTOR
+//      INITIALIZATION
 //======== ====== ==== ==
 
         public void Init(int xChunk, int zChunk, Efficient2DArray<Cell> cells)
@@ -89,8 +124,35 @@ namespace Code.Scripts.TerrainGeneration.Components
         }
 
 //======== ====== ==== ==
+//      LIFECYCLE
+//======== ====== ==== ==
+
+        private void Awake()
+        {
+            _terrainManager = GetComponentInParent<TerrainManager>();
+        }
+
+        private void Start()
+        {
+            NotifyNeighbour(ChunkX - 1, ChunkZ);
+            NotifyNeighbour(ChunkX + 1, ChunkZ);
+            NotifyNeighbour(ChunkX, ChunkZ - 1);
+            NotifyNeighbour(ChunkX, ChunkZ + 1);
+        }
+        
+        private void NotifyNeighbour(int neighbourX, int neighbourZ)
+        {
+            if (_terrainManager.TryGetChunkAt(neighbourX, neighbourZ, out var neighbour))
+            {
+                neighbour.OnNeighbourLoaded();
+            }
+        }
+
+//======== ====== ==== ==
 //      METHODS
 //======== ====== ==== ==
+
+        public void OnNeighbourLoaded() => NeighbourStateChanged?.Invoke();
 
         /// <param name="x">The x coordinate in the chunk's referential</param>
         /// <param name="z">The y coordinate in the chunk's referential</param>
@@ -111,39 +173,6 @@ namespace Code.Scripts.TerrainGeneration.Components
         /// <returns>The height of the terrain at the specified coordinates</returns>
         public float GetHeightAtOrDefault(int x, int z, float fallback) =>
             IsInBounds(x, z, Size, Size) ? GetCellAt(x, z).Height : fallback;
-        
-        /// <summary>
-        /// A neighbouring chunk has just been loaded
-        /// </summary>
-        /// <param name="chunk">The loaded chunk</param>
-        /// <param name="loaded">True if the chunk is getting loaded, false if it is
-        ///  getting unloaded</param>
-        public void OnNeighbourLoadingStateChanged(Chunk chunk, bool loaded)
-        {
-            var index = (int)IndexFromCoordinates(
-                ChunkX - chunk.ChunkX,
-                ChunkZ - chunk.ChunkZ
-            );
-
-            NeighbouringChunks[index] = loaded ? NeighbouringChunk.Of(chunk) : NeighbouringChunk.None; 
-            // Notify modules that a neighbour's state has changed
-            NeighbourStateChanged?.Invoke();
-        }
-
-        private static Direction IndexFromCoordinates(int x, int z)
-        {
-            return z switch
-            {
-                > 0 => Direction.North,
-                < 0 => Direction.South,
-                _ => x switch
-                {
-                    > 0 => Direction.East,
-                    < 0 => Direction.West,
-                    _ => throw new ArgumentException("The chunk should not be identical")
-                }
-            };
-        }
 
 //======== ====== ==== ==
 //      OVERRIDES
@@ -179,5 +208,6 @@ namespace Code.Scripts.TerrainGeneration.Components
         public static (int, int) GetChunkCoordinatesOf(
             int cellX, int cellZ
         ) =>  (cellX / Size, cellZ / Size);
+
     }
 }

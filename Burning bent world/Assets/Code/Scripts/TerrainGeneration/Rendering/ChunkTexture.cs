@@ -1,8 +1,11 @@
-﻿using Code.Scripts.TerrainGeneration.Components;
+﻿using System;
+using Code.Scripts.TerrainGeneration.Components;
 using TerrainGeneration;
 using TerrainGeneration.Components;
 using UnityEngine;
 using Utils;
+using static UnityEngine.Mathf;
+using static Utils.Utils;
 using static Utils.Utils;
 using Terrain = TerrainGeneration.Components.Terrain;
 
@@ -10,6 +13,9 @@ namespace Code.Scripts.TerrainGeneration.Rendering
 {
     public static class ChunkTexture
     {
+        private const float NoiseFrequency = 0.5f;
+        private const float NoiseAmplitude = 0.25f;
+        
         //TODO: Check if this is a good way of doing this
         public static Color burntColor = Color255(77, 29, 20);
 
@@ -30,12 +36,12 @@ namespace Code.Scripts.TerrainGeneration.Rendering
             const int width = Chunk.Size;
             const int height = Chunk.Size;
 
-            return CreateTexture(width, height, (x, y) =>
+            return CreateTexture(width*2, height*2, (x, y) =>
             {
-                var cell = chunk.GetCellAt(x, y);
+                var cell = chunk.GetCellAt(x/2, y/2);
                 var cellInfo = cell.Info;
 
-                return displayType switch
+                var color = displayType switch
                 {
                     DisplayType.Default => cellInfo.Ocean || cellInfo.Biome.IsRiver ? Color.blue 
                         : cell.burnt ? Color.Lerp(new Color(0.77f, 0.29f, 0.20f), cellInfo.Biome.Color, 0.2f)
@@ -47,6 +53,17 @@ namespace Code.Scripts.TerrainGeneration.Rendering
                     DisplayType.Biome => GetBiomeColor(cellInfo),
                     _ => Color.magenta // Indicates a bug
                 };
+
+                var noise = Clamp01(PerlinNoise(
+                    (chunk.ChunkX * Chunk.Size * 2 + x) * NoiseFrequency,
+                    (chunk.ChunkZ * Chunk.Size * 2 + y) * NoiseFrequency
+                )) * NoiseAmplitude - NoiseAmplitude/2.0f;
+
+                Color.RGBToHSV(color, out var h, out var s, out var v);
+                v *= 1 - noise;
+                s *= 1 - noise * 0.5f;
+                
+                return Color.HSVToRGB(h, s, v);
             });
             
         }
@@ -66,7 +83,7 @@ namespace Code.Scripts.TerrainGeneration.Rendering
 
         private static Color GetHeightColor(float cellHeight)
         {
-            var relativeHeight = Mathf.InverseLerp(
+            var relativeHeight = InverseLerp(
                 Terrain.MinHeight, Terrain.MaxHeight, cellHeight
             );
             return Color.black.Mix(Color.white, relativeHeight);
@@ -74,7 +91,7 @@ namespace Code.Scripts.TerrainGeneration.Rendering
 
         private static Color GetPrecipitationColor(float cellPrecipitation)
         {
-            var relativeTemperature = Mathf.InverseLerp(
+            var relativeTemperature = InverseLerp(
                 Biome.MinPrecipitationCm, Biome.MaxPrecipitationCm, cellPrecipitation
             );
             return Color255(82, 72, 28).Mix(Color255(34, 255, 0), relativeTemperature);
@@ -82,7 +99,7 @@ namespace Code.Scripts.TerrainGeneration.Rendering
 
         private static Color GetTemperatureColor(float cellTemperature)
         {
-            var relativeTemperature = Mathf.InverseLerp(
+            var relativeTemperature = InverseLerp(
                 Biome.MinTemperatureDeg, Biome.MaxTemperatureDeg, cellTemperature
             );
             return Color.red.Mix(Color.blue, relativeTemperature);

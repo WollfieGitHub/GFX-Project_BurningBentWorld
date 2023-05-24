@@ -36,12 +36,10 @@ namespace Utils
         {
             // Don't pay attention to this hehe
             // ReSharper disable once HeuristicUnreachableCode
-            Debug.Log(DateTime.Now);
 #pragma warning disable CS0162
             Seed = UseRandomSeed ? (int)DateTime.Now.Ticks : CustomSeed;
 #pragma warning restore CS0162
             URandom = new(Seed);
-            Debug.Log($"Starting with seed [{Seed}]");
         }
 
 //======== ====== ==== ==

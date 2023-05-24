@@ -30,7 +30,6 @@ public class BendingManager : MonoBehaviour
     else
       Shader.DisableKeyword(PLANET_FEATURE);
 
-    Debug.Log("AWAKE");
     UpdateBendingAmount();
   }
 

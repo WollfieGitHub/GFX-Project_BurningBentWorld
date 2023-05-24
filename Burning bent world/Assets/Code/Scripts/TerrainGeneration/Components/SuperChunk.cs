@@ -119,8 +119,8 @@ namespace Code.Scripts.TerrainGeneration.Components
             
             var result = new Efficient2DArray<Cell>(Chunk.Size, Chunk.Size);
 
-            xChunk = MathModulus(xChunk, Size / Chunk.Size);
-            zChunk = MathModulus(zChunk, Size / Chunk.Size);
+            xChunk = Mathf.RoundToInt(MathModulus(xChunk, Size / Chunk.Size));
+            zChunk = Mathf.RoundToInt(MathModulus(zChunk, Size / Chunk.Size));
             
             for (var x = 0; x < Chunk.Size; x++)
             {

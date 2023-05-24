@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Code.Scripts.TerrainGeneration.Components;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -36,7 +38,10 @@ namespace Code.Scripts.TerrainGeneration.Rendering
             set
             {
                 _renderMesh = value;
-                StartCoroutine(nameof(CalcNewMesh));
+                if (_started)
+                {
+                    StartCoroutine(nameof(CalcNewMesh));
+                }
             }
         }
 
@@ -51,9 +56,14 @@ namespace Code.Scripts.TerrainGeneration.Rendering
             set
             {
                 _displayType = value;
-                StartCoroutine(nameof(CalcNewTexture));
+                if (_started)
+                {
+                    StartCoroutine(nameof(CalcNewMesh));
+                }
             }
         }
+
+        private bool _started;
         
 //======== ====== ==== ==
 //      LIFECYCLE
@@ -76,14 +86,17 @@ namespace Code.Scripts.TerrainGeneration.Rendering
         /// A neighbour's state has changed, we must recompute the
         /// mesh so that the boundaries adapt to the neighbouring chunk's bound appearance
         /// </summary>
-        private void OnNeighbourChanged() => 
+        private void OnNeighbourChanged()
+        {
             StartCoroutine(nameof(CalcNewMesh));
+        }
 
         private void Start()
         {
             // Set up the texture.
             CalcNewTexture();
             CalcNewMesh();
+            _started = true;
         }
         
 //======== ====== ==== ==
@@ -93,6 +106,8 @@ namespace Code.Scripts.TerrainGeneration.Rendering
         private void CalcNewMesh()
         {
             if (_mesh != null && !_mesh.IsDestroyed()) { Destroy(_mesh); }
+
+            // Debug.Log($"#Neighbours = {_chunk.NeighbouringChunks.ToList().Count(_ => _.Loaded)}");
 
             _mesh = _renderMesh ? GenerateChunkMesh(_chunk) : GeneratePlanarMesh();
             

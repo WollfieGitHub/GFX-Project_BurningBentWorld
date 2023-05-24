@@ -156,6 +156,6 @@ namespace Utils
         /// <param name="a">The value</param>
         /// <param name="b">The modulus' base</param>
         /// <returns>The result of a mod b</returns>
-        public static int MathModulus(int a, int b) => (Math.Abs(a * b) + a) % b;
+        public static float MathModulus(float a, int b) => (Math.Abs(a * b) + a) % b;
     }
 }

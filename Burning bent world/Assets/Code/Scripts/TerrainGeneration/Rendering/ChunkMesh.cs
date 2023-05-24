@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Code.Scripts.TerrainGeneration.Components;
-using TerrainGeneration.Components;
 using UnityEngine;
 using Utils;
+using static Utils.Utils;
 using Terrain = TerrainGeneration.Components.Terrain;
 
 namespace Code.Scripts.TerrainGeneration.Rendering
@@ -25,15 +26,15 @@ namespace Code.Scripts.TerrainGeneration.Rendering
             // - For top : 2 triangles at height level of cell
             for (var x = 0; x < Chunk.Size; x++)
             {
-                for (var y = 0; y < Chunk.Size; y++)
+                for (var z = 0; z < Chunk.Size; z++)
                 {
-                    var height = chunk.GetHeightAt(x, y);
+                    var height = chunk.GetHeightAt(x, z);
                     
                     // In clockwise wind rose : NW, NE, SE, SW
-                    var vTop1 = meshData.AddVertex(x, y, height, VertexDir.Nw);
-                    var vTop2 = meshData.AddVertex(x, y, height, VertexDir.Ne);
-                    var vTop3 = meshData.AddVertex(x, y, height, VertexDir.Se);
-                    var vTop4 = meshData.AddVertex(x, y, height, VertexDir.Sw);
+                    var vTop1 = meshData.AddVertex(x, z, height, VertexDir.Nw);
+                    var vTop2 = meshData.AddVertex(x, z, height, VertexDir.Ne);
+                    var vTop3 = meshData.AddVertex(x, z, height, VertexDir.Se);
+                    var vTop4 = meshData.AddVertex(x, z, height, VertexDir.Sw);
                     // Add top surface such that it faces upward
                     meshData.AddTriangle(vTop1, vTop2, vTop3);
                     meshData.AddTriangle(vTop1, vTop3, vTop4);
@@ -43,12 +44,14 @@ namespace Code.Scripts.TerrainGeneration.Rendering
                     //======== ====== ==== ==
                     //      NORTH VERTICAL PANE
                     //======== ====== ==== ==
-
-                    if (y == Chunk.Size-1)
-                    {
-                        vBot1 = meshData.AddBoundaryVertex(x, y+1, VertexDir.Sw);
-                        vBot2 = meshData.AddBoundaryVertex(x, y+1, VertexDir.Se);
                     
+                    if (z == Chunk.Size-1 && chunk.NeighbouringChunks[Direction.North].GetIfLoaded(out var northChunk))
+                    {
+                        var northHeight = northChunk.GetCellAt(x, 0).Height;
+                        vBot1 = meshData.AddBoundaryVertex(x, northHeight, z + 1, VertexDir.Sw);
+                        vBot2 = meshData.AddBoundaryVertex(x, northHeight, z + 1, VertexDir.Se);
+
+                        // Setup normal direction depending on which way the face is facing
                         meshData.AddTriangle(vTop1, vBot2, vTop2);
                         meshData.AddTriangle(vTop1, vBot1, vBot2);
                     }
@@ -57,44 +60,37 @@ namespace Code.Scripts.TerrainGeneration.Rendering
                     //      SOUTH VERTICAL PANE
                     //======== ====== ==== ==
                     
-                    if (y != 0) {
-                        vBot3 = meshData.GetVertex(x, y - 1, VertexDir.Ne).Index;
-                        vBot4 = meshData.GetVertex(x, y - 1, VertexDir.Nw).Index;
+                    if (z != 0) {
+                        vBot3 = meshData.GetVertex(x, z - 1, VertexDir.Ne).Index;
+                        vBot4 = meshData.GetVertex(x, z - 1, VertexDir.Nw).Index;
+                        
+                        meshData.AddTriangle(vTop4, vTop3, vBot3);
+                        meshData.AddTriangle(vTop4, vBot3, vBot4);
                     }
-                    else
-                    {
-                        vBot3 = meshData.AddBoundaryVertex(x, y - 1, VertexDir.Se);
-                        vBot4 = meshData.AddBoundaryVertex(x, y - 1, VertexDir.Sw);
-                    }
-                    meshData.AddTriangle(vTop4, vTop3, vBot3);
-                    meshData.AddTriangle(vTop4, vBot3, vBot4);
-                    
                     
                     //======== ====== ==== ==
                     //      WEST VERTICAL PANE
                     //======== ====== ==== ==
                     
                     if (x != 0) {
-                        vBot1 = meshData.GetVertex(x - 1, y, VertexDir.Ne).Index;
-                        vBot4 = meshData.GetVertex(x - 1, y, VertexDir.Se).Index;
+                        vBot1 = meshData.GetVertex(x - 1, z, VertexDir.Ne).Index;
+                        vBot4 = meshData.GetVertex(x - 1, z, VertexDir.Se).Index;
+                        
+                        meshData.AddTriangle(vTop1, vTop4, vBot4);
+                        meshData.AddTriangle(vTop1, vBot4, vBot1);
                     }
-                    else
-                    {
-                        vBot1 = meshData.AddBoundaryVertex(x - 1, y, VertexDir.Ne);
-                        vBot4 = meshData.AddBoundaryVertex(x - 1, y, VertexDir.Se);
-                    }
-                    meshData.AddTriangle(vTop1, vTop4, vBot4);
-                    meshData.AddTriangle(vTop1, vBot4, vBot1);
 
                     //======== ====== ==== ==
                     //      EAST VERTICAL PANE
                     //======== ====== ==== ==
 
-                    if (x == Chunk.Size-1)
+                    if (x == Chunk.Size-1 && chunk.NeighbouringChunks[Direction.East].GetIfLoaded(out var eastChunk))
                     {
-                        vBot2 = meshData.AddBoundaryVertex(x + 1, y, VertexDir.Nw);
-                        vBot3 = meshData.AddBoundaryVertex(x + 1, y, VertexDir.Sw);
-                    
+                        var eastHeight = eastChunk.GetCellAt(0, z).Height;
+                        vBot2 = meshData.AddBoundaryVertex(x + 1, eastHeight, z, VertexDir.Nw);
+                        vBot3 = meshData.AddBoundaryVertex(x + 1, eastHeight, z, VertexDir.Sw);
+
+                        // Setup normal direction depending on which way the face is facing
                         meshData.AddTriangle(vTop3, vTop2, vBot2);
                         meshData.AddTriangle(vTop3, vBot2, vBot3);
                     }
@@ -161,12 +157,12 @@ namespace Code.Scripts.TerrainGeneration.Rendering
             
             public int AddVertex(int x, int y, float height, VertexDir dir)
             {
-                var vertex = new Vertex(_counter++, x + XOffset(dir), height, y+YOffset(dir));
+                var vertex = new Vertex(_counter++, x + XOffset(dir), height, y+ZOffset(dir));
                 _vertices[x, y, (int)dir] = vertex;
                 return vertex.Index;
             }
 
-            private static float YOffset(VertexDir dir) => dir switch 
+            private static float ZOffset(VertexDir dir) => dir switch 
             {
                 VertexDir.Se or VertexDir.Sw => -.5f,
                 _ => +.5f
@@ -178,9 +174,9 @@ namespace Code.Scripts.TerrainGeneration.Rendering
                 _ => +.5f
             };
 
-            public int AddBoundaryVertex(int x, int y, VertexDir dir)
+            public int AddBoundaryVertex(int x, float height, int z, VertexDir dir)
             {
-                var vertex = new Vertex(_counter++, x + XOffset(dir), Terrain.MinHeight, y+YOffset(dir));
+                var vertex = new Vertex(_counter++, x + XOffset(dir), height, z+ZOffset(dir));
                 _boundaryVertices.Add(vertex);
                 return vertex.Index;
             }
@@ -210,12 +206,6 @@ namespace Code.Scripts.TerrainGeneration.Rendering
             }
         }
 
-        /** All vertex directions */
-        private static readonly VertexDir[] AllDirections = { VertexDir.Nw, VertexDir.Ne, VertexDir.Se, VertexDir.Sw };
-        
-        /** Return the next Vertex dir in clockwise wind rose order */
-        private static VertexDir Next(VertexDir curr) => (VertexDir)(((int)curr + 1) % AllDirections.Length);
-        
         private enum VertexDir { Nw, Ne, Se, Sw }
     }
 }

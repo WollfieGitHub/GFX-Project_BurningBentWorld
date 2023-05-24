@@ -48,6 +48,10 @@ namespace Code.Scripts.TerrainGeneration
         [Header("Base")]
         [SerializeField] private Transform playerTransform;
         [SerializeField] [Range(1, 32)] private float chunkColliderActivationDistance;
+        
+        [Header("Position")]
+        [SerializeField] public int offsetX;
+        [SerializeField] public int offsetZ;
 
         [Header("Performance")] 
         [SerializeField] [Range(1, 32)] private int chunkDistance = 4;
@@ -102,7 +106,7 @@ namespace Code.Scripts.TerrainGeneration
             
             Debug.Log("Starting terrain generation...");
 
-            _manager.PlayerPosition = playerTransform.position;
+            _manager.PlayerPosition = playerTransform.position + new Vector3(offsetX, 0, offsetZ);
             _manager.ChunkDistance = chunkDistance;
 
             _chunkFactory = GetComponent<ChunkFactory>();
@@ -130,7 +134,7 @@ namespace Code.Scripts.TerrainGeneration
 
         private void Update()
         {
-            _manager.PlayerPosition = playerTransform.position;
+            _manager.PlayerPosition = playerTransform.position + new Vector3(offsetX, 0, offsetZ);
 
             if (_needRefresh)
             {
