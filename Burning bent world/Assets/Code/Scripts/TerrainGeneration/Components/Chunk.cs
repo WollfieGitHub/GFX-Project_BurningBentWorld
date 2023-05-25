@@ -20,7 +20,7 @@ namespace Code.Scripts.TerrainGeneration.Components
 //      EVENTS
 //======== ====== ==== ==
 
-        public event Action NeighbourStateChanged;
+        public event Action<Direction> NeighbourStateChanged;
 
 //======== ====== ==== ==
 //      PROPERTIES
@@ -145,17 +145,24 @@ namespace Code.Scripts.TerrainGeneration.Components
         
         private void NotifyNeighbour(int neighbourX, int neighbourZ)
         {
-            if (_terrainManager.TryGetChunkAt(neighbourX, neighbourZ, out var neighbour))
+            if (!_terrainManager.TryGetChunkAt(neighbourX, neighbourZ, out var neighbour)) return;
+            
+            var dir = (ChunkZ - neighbourZ) switch
             {
-                neighbour.OnNeighbourLoaded();
-            }
+                > 0 => Direction.North,
+                < 0 => Direction.South,
+                // ReSharper disable once ArrangeRedundantParentheses : This is wrong, it needs parentheses
+                _ => (ChunkX - neighbourX > 0) ? Direction.East : Direction.West
+            };
+
+            neighbour.OnNeighbourLoaded(dir);
         }
 
 //======== ====== ==== ==
 //      METHODS
 //======== ====== ==== ==
 
-        public void OnNeighbourLoaded() => NeighbourStateChanged?.Invoke();
+        public void OnNeighbourLoaded(Direction direction) => NeighbourStateChanged?.Invoke(direction);
 
         /// <param name="x">The x coordinate in the chunk's referential</param>
         /// <param name="z">The y coordinate in the chunk's referential</param>

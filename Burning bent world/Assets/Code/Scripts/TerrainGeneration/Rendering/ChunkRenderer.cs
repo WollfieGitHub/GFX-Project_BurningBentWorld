@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Code.Scripts.TerrainGeneration.Components;
 using Unity.VisualScripting;
 using UnityEngine;
+using static Utils.Utils;
 
 namespace Code.Scripts.TerrainGeneration.Rendering
 {
@@ -13,6 +14,8 @@ namespace Code.Scripts.TerrainGeneration.Rendering
     [RequireComponent(typeof(ChunkCollider))]
     public class ChunkRenderer : MonoBehaviour
     {
+
+        private event Action OnTextureLoaded;
         
 //======== ====== ==== ==
 //      PROPERTIES
@@ -86,9 +89,54 @@ namespace Code.Scripts.TerrainGeneration.Rendering
         /// A neighbour's state has changed, we must recompute the
         /// mesh so that the boundaries adapt to the neighbouring chunk's bound appearance
         /// </summary>
-        private void OnNeighbourChanged()
+        private void OnNeighbourChanged(Direction direction)
         {
-            StartCoroutine(nameof(CalcNewMesh));
+            CalcNewMesh();
+            TryUpdateTexture(direction);
+        }
+
+        private void TryUpdateTexture(Direction direction)
+        {
+            if (!_chunk.NeighbouringChunks[direction].GetIfLoaded(out var neighbour)) { return; }
+            
+            var srcText = neighbour.ChunkRenderer._texture;
+            var dstText = _texture;
+            
+            if (dstText == null || dstText.IsDestroyed())
+            {
+                // Come back later when dest texture is loaded
+                OnTextureLoaded += () => TryUpdateTexture(direction);
+                return;
+            }
+            
+            if (srcText == null || srcText.IsDestroyed())
+            {
+                // Come back later when src texture is loaded
+                neighbour.ChunkRenderer.OnTextureLoaded += () => TryUpdateTexture(direction);
+                return;
+            }
+            
+            UpdateTexture(direction, srcText, dstText);
+        }
+
+        private static void UpdateTexture(Direction direction, Texture src, Texture dst)
+        {
+            var dstX = (direction == Direction.East ? Chunk.Size+1 : 1) * ChunkTexture.TextureResolution;
+            var dstY = (direction == Direction.North ? Chunk.Size+1 : 1) * ChunkTexture.TextureResolution;
+
+            var width = (direction == Direction.East ? 1 : Chunk.Size) * ChunkTexture.TextureResolution;
+            var height = (direction == Direction.North ? 1 : Chunk.Size) * ChunkTexture.TextureResolution;
+
+            const int srcX = 1 * ChunkTexture.TextureResolution;
+            const int srcY = 1 * ChunkTexture.TextureResolution;
+            
+            Debug.Log(direction);
+            
+            Graphics.CopyTexture(
+                src, srcElement: 0, srcMip: 0, srcX: srcX, srcY: srcY, 
+                srcWidth: width, srcHeight: height,
+                dst, dstElement: 0, dstMip: 0, dstX: dstX, dstY: dstY
+            );
         }
 
         private void Start()
@@ -124,6 +172,8 @@ namespace Code.Scripts.TerrainGeneration.Rendering
             
             _texture = ChunkTexture.From(_chunk, _displayType);
             _rend.material.mainTexture = _texture;
+
+            OnTextureLoaded?.Invoke();
         }
 
         /// <summary>
@@ -132,7 +182,7 @@ namespace Code.Scripts.TerrainGeneration.Rendering
         /// <param name="materials">The materials that the renderer should use</param>
         public void SetMaterials(IEnumerable<Material> materials) => 
             _rend.SetMaterials(new List<Material>(materials));
-        
+
 //======== ====== ==== ==
 //      HELPERS
 //======== ====== ==== ==

@@ -15,6 +15,8 @@ namespace Code.Scripts.TerrainGeneration.Rendering
     {
         private const float NoiseFrequency = 0.5f;
         private const float NoiseAmplitude = 0.25f;
+
+        public const int TextureResolution = 2;
         
         //TODO: Check if this is a good way of doing this
         public static Color burntColor = Color255(77, 29, 20);
@@ -37,12 +39,18 @@ namespace Code.Scripts.TerrainGeneration.Rendering
             const int height = Chunk.Size;
 
             // Add 2 to be able to represent neighbours' color
-            return CreateTexture((width + 2)*2, (height + 2)*2, (x, y) =>
+            return CreateTexture(
+                (width + 2)*TextureResolution, 
+                (height + 2)*TextureResolution, 
+                (x, y) =>
             {
-                var dx = x/2;
-                var dy = y/2;
+                var dx = x/TextureResolution;
+                var dy = y/TextureResolution;
                 // If one of the neighbour
-                if (dx == 0 || dy == 0 || dx == width+1 || dy == height+1) { return Color.black; }
+                if (dx == 0) { return Color255(0, 0, 0, 0); }
+                if (dy == 0) { return Color255(0, 0, 0, 0); }
+                if (dx == width + 1 && dy == height + 1) { return Color255(0, 0, 0, 0); }
+                if (dx == width + 1 || dy == height + 1) { return Color255(0, 0, 0, 0); }
 
                 dx -= 1;
                 dy -= 1;
@@ -65,8 +73,8 @@ namespace Code.Scripts.TerrainGeneration.Rendering
                 };
 
                 var noise = Clamp01(PerlinNoise(
-                    (chunk.ChunkX * Chunk.Size * 2 + x) * NoiseFrequency,
-                    (chunk.ChunkZ * Chunk.Size * 2 + y) * NoiseFrequency
+                    (chunk.ChunkX * Chunk.Size * TextureResolution + x) * NoiseFrequency,
+                    (chunk.ChunkZ * Chunk.Size * TextureResolution + y) * NoiseFrequency
                 )) * NoiseAmplitude - NoiseAmplitude/2.0f;
 
                 Color.RGBToHSV(color, out var h, out var s, out var v);
