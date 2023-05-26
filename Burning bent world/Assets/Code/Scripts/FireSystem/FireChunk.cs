@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Code.Scripts.TerrainGeneration.Components;
@@ -23,7 +24,7 @@ namespace FireSystem
             this.x = x;
             this.z = z;
             this.linkedVFXGameObject = linkedVFXGameObject;
-            linkedVFXGameObject.transform.position = new Vector3((x + 0.25f) * Chunk.Size, 0f, (z + 0.25f) * Chunk.Size);
+            linkedVFXGameObject.transform.position = new Vector3(x * Chunk.Size, 0f, z * Chunk.Size);
             linkedVFXGameObject.SetActive(true);
         }
 
@@ -63,15 +64,21 @@ namespace FireSystem
             int i = 0;
             foreach (FireCell cell in activeCells.Values)
             {
-                texture.SetPixel(i, 0, new Color(((float)(cell.x % Chunk.Size)) / Chunk.Size,
-                    (cell.height + 1) / 16f,
-                    ((float)(cell.z % Chunk.Size)) / Chunk.Size));
+                var r = LinearToGamma(cell.x % Chunk.Size / (float)(Chunk.Size - 1));
+                var g = LinearToGamma(cell.height / 16f);
+                var b = LinearToGamma(cell.z % Chunk.Size / (float)(Chunk.Size - 1));
+                texture.SetPixel(i, 0, new Color(r, g, b));
                 i++;                
             }
 
             texture.Apply();
 
             return texture;
+        }
+
+        private static float LinearToGamma(float value)
+        {
+            return Mathf.Pow(value, 1 / 2.2f);
         }
     }
 }
