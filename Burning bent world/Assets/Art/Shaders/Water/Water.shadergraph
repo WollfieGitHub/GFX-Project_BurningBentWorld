@@ -43,12 +43,6 @@
             "m_Id": "9343cfb51af8432eaeaa862411bef06e"
         },
         {
-            "m_Id": "c9ba891370ee463aa5fc2cd5765c9366"
-        },
-        {
-            "m_Id": "aeca1f47631d4d968b27052953770980"
-        },
-        {
             "m_Id": "fbd61ea2118e4ecebcb5b13914b4cd03"
         },
         {
@@ -3148,9 +3142,6 @@
     "m_Name": "",
     "m_ChildObjectList": [
         {
-            "m_Id": "aeca1f47631d4d968b27052953770980"
-        },
-        {
             "m_Id": "aed08637b89d4da0adfa0f93222c008a"
         },
         {
@@ -3194,9 +3185,6 @@
         },
         {
             "m_Id": "9343cfb51af8432eaeaa862411bef06e"
-        },
-        {
-            "m_Id": "c9ba891370ee463aa5fc2cd5765c9366"
         },
         {
             "m_Id": "3f21137a176441a4a3e3be285ec90d23"
@@ -7321,34 +7309,6 @@
 }
 
 {
-    "m_SGVersion": 1,
-    "m_Type": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty",
-    "m_ObjectId": "aeca1f47631d4d968b27052953770980",
-    "m_Guid": {
-        "m_GuidSerialized": "80b01c58-54b4-4cde-a283-64769cea2c23"
-    },
-    "m_Name": "WaterAlpha",
-    "m_DefaultRefNameVersion": 1,
-    "m_RefNameGeneratedByDisplayName": "WaterAlpha",
-    "m_DefaultReferenceName": "_WaterAlpha",
-    "m_OverrideReferenceName": "",
-    "m_GeneratePropertyBlock": true,
-    "m_UseCustomSlotLabel": false,
-    "m_CustomSlotLabel": "",
-    "m_DismissedVersion": 0,
-    "m_Precision": 0,
-    "overrideHLSLDeclaration": false,
-    "hlslDeclarationOverride": 0,
-    "m_Hidden": false,
-    "m_Value": 1.0,
-    "m_FloatType": 0,
-    "m_RangeValues": {
-        "x": 0.0,
-        "y": 1.0
-    }
-}
-
-{
     "m_SGVersion": 3,
     "m_Type": "UnityEditor.ShaderGraph.Internal.ColorShaderProperty",
     "m_ObjectId": "aed08637b89d4da0adfa0f93222c008a",
@@ -8083,34 +8043,6 @@
     "hlslDeclarationOverride": 0,
     "m_Hidden": false,
     "m_Value": 0.0,
-    "m_FloatType": 0,
-    "m_RangeValues": {
-        "x": 0.0,
-        "y": 1.0
-    }
-}
-
-{
-    "m_SGVersion": 1,
-    "m_Type": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty",
-    "m_ObjectId": "c9ba891370ee463aa5fc2cd5765c9366",
-    "m_Guid": {
-        "m_GuidSerialized": "dc2503b6-eddc-4aaa-8d04-c9482cbbbb18"
-    },
-    "m_Name": "RippleShearStrength",
-    "m_DefaultRefNameVersion": 1,
-    "m_RefNameGeneratedByDisplayName": "RippleShearStrength",
-    "m_DefaultReferenceName": "_RippleShearStrength",
-    "m_OverrideReferenceName": "",
-    "m_GeneratePropertyBlock": true,
-    "m_UseCustomSlotLabel": false,
-    "m_CustomSlotLabel": "",
-    "m_DismissedVersion": 0,
-    "m_Precision": 0,
-    "overrideHLSLDeclaration": false,
-    "hlslDeclarationOverride": 0,
-    "m_Hidden": false,
-    "m_Value": 1.0,
     "m_FloatType": 0,
     "m_RangeValues": {
         "x": 0.0,
