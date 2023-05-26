@@ -93,7 +93,7 @@ namespace Code.Scripts.TerrainGeneration.Generators
                 // Setup water
                 Instantiate(
                     _terrain.waterPrefab, 
-                    chunkTransform.position,
+                    chunkTransform.position - new Vector3(0, 1, 0),
                     Quaternion.identity,
                     chunkTransform    
                 );

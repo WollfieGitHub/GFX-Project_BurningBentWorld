@@ -117,7 +117,7 @@ namespace Code.Scripts.TerrainGeneration
         /// <param name="z">The Z coordinate of the cell</param>
         /// <returns>The cell found or null if none is loaded</returns>
         public Cell GetCellAt(int x, int z) =>
-            GetChunkAt(x / Chunk.Size, z / Chunk.Size)
+            GetChunkAt(x / Chunk.Size, z / Chunk.Size)?
                 .GetCellAt(MathModulus(x, Chunk.Size), MathModulus(z, Chunk.Size));
 
 // //======================================================================================\\

@@ -134,7 +134,15 @@ namespace Code.Scripts.FireSystem
                 // ChunkRenderer cr = terrainRenderer.GetChunkRenderer(chunk.ChunkX, chunk.ChunkZ);
                 //TODO: Waiting for L�o's modifications.
                 //cr.GenerateTexture();
-                chunk.ChunkRenderer.UpdateBurntColor();
+                try
+                {
+                    chunk.ChunkRenderer.UpdateBurntColor();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e);
+                    throw e;
+                }
             }
 
             _chunksToUpdateTextures.Clear();

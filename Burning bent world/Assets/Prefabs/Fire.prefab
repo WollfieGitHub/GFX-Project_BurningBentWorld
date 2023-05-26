@@ -30,7 +30,7 @@ Transform:
   m_Children:
   - {fileID: 2535817471732445047}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5708937304000278323
 GameObject:
@@ -83,7 +83,7 @@ VisualEffect:
   m_PropertySheet:
     m_Float:
       m_Array:
-      - m_Value: 1
+      - m_Value: 2
         m_Name: FlamesSize
         m_Overridden: 1
       - m_Value: 1.5
@@ -114,7 +114,7 @@ VisualEffect:
       m_Array: []
     m_Int:
       m_Array:
-      - m_Value: 32
+      - m_Value: 4
         m_Name: FlamesRate
         m_Overridden: 1
       - m_Value: 32

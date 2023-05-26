@@ -146,13 +146,15 @@ namespace Code.Scripts.TerrainGeneration.Rendering
                     var cell = _chunk.GetCellAt(x, z);
                     if (cell.burnt)
                     {
+                        Debug.Log("Burnt");
                         SetCellColor(x, z, Color.Lerp(
-                            new Color(0.77f, 0.29f, 0.20f),
-                            cell.Info.Biome.Color, 0.2f)
+                            Color.black, 
+                            cell.Info.Biome.Color, 0.5f)
                         );
                     }
                 }
             }
+            _texture.Apply();
         }
 
         private void SetCellColor(int cellX, int cellZ, Color color)
