@@ -7,8 +7,6 @@ using UnityEngine.Rendering.Universal;
 
 public class PixelizePass : ScriptableRenderPass
 {
-    private PixelizeFeature.CustomPassSettings settings;
-
     private RenderTargetIdentifier colorBuffer, pixelBuffer;
     private int pixelBufferID = Shader.PropertyToID("_PixelBuffer");
 
@@ -18,11 +16,10 @@ public class PixelizePass : ScriptableRenderPass
     private static readonly int BlockSize = Shader.PropertyToID("_BlockSize");
     private static readonly int HalfBlockSize = Shader.PropertyToID("_HalfBlockSize");
 
-    public PixelizePass(PixelizeFeature.CustomPassSettings settings)
+    public PixelizePass(Material pixelizeMaterial)
     {
-        this.settings = settings;
-        this.renderPassEvent = settings.renderPassEvent;
-        if (material == null) material = CoreUtils.CreateEngineMaterial("Hidden/Pixelize");
+        this.renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
+        material = pixelizeMaterial;
     }
 
     public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
@@ -30,7 +27,10 @@ public class PixelizePass : ScriptableRenderPass
         colorBuffer = renderingData.cameraData.renderer.cameraColorTarget;
         RenderTextureDescriptor descriptor = renderingData.cameraData.cameraTargetDescriptor;
 
-        pixelScreenHeight = settings.screenHeight;
+        VolumeStack stack = VolumeManager.instance.stack;
+        var pixelizeEffect = stack.GetComponent<Pixelize>();
+
+        pixelScreenHeight = pixelizeEffect.screenHeight.value;
         pixelScreenWidth = (int)(pixelScreenHeight * renderingData.cameraData.camera.aspect + 0.5f);
 
         material.SetVector(BlockCount, new Vector2(pixelScreenWidth, pixelScreenHeight));
