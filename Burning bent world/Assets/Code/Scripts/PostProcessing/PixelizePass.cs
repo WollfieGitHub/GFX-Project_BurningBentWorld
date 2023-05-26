@@ -19,7 +19,7 @@ public class PixelizePass : ScriptableRenderPass
     public PixelizePass(Material pixelizeMaterial)
     {
         this.renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
-        if (material == null) material = CoreUtils.CreateEngineMaterial("Hidden/Pixelize");
+        material = pixelizeMaterial;
     }
 
     public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
@@ -28,7 +28,7 @@ public class PixelizePass : ScriptableRenderPass
         RenderTextureDescriptor descriptor = renderingData.cameraData.cameraTargetDescriptor;
 
         VolumeStack stack = VolumeManager.instance.stack;
-        var pixelizeEffect = stack.GetComponent<PixelizeComponent>();
+        var pixelizeEffect = stack.GetComponent<Pixelize>();
 
         pixelScreenHeight = pixelizeEffect.screenHeight.value;
         pixelScreenWidth = (int)(pixelScreenHeight * renderingData.cameraData.camera.aspect + 0.5f);

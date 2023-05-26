@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-7891776592196919915
+--- !u!114 &-8309447294407753104
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
@@ -20,8 +20,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Water
-  m_Shader: {fileID: -6465566751694194690, guid: d4a7cc0d10f49459a874296971f4afde,
+  m_Name: Shader Graphs_Water 1
+  m_Shader: {fileID: -6465566751694194690, guid: 330d6c9b14d8f4e869dadd9c580d8451,
     type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -51,22 +51,19 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _FoamAmount: 0.75
-    - _FoamCutoff: 1.2
-    - _FoamScale: 75
-    - _FoamSpeed: 0.01
+    - _FoamAmount: 1
+    - _FoamCutoff: 0.5
+    - _FoamScale: 100
+    - _FoamSpeed: 1
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _RippleDensity: 5
-    - _RipplePower: 3
-    - _RippleSpeed: 0.5
-    - _WaterDepth: 0.75
+    - _RippleDensity: 0
+    - _RipplePower: 5
+    - _RippleShearStrength: 1
+    - _RippleSpeed: 1
+    - _WaterDepth: 10
     m_Colors:
-    - _Deep: {r: 0.31181023, g: 0.36257836, b: 0.8584906, a: 1}
-    - _DeepColor: {r: 0, g: 0.12190769, b: 1, a: 1}
-    - _FoamColor: {r: 1, g: 1, b: 1, a: 0.8}
-    - _RippleColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Shallow: {r: 0.47899607, g: 0.8565006, b: 0.8679245, a: 1}
-    - _ShallowColor: {r: 0, g: 0.84600186, b: 1, a: 0}
-    - _WaterColor: {r: 0.4425062, g: 0.74551064, b: 0.8301887, a: 1}
+    - _FoamColor: {r: 0, g: 0, b: 0, a: 0}
+    - _RippleColor: {r: 0, g: 0, b: 0, a: 0}
+    - _WaterColor: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []

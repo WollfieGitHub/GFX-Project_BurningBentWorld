@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PixelizeFeature
   m_EditorClassIdentifier: 
   m_Active: 1
-  pixelizeShader: {fileID: 0}
+  pixelizeShader: {fileID: 4800000, guid: b3bc353b9c54d4e8ca74fc801fada5b4, type: 3}
 --- !u!114 &-1878332245247344467
 MonoBehaviour:
   m_ObjectHideFlags: 0

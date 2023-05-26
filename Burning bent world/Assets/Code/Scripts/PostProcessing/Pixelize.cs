@@ -2,7 +2,7 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
 [VolumeComponentMenuForRenderPipeline("Custom/Pixelize", typeof(UniversalRenderPipeline))]
-public class PixelizeComponent : VolumeComponent, IPostProcessComponent
+public class Pixelize : VolumeComponent, IPostProcessComponent
 {
     public IntParameter screenHeight = new(256);
     
