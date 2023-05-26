@@ -163,4 +163,4 @@ MonoBehaviour:
   active: 1
   screenHeight:
     m_OverrideState: 1
-    m_Value: 1920
+    m_Value: 256
