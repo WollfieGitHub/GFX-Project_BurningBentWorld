@@ -57,13 +57,13 @@ Material:
     - _FoamSpeed: 1
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _RippleDensity: 0
-    - _RipplePower: 5
-    - _RippleShearStrength: 1
-    - _RippleSpeed: 1
-    - _WaterDepth: 10
+    - _RippleDensity: 5
+    - _RipplePower: 1
+    - _RippleShearStrength: 0
+    - _RippleSpeed: 0.1
+    - _WaterDepth: 0
     m_Colors:
     - _FoamColor: {r: 0, g: 0, b: 0, a: 0}
-    - _RippleColor: {r: 0, g: 0, b: 0, a: 0}
-    - _WaterColor: {r: 0, g: 0, b: 0, a: 0}
+    - _RippleColor: {r: 1, g: 1, b: 1, a: 1}
+    - _WaterColor: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []

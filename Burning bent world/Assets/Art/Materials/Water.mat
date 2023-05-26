@@ -55,13 +55,16 @@ Material:
     - _FoamCutoff: 1.2
     - _FoamScale: 75
     - _FoamSpeed: 0.01
+    - _Offset: 16
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _RippleDensity: 4
-    - _RipplePower: 4
+    - _RippleDensity: 0.25
+    - _RipplePower: 3
     - _RippleShearStrength: 1
     - _RippleSpeed: 0.5
+    - _WaterAlpha: 1
     - _WaterDepth: 0.75
+    - _scale: 1.5
     m_Colors:
     - _Deep: {r: 0.31181023, g: 0.36257836, b: 0.8584906, a: 1}
     - _DeepColor: {r: 0, g: 0.12190769, b: 1, a: 1}
