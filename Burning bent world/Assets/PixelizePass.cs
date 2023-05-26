@@ -7,60 +7,69 @@ using UnityEngine.Rendering.Universal;
 
 public class PixelizePass : ScriptableRenderPass
 {
-    private PixelizeFeature.CustomPassSettings settings;
+    private Material pixelizeMaterial;
+    private PixelizeComponent pixelizeEffect;
 
-    private RenderTargetIdentifier colorBuffer, pixelBuffer;
-    private int pixelBufferID = Shader.PropertyToID("_PixelBuffer");
-
-    private Material material;
-    private int pixelScreenHeight, pixelScreenWidth;
+    private RTHandle cameraColorTargetHandle;
+    private RTHandle pixelTargetHandle;
+    
     private static readonly int BlockCount = Shader.PropertyToID("_BlockCount");
     private static readonly int BlockSize = Shader.PropertyToID("_BlockSize");
     private static readonly int HalfBlockSize = Shader.PropertyToID("_HalfBlockSize");
 
-    public PixelizePass(PixelizeFeature.CustomPassSettings settings)
+    public PixelizePass(Material pixelizeMaterial)
     {
-        this.settings = settings;
-        this.renderPassEvent = settings.renderPassEvent;
-        if (material == null) material = CoreUtils.CreateEngineMaterial("Hidden/Pixelize");
+        this.pixelizeMaterial = pixelizeMaterial;
+        
+        renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
     }
 
-    public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
+    public void SetTarget(RTHandle cameraColorTargetHandle)
     {
-        colorBuffer = renderingData.cameraData.renderer.cameraColorTarget;
-        RenderTextureDescriptor descriptor = renderingData.cameraData.cameraTargetDescriptor;
-
-        pixelScreenHeight = settings.screenHeight;
-        pixelScreenWidth = (int)(pixelScreenHeight * renderingData.cameraData.camera.aspect + 0.5f);
-
-        material.SetVector(BlockCount, new Vector2(pixelScreenWidth, pixelScreenHeight));
-        material.SetVector(BlockSize, new Vector2(1.0f / pixelScreenWidth, 1.0f / pixelScreenHeight));
-        material.SetVector(HalfBlockSize, new Vector2(0.5f / pixelScreenWidth, 0.5f / pixelScreenHeight));
-
-        descriptor.height = pixelScreenHeight;
-        descriptor.width = pixelScreenWidth;
-
-        cmd.GetTemporaryRT(pixelBufferID, descriptor, FilterMode.Point);
-        pixelBuffer = new RenderTargetIdentifier(pixelBufferID);
+        this.cameraColorTargetHandle = cameraColorTargetHandle;
     }
 
     public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
     {
+        VolumeStack stack = VolumeManager.instance.stack;
+        pixelizeEffect = stack.GetComponent<PixelizeComponent>();
+        
+        var descriptor = renderingData.cameraData.cameraTargetDescriptor;
+
         CommandBuffer cmd = CommandBufferPool.Get();
         using (new ProfilingScope(cmd, new ProfilingSampler("Pixelize Pass")))
         {
-            Blit(cmd, colorBuffer, pixelBuffer, material);
-            Blit(cmd, pixelBuffer, colorBuffer);
+            SetupPixelize(cmd, renderingData.cameraData.camera.aspect, descriptor);
         }
 
         context.ExecuteCommandBuffer(cmd);
+        cmd.Clear();
+        
         CommandBufferPool.Release(cmd);
     }
 
-    public override void OnCameraCleanup(CommandBuffer cmd)
+    private void SetupPixelize(CommandBuffer cmd, float cameraAspect, RenderTextureDescriptor descriptor)
     {
-        if (cmd == null) throw new System.ArgumentNullException("cmd");
-        cmd.ReleaseTemporaryRT(pixelBufferID);
-    }
+        var pixelScreenHeight = pixelizeEffect.screenHeight.value;
+        var pixelScreenWidth = (int)(pixelScreenHeight * cameraAspect + 0.5f);
 
+        pixelizeMaterial.SetVector(BlockCount, new Vector2(pixelScreenWidth, pixelScreenHeight));
+        pixelizeMaterial.SetVector(BlockSize, new Vector2(1.0f / pixelScreenWidth, 1.0f / pixelScreenHeight));
+        pixelizeMaterial.SetVector(HalfBlockSize, new Vector2(0.5f / pixelScreenWidth, 0.5f / pixelScreenHeight));
+
+        //descriptor.height = pixelScreenHeight;
+        //descriptor.width = pixelScreenWidth;
+
+        //pixelTargetHandle = RTHandles.Alloc(descriptor: descriptor, filterMode: FilterMode.Point);
+        Blitter.BlitCameraTexture(
+            cmd, 
+            cameraColorTargetHandle, 
+            cameraColorTargetHandle,
+            pixelizeMaterial,
+            0);
+        /*Blitter.BlitCameraTexture(
+            cmd, 
+            pixelTargetHandle, 
+            cameraColorTargetHandle);*/
+    }
 }
