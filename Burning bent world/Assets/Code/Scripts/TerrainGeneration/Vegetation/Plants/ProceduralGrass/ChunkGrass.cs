@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using Code.Scripts.TerrainGeneration.Components;
-using TerrainGeneration.Components;
+﻿using Code.Scripts.TerrainGeneration.Components;
 using TerrainGeneration.Rendering;
 using UnityEngine;
 using Utils;

@@ -1,13 +1,8 @@
-﻿using System;
-using Code.Scripts.TerrainGeneration.Components;
-using TerrainGeneration;
-using TerrainGeneration.Components;
+﻿using Code.Scripts.TerrainGeneration.Components;
 using UnityEngine;
 using Utils;
 using static UnityEngine.Mathf;
 using static Utils.Utils;
-using static Utils.Utils;
-using Terrain = TerrainGeneration.Components.Terrain;
 
 namespace Code.Scripts.TerrainGeneration.Rendering
 {
@@ -16,7 +11,7 @@ namespace Code.Scripts.TerrainGeneration.Rendering
         private const float NoiseFrequency = 0.5f;
         private const float NoiseAmplitude = 0.25f;
 
-        public const int TextureResolution = 2;
+        public const int Resolution = 2;
         
         //TODO: Check if this is a good way of doing this
         public static Color burntColor = Color255(77, 29, 20);
@@ -40,12 +35,12 @@ namespace Code.Scripts.TerrainGeneration.Rendering
 
             // Add 2 to be able to represent neighbours' color
             return CreateTexture(
-                (width + 2)*TextureResolution, 
-                (height + 2)*TextureResolution, 
+                (width + 2)*Resolution, 
+                (height + 2)*Resolution, 
                 (x, y) =>
             {
-                var dx = x/TextureResolution;
-                var dy = y/TextureResolution;
+                var dx = x/Resolution;
+                var dy = y/Resolution;
                 // If one of the neighbour
                 if (dx == 0) { return Color255(0, 0, 0, 0); }
                 if (dy == 0) { return Color255(0, 0, 0, 0); }
@@ -60,7 +55,11 @@ namespace Code.Scripts.TerrainGeneration.Rendering
 
                 var color = displayType switch
                 {
-                    DisplayType.Default => cellInfo.Ocean || cellInfo.Biome.IsRiver ? Color.blue 
+                    DisplayType.Default => cellInfo.Ocean || cellInfo.Biome.IsRiver ? (
+                            Color.black.Mix(Color255(164, 197, 235), InverseLerp(
+                                GeneratedTerrain.SeaLevel, GeneratedTerrain.MinHeight / 4f, cell.Height
+                            ))
+                        )
                         : cell.burnt ? Color.Lerp(new Color(0.77f, 0.29f, 0.20f), cellInfo.Biome.Color, 0.2f)
                         : cellInfo.Biome.Color,
                     DisplayType.Temperature => GetTemperatureColor(cellInfo.Temperature),
@@ -73,8 +72,8 @@ namespace Code.Scripts.TerrainGeneration.Rendering
                 };
 
                 var noise = Clamp01(PerlinNoise(
-                    (chunk.ChunkX * Chunk.Size * TextureResolution + x) * NoiseFrequency,
-                    (chunk.ChunkZ * Chunk.Size * TextureResolution + y) * NoiseFrequency
+                    (chunk.ChunkX * Chunk.Size * Resolution + x) * NoiseFrequency,
+                    (chunk.ChunkZ * Chunk.Size * Resolution + y) * NoiseFrequency
                 )) * NoiseAmplitude - NoiseAmplitude/2.0f;
 
                 Color.RGBToHSV(color, out var h, out var s, out var v);
@@ -102,7 +101,7 @@ namespace Code.Scripts.TerrainGeneration.Rendering
         private static Color GetHeightColor(float cellHeight)
         {
             var relativeHeight = InverseLerp(
-                Terrain.MinHeight, Terrain.MaxHeight, cellHeight
+                GeneratedTerrain.MinHeight, GeneratedTerrain.MaxHeight, cellHeight
             );
             return Color.black.Mix(Color.white, relativeHeight);
         }

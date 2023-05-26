@@ -9,6 +9,8 @@ using Code.Scripts.TerrainGeneration.Rendering;
 using Code.Scripts.Utils;
 using TerrainGeneration.Rendering;
 using UnityEngine;
+using static Utils.Utils;
+using Object = UnityEngine.Object;
 
 namespace Code.Scripts.TerrainGeneration
 {
@@ -61,17 +63,30 @@ namespace Code.Scripts.TerrainGeneration
         [SerializeField] public bool renderMesh = true;
         [SerializeField] public ChunkTexture.DisplayType displayType;
         [SerializeField] public Material terrainMaterial;
-        [SerializeField] public Material waterMaterial;
         [SerializeField] public Material grassMaterial;
+        [SerializeField] public GameObject waterPrefab;
 
-        private bool _needRefresh;
-        
         public TerrainRenderer Renderer { get; private set; }
 
         private void OnValidate()
         {
             _needRefresh = true;
         }
+        
+//======== ====== ==== ==
+//      CONSTANTS
+//======== ====== ==== ==
+
+        /** Min Height the Terrain can have */
+        public const int MaxHeight = 256;
+
+        /** Max Height the Terrain can have */
+        public const int MinHeight = -128;
+
+        /** Height of the sea */
+        public const int SeaLevel = 0;
+
+        private bool _needRefresh;
 
 //======== ====== ==== ==
 //      TERRAIN OBJECTS
@@ -93,6 +108,17 @@ namespace Code.Scripts.TerrainGeneration
         /// <returns>The chunk found or null if none is loaded</returns>
         public Chunk GetChunkAt(int xChunk, int zChunk) => 
             _chunks.GetValueOrDefault((xChunk, zChunk));
+        
+        /// <summary>
+        /// Finds the cell at coordinates (x, z) or null if
+        /// the chunk is not currently loaded
+        /// </summary>
+        /// <param name="x">The X coordinate of the cell</param>
+        /// <param name="z">The Z coordinate of the cell</param>
+        /// <returns>The cell found or null if none is loaded</returns>
+        public Cell GetCellAt(int x, int z) =>
+            GetChunkAt(x / Chunk.Size, z / Chunk.Size)
+                .GetCellAt(MathModulus(x, Chunk.Size), MathModulus(z, Chunk.Size));
 
 // //======================================================================================\\
 // ||                                                                                      ||

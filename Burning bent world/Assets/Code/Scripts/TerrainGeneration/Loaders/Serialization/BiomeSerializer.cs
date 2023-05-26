@@ -1,6 +1,5 @@
 ﻿using System.Runtime.Serialization;
 using Code.Scripts.TerrainGeneration.Components;
-using TerrainGeneration.Components;
 
 namespace Code.Scripts.TerrainGeneration.Loaders.Serialization
 {

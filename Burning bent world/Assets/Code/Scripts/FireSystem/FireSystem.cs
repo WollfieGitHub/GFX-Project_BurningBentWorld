@@ -1,65 +1,59 @@
+using System;
 using System.Collections.Generic;
+using Code.Scripts.TerrainGeneration;
 using Code.Scripts.TerrainGeneration.Components;
-using Code.Scripts.TerrainGeneration.Generators;
-using TerrainGeneration.Rendering;
+using FireSystem;
 using UnityEngine;
 
-namespace FireSystem
+namespace Code.Scripts.FireSystem
 {
     public class FireSystem : MonoBehaviour
     {
         [Header("Terrain synchronization")]
-        [SerializeField] private TerrainRenderer terrainRenderer;
-        [SerializeField] private TerrainGenerator terrainGenerator;        
+        [SerializeField] private GeneratedTerrain terrain;
 
         [Header("Configuration")]
         [SerializeField] private GameObject firePrefab;
         [Tooltip("Name given to the texture that must be updated in the fire VFX to indicate active cells")]
-        [SerializeField] private string SpawningTextureNameFireVFX = "ActiveCells";
+        [SerializeField] private string spawningTextureNameFireVFX = "ActiveCells";
         [SerializeField] private int initialVFXPoolSize = 20;
-        [SerializeField] private int initialCell_x = 0;
-        [SerializeField] private int initialCell_z = 0;        
 
         [Header("Propagation parameters")]        
-        [SerializeField] private float baseCellHP = 50f;
+        [SerializeField] private float baseCellHp = 50f;
         [SerializeField] private float damageMultiplier = 1f;
         [SerializeField] private float averageTemperature = 20f;
         [Tooltip("Coefficient that will be applied to increase HP from the cell average temperature.")]
-        [SerializeField] private float temperatureHPMultiplier = 0.5f;
+        [SerializeField] private float temperatureHpMultiplier = 0.5f;
         [SerializeField] private float averageHumidity = 100f;
         [Tooltip("Coefficient that will be applied to increase HP from the cell average humidity.")]
-        [SerializeField] private float humidityHPMultiplier = 0.5f;
+        [SerializeField] private float humidityHpMultiplier = 0.5f;
         [SerializeField] private float baseBurningLifetime = 10f;
         [SerializeField] private float burningLifetimeRandomizer = 0.2f;
-        [SerializeField] private Vector3 windDirection = new Vector3(0, 0, 0);
+        [SerializeField] private Vector3 windDirection = new(0, 0, 0);
         [SerializeField] private float windDamageMultiplier = 0.5f;
 
         //General
-        private TerrainGeneration.Components.Terrain terrain;
-        private bool active = false;
-        private FireCell[,] cells;
+        private bool _active;
+        private readonly Dictionary<(int, int), FireCell> _cells = new();
 
         //Cell update logic       
-        private Dictionary<int, FireCell> activeCells = new Dictionary<int, FireCell>();
-        private List<FireCell> newActiveCells = new List<FireCell>();
-        private List<FireCell> consumedActiveCells = new List<FireCell>();
-        private HashSet<Chunk> chunksToUpdateTextures = new HashSet<Chunk>();
+        private readonly Dictionary<(int, int), FireCell> _activeCells = new();
+        private readonly List<FireCell> _newActiveCells = new();
+        private readonly List<FireCell> _consumedActiveCells = new();
+        private readonly HashSet<Chunk> _chunksToUpdateTextures = new();
 
         //VFX management        
-        private Dictionary<int, FireChunk> activeChunks = new Dictionary<int, FireChunk>();
-        private Dictionary<int, FireChunk> chunksToUpdateVFX = new Dictionary<int, FireChunk>();
-        private FireVFXPool fireVFXPool;
+        private readonly Dictionary<(int, int), FireChunk> _activeChunks = new();
+        private readonly Dictionary<(int, int), FireChunk> _chunksToUpdateVFX = new();
+        private FireVFXPool _fireVFXPool;
 
         // Start is called before the first frame update
-        void Start()
-        {
-            // terrainRenderer.OnGenerationFinished += StartFireSystem;
-        }
+        private void Start() { StartFireSystem(); }
 
         // Update is called once per frame
-        void Update()
+        private void Update()
         {            
-            if (!active) return;
+            if (!_active) return;
 
             UpdateActiveCells();
 
@@ -75,38 +69,21 @@ namespace FireSystem
         /// </summary>
         private void StartFireSystem()
         {
-            // TODO Put back the way to get cells terrain = terrainRenderer.Terrain;
-            cells = new FireCell[terrain.Width, terrain.Height];
+            _fireVFXPool = new FireVFXPool(transform, firePrefab, initialVFXPoolSize);
 
-            for (int x = 0; x < terrain.Width; x++)
-            {
-                for (int y = 0; y < terrain.Height; y++)
-                {
-                    Cell c = terrain.GetCellAt(x, y);
-                    cells[x, y] = new FireCell(c, x, y,
-                        averageTemperature, averageHumidity, temperatureHPMultiplier, humidityHPMultiplier,
-                        baseCellHP, baseBurningLifetime, burningLifetimeRandomizer);
-                }
-            }
-
-            fireVFXPool = new FireVFXPool(this.transform, firePrefab, initialVFXPoolSize);
-
-            active = true;
-
-            //TODO: Arbitrarly starting a fire here. Will remove later.            
-            SetCellOnFire(cells[initialCell_x, initialCell_z]);
+            _active = true;
         }
 
         /// <summary>
-        /// Update each active cell in the dictionnary, and its corresponding neighbors.
+        /// Update each active cell in the dictionary, and its corresponding neighbors.
         /// </summary>
         private void UpdateActiveCells()
         {
-            foreach (var cell in activeCells.Values)
+            foreach (var cell in _activeCells.Values)
             {
                 UpdateNeighbors(cell);
                 cell.burningLifetime -= Time.deltaTime;
-                if (cell.burningLifetime < 0) { consumedActiveCells.Add(cell); }
+                if (cell.burningLifetime < 0) { _consumedActiveCells.Add(cell); }
             }
         }
 
@@ -116,12 +93,9 @@ namespace FireSystem
         /// </summary>
         private void UpdateNewActiveCells()
         {
-            foreach (var cell in newActiveCells)
-            {
-                activeCells.Add(GetKeyFromCell(cell), cell);
-            }
+            foreach (var cell in _newActiveCells) { _activeCells.TryAdd((cell.x, cell.z), cell); }
 
-            newActiveCells.Clear();
+            _newActiveCells.Clear();
         }
 
         /// <summary>
@@ -130,52 +104,53 @@ namespace FireSystem
         /// </summary>
         private void UpdateConsumedCells()
         {
-            foreach (var cell in consumedActiveCells)
+            foreach (var cell in _consumedActiveCells)
             {
                 //Mark the chunk to update the terrain texture
-                Chunk terrainChunk = terrain.GetChunkAt(cell.x, cell.z, true);
+                var terrainChunk = terrain.GetChunkAt(cell.x / Chunk.Size, cell.z / Chunk.Size);
                 terrain.GetCellAt(cell.x, cell.z).burnt = true;
-                chunksToUpdateTextures.Add(terrainChunk);
+                _chunksToUpdateTextures.Add(terrainChunk);
 
                 //Mark the chunk to update the VFX texture (the value should always exist in the dictionnary)          
-                activeChunks.TryGetValue(GetKeyFromChunk(terrainChunk), out var modifiedFireChunk);
-                chunksToUpdateVFX.TryAdd(GetKeyFromChunk(modifiedFireChunk), modifiedFireChunk);
-                
-                modifiedFireChunk.activeCells.Remove(GetKeyFromCell(cell));
+                if (_activeChunks.TryGetValue((terrainChunk.ChunkX, terrainChunk.ChunkZ), out var modifiedFireChunk))
+                {
+                    _chunksToUpdateVFX.TryAdd((modifiedFireChunk.X, modifiedFireChunk.Z), modifiedFireChunk);
 
-                activeCells.Remove(GetKeyFromCell(cell));
+                    modifiedFireChunk.ActiveCells.Remove((cell.x, cell.z));
+                }
+                else { throw new InvalidOperationException(); }
+                
+                _activeCells.Remove((cell.x, cell.z));
             }
 
-            consumedActiveCells.Clear();
+            _consumedActiveCells.Clear();
         }
 
         private void UpdateModifiedChunks()
         {
             //Update chunks' textures
-            foreach (var chunk in chunksToUpdateTextures)
+            foreach (var chunk in _chunksToUpdateTextures)
             {
                 // ChunkRenderer cr = terrainRenderer.GetChunkRenderer(chunk.ChunkX, chunk.ChunkZ);
                 //TODO: Waiting for L�o's modifications.
                 //cr.GenerateTexture();
+                chunk.ChunkRenderer.UpdateBurntColor();
             }
 
-            chunksToUpdateTextures.Clear();
+            _chunksToUpdateTextures.Clear();
 
             //Update chunks' VFX
-            foreach (var fireChunk in chunksToUpdateVFX.Values)
+            foreach (var fireChunk in _chunksToUpdateVFX.Values)
             {                
-                if (fireChunk.activeCells.Count == 0)
+                if (fireChunk.ActiveCells.Count == 0)
                 {
-                    fireVFXPool.DisableAndPushToPool(fireChunk.linkedVFXGameObject);
-                    activeChunks.Remove(GetKeyFromChunk(fireChunk));                    
+                    _fireVFXPool.DisableAndPushToPool(fireChunk.LinkedVFXGameObject);
+                    _activeChunks.Remove((fireChunk.X, fireChunk.Z));                    
                 }
-                else
-                {                    
-                    fireChunk.UpdateVFXTexture(SpawningTextureNameFireVFX);
-                }
+                else { fireChunk.UpdateVFXTexture(spawningTextureNameFireVFX); }
             }
 
-            chunksToUpdateVFX.Clear();
+            _chunksToUpdateVFX.Clear();
         }
 
         /// <summary>
@@ -188,29 +163,31 @@ namespace FireSystem
         {
             if (!cell.burning) { return; }
 
-            for (int deltaz = -1; deltaz < 2; deltaz++)
+            var cellPos = new Vector3(cell.x, cell.height, cell.z);
+
+            for (var deltaZ = -1; deltaZ < 2; deltaZ++)
             {
-                for (int deltax = -1; deltax < 2; deltax++)
+                for (var deltaX = -1; deltaX < 2; deltaX++)
                 {
-                    int neighborX = cell.x + deltax;
-                    int neighborZ = cell.z + deltaz;
+                    var neighborX = cell.x + deltaX;
+                    var neighborZ = cell.z + deltaZ;
+                    
+                    if (neighborX == cell.x && neighborZ == cell.z) { return; }
 
-                    if (neighborX >= 0 && neighborZ >= 0
-                        && neighborX < terrain.Width && neighborZ < terrain.Height
-                        && (neighborX != cell.x || neighborZ != cell.z))
-                    {
-                        FireCell neighbor = cells[neighborX, neighborZ];
+                    // The cell we want to update is not loaded in the terrain and does not exist in _cells
+                    if (!TryGet(neighborX, neighborZ, out var neighbor)) { continue; }
+                    // The neighbour is already burning or about to be set on fire
+                    if (_activeCells.ContainsKey((neighbor.x, neighbor.z)) || !(neighbor.HP > 0)) continue;
+                    
+                    neighbor.HP -= Time.deltaTime * (
+                        damageMultiplier +
+                        windDamageMultiplier * Vector3.Dot(
+                            windDirection, 
+                            new Vector3(neighbor.x, neighbor.height, neighbor.z) - cellPos
+                        )
+                    );
 
-                        if (!activeCells.ContainsKey(GetKeyFromCell(neighbor))
-                            && neighbor.HP > 0)
-                        {
-                            neighbor.HP -= Time.deltaTime * (damageMultiplier +
-                                windDamageMultiplier * Vector3.Dot(windDirection,
-                                new Vector3(neighbor.x, neighbor.height, neighbor.z) - new Vector3(cell.x, cell.height, cell.z)));
-
-                            if (neighbor.HP < 0) { SetCellOnFire(neighbor); }
-                        }
-                    }
+                    if (neighbor.HP < 0) { SetCellOnFire(neighbor); }
                 }
             }
         }
@@ -223,26 +200,28 @@ namespace FireSystem
         private void SetCellOnFire(FireCell cell)
         {
             cell.burning = true;
-            newActiveCells.Add(cell);
+            _newActiveCells.Add(cell);
 
+            var chunk = terrain.GetChunkAt(cell.x / Chunk.Size, cell.z / Chunk.Size);
+            
             //Find out which chunks have been modified and if they were already active chunks.
-            if (activeChunks.TryGetValue(GetKeyFromChunk(terrain.GetChunkAt(cell.x, cell.z, true)), out var fireChunk))
+            if (_activeChunks.TryGetValue((chunk.ChunkX, chunk.ChunkZ), out var fireChunk))
             {
                 //Update active cell count in the chunk and update VFX accordingly.                
-                fireChunk.activeCells.Add(GetKeyFromCell(cell), cell);
-                fireChunk.UpdateVFXTexture(SpawningTextureNameFireVFX);
-                chunksToUpdateVFX.TryAdd(GetKeyFromChunk(fireChunk), fireChunk);
+                fireChunk.ActiveCells.TryAdd((cell.x, cell.z), cell);
+                fireChunk.UpdateVFXTexture(spawningTextureNameFireVFX);
+                _chunksToUpdateVFX.TryAdd((fireChunk.X, fireChunk.Z), fireChunk);
             }
             else
             {
                 //Create all necessary elements for the new FireChunk.
-                Chunk newChunk = terrain.GetChunkAt(cell.x, cell.z, true);
-                FireChunk newFireChunk = new FireChunk(newChunk.ChunkX, newChunk.ChunkZ, fireVFXPool.PopPool(), terrain);
+                var newChunk = terrain.GetChunkAt(cell.x / Chunk.Size, cell.z / Chunk.Size);
+                var newFireChunk = new FireChunk(newChunk.ChunkX, newChunk.ChunkZ, _fireVFXPool.PopPool());
                 
-                newFireChunk.activeCells.Add(GetKeyFromCell(cell), cell);
+                newFireChunk.ActiveCells.TryAdd((cell.x, cell.z), cell);
 
-                activeChunks.TryAdd(GetKeyFromChunk(newFireChunk), newFireChunk);
-                chunksToUpdateVFX.Add(GetKeyFromChunk(newFireChunk), newFireChunk);
+                _activeChunks.TryAdd((newFireChunk.X, newFireChunk.Z), newFireChunk);
+                _chunksToUpdateVFX.TryAdd((newFireChunk.X, newFireChunk.Z), newFireChunk);
             }
         }
 
@@ -253,45 +232,56 @@ namespace FireSystem
         public void SetCellOnFire(Vector3 position)
         {
             Debug.Log($"Setting new cell on fire at {position}");
-            int x = (int)position.x;
-            int z = (int)position.z;
-            if (x >= 0 && x < terrain.Width
-                && z >= 0 && z < terrain.Height)
-            {
-                Debug.Log($"Setting new cell on fire at {x}, {z}");
-                Debug.Log($"Cell info: {cells[x, z]}");
-                SetCellOnFire(cells[x, z]);
-            }
+            var x = (int)position.x;
+            var z = (int)position.z;
+
+            Debug.Log($"Setting new cell on fire at {x}, {z}");
+
+            if (!TryGet(x, z, out var fireCell)) { return; }
+            
+            SetCellOnFire(fireCell);
         }
 
         /// <summary>
+        /// TODO
         /// </summary>
+        /// <param name="x"></param>
+        /// <param name="z"></param>
         /// <param name="fireCell"></param>
-        /// <returns>The key used in the hashtable to identify a given cell.</returns>
-        private int GetKeyFromCell(FireCell fireCell)
+        /// <returns></returns>
+        private bool TryGet(int x, int z, out FireCell fireCell)
         {
-            return fireCell.z * terrain.Height + fireCell.x;
+            if (_cells.TryGetValue((x, z), out fireCell)) { return true; }
+
+            // If the cell from the terrain is not loaded, return false
+            var terrainCell = terrain.GetCellAt(x, z);
+            if (terrainCell == null) { return false; }
+            if (terrainCell.Info.Ocean) { return false; }
+
+            fireCell = CreateNewCellAt(x, z, terrainCell);
+            _cells[(x, z)] = fireCell;
+            return true;
+
         }
 
         /// <summary>
-        /// Note that the key for a terrain chunk and fire chunk should be the same.
+        /// Creates a new instance of a <see cref="FireCell"/> with
+        /// the value of the properties of this fire system
         /// </summary>
-        /// <param name="fireChunk"></param>
-        /// <returns>The key used in the hashtable to identify a given chunk.</returns>
-        private int GetKeyFromChunk(Chunk chunk)
+        /// <param name="x">X Coordinate</param>
+        /// <param name="z">Z Coordinate</param>
+        /// <param name="cell">The cell</param>
+        /// <returns>The FireCell</returns>
+        private FireCell CreateNewCellAt(int x, int z, Cell cell)
         {
-            return chunk.ChunkZ * terrain.Height / Chunk.Size + chunk.ChunkX;
+            return new FireCell(
+                cell, x, z, 
+                averageTemperature, averageHumidity, temperatureHpMultiplier,
+                humidityHpMultiplier, baseCellHp, baseBurningLifetime,
+                burningLifetimeRandomizer
+            );
         }
 
-        /// <summary>
-        /// Note that the key for a terrain chunk and fire chunk should be the same.
-        /// </summary>
-        /// <param name="fireChunk"></param>
-        /// <returns>The key used in the hashtable to identify a given chunk.</returns>
-        private int GetKeyFromChunk(FireChunk fireChunk)
-        {
-            return fireChunk.z * terrain.Height / Chunk.Size + fireChunk.x;
-        }
 
         private void OnDrawGizmosSelected()
         {
@@ -299,7 +289,7 @@ namespace FireSystem
 
             //Draw active cells with red cubes
             Gizmos.color = Color.red;
-            foreach (var cell in activeCells.Values)
+            foreach (var cell in _activeCells.Values)
             {
                 Gizmos.DrawCube(new Vector3(cell.x, cell.height, cell.z), new Vector3(1f, 1f, 1f));
                 maxHeight = maxHeight > cell.height ? maxHeight : cell.height;
@@ -307,9 +297,9 @@ namespace FireSystem
 
             //Draw active chunks with blue wire cubes
             Gizmos.color = Color.blue;
-            foreach (var chunk in activeChunks.Values)
+            foreach (var chunk in _activeChunks.Values)
             {
-                Gizmos.DrawWireCube(new Vector3((chunk.x + 0.5f) * Chunk.Size, 0, (chunk.z + 0.5f) * Chunk.Size), new Vector3(Chunk.Size, maxHeight, Chunk.Size));
+                Gizmos.DrawWireCube(new Vector3((chunk.X + 0.5f) * Chunk.Size, 0, (chunk.Z + 0.5f) * Chunk.Size), new Vector3(Chunk.Size, maxHeight, Chunk.Size));
             }
         }
     }

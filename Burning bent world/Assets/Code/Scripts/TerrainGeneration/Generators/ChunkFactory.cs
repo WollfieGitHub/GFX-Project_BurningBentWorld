@@ -6,8 +6,6 @@ using Code.Scripts.TerrainGeneration.Components;
 using Code.Scripts.TerrainGeneration.Rendering;
 using Code.Scripts.TerrainGeneration.Vegetation.Plants.ProceduralGrass;
 using Code.Scripts.Utils;
-using TerrainGeneration.Components;
-using TerrainGeneration.Rendering;
 using UnityEngine;
 
 namespace Code.Scripts.TerrainGeneration.Generators
@@ -22,6 +20,7 @@ namespace Code.Scripts.TerrainGeneration.Generators
         public event Action<Chunk> OnChunkDestroyed;
         
         private Transform _transform;
+        private GeneratedTerrain _terrain;
 
         private readonly ConcurrentQueue<Task> _chunkCreationQueue = new();
 
@@ -32,6 +31,7 @@ namespace Code.Scripts.TerrainGeneration.Generators
         private void Awake()
         {
             _transform = transform;
+            _terrain = GetComponent<GeneratedTerrain>();
         }
         
         // DONE Idea : Queue all creation tasks and run them in update loop 
@@ -82,14 +82,21 @@ namespace Code.Scripts.TerrainGeneration.Generators
                 var chunkObj = new GameObject($"Chunk#{xOffset}#{zOffset}");
 
                 // Setup transform
-                SetupChunkTransform(xOffset, zOffset, chunkObj);
+                var chunkTransform = SetupChunkTransform(xOffset, zOffset, chunkObj);
 
                 // Setup chunk behaviours
                 var chunk = chunkObj.AddComponent<Chunk>();
                 chunk.Init(xOffset, zOffset, cells);
 
                 // Setup collider
-                var chunkCollider = chunkObj.AddComponent<ChunkCollider>();
+                chunkObj.AddComponent<MeshCollider>();
+                // Setup water
+                Instantiate(
+                    _terrain.waterPrefab, 
+                    chunkTransform.position,
+                    Quaternion.identity,
+                    chunkTransform    
+                );
                 // Setup grass
 
                 var rb = chunkObj.AddComponent<Rigidbody>();
@@ -105,7 +112,7 @@ namespace Code.Scripts.TerrainGeneration.Generators
                 var chunkGrass = chunkObj.AddComponent<ChunkGrass>();
 
                 // Update the chunk's references
-                chunk.UpdateRefs(chunkRenderer, chunkCollider, chunkGrass);
+                chunk.UpdateRefs(chunkRenderer, chunkGrass);
 
                 OnChunkCreated?.Invoke(chunk);
 
@@ -118,7 +125,7 @@ namespace Code.Scripts.TerrainGeneration.Generators
         }
 
         /** Setup the object's transform */
-        private void SetupChunkTransform(int xOffset, int zOffset, GameObject chunkObj)
+        private Transform SetupChunkTransform(int xOffset, int zOffset, GameObject chunkObj)
         {
             var chunkTransform = chunkObj.transform;
             chunkTransform.SetParent(_transform);
@@ -126,6 +133,7 @@ namespace Code.Scripts.TerrainGeneration.Generators
             chunkTransform.localPosition = new Vector3(
                 xOffset * Chunk.Size, 0, zOffset * Chunk.Size
             );
+            return chunkTransform;
         }
 
 //======== ====== ==== ==

@@ -3,7 +3,6 @@ using Code.Scripts.TerrainGeneration.Generators.Layers.Optimization;
 using Code.Scripts.TerrainGeneration.Generators.Layers.Smoothing;
 using TerrainGeneration;
 using UnityEngine;
-using Terrain = TerrainGeneration.Components.Terrain;
 
 namespace Code.Scripts.TerrainGeneration.Generators.Layers
 {
@@ -46,8 +45,8 @@ namespace Code.Scripts.TerrainGeneration.Generators.Layers
                         
                         cell.Height = Mathf.RoundToInt(
                             cellHeight > 0
-                                ? Mathf.Lerp(Terrain.SeaLevel, Terrain.MaxHeight, cellHeight)
-                                : Mathf.Lerp(Terrain.SeaLevel-1.1f, Terrain.MinHeight, -cellHeight)
+                                ? Mathf.Lerp(GeneratedTerrain.SeaLevel, GeneratedTerrain.MaxHeight, cellHeight)
+                                : Mathf.Lerp(GeneratedTerrain.SeaLevel-1.1f, GeneratedTerrain.MinHeight, -cellHeight)
                         );
 
                         cells[rX, rZ] = cell;

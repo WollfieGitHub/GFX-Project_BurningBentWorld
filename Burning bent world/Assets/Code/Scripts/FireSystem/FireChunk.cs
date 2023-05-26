@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Code.Scripts.TerrainGeneration.Components;
-using TerrainGeneration.Components;
 using UnityEngine;
 using UnityEngine.VFX;
 
@@ -13,17 +11,17 @@ namespace FireSystem
     /// </summary>
     public class FireChunk
     {
-        public int x;
-        public int z;
+        public readonly int X;
+        public readonly int Z;
         //Unfortunately, this is yet another copy, but I didn't find a better way of implementing this.
-        public Dictionary<int, FireCell> activeCells = new Dictionary<int, FireCell>();
-        public GameObject linkedVFXGameObject { get; private set; }
+        public readonly Dictionary<(int, int), FireCell> ActiveCells = new ();
+        public GameObject LinkedVFXGameObject { get; }
 
-        public FireChunk(int x, int z, GameObject linkedVFXGameObject, TerrainGeneration.Components.Terrain terrain)
+        public FireChunk(int x, int z, GameObject linkedVFXGameObject)
         {
-            this.x = x;
-            this.z = z;
-            this.linkedVFXGameObject = linkedVFXGameObject;
+            X = x;
+            Z = z;
+            LinkedVFXGameObject = linkedVFXGameObject;
             linkedVFXGameObject.transform.position = new Vector3(x * Chunk.Size, 0f, z * Chunk.Size);
             linkedVFXGameObject.SetActive(true);
         }
@@ -35,14 +33,14 @@ namespace FireSystem
         /// <param name="terrain"></param>
         public void UpdateVFXTexture(string ActiveCellsTextureVFX)
         {
-            if (linkedVFXGameObject == null)
+            if (LinkedVFXGameObject == null)
             {
                 throw new System.Exception("Trying to update a VFX texture from a chunk without an associated VFX object.");
             }
 
             Texture t = CalculateChunkVFXTexture();
 
-            VisualEffect ve = linkedVFXGameObject.GetComponentInChildren<VisualEffect>();
+            VisualEffect ve = LinkedVFXGameObject.GetComponentInChildren<VisualEffect>();
             if (!ve.HasTexture(ActiveCellsTextureVFX)) { throw new System.Exception("Wrong name!"); }
 
             ve.SetTexture(ActiveCellsTextureVFX, t);
@@ -59,10 +57,10 @@ namespace FireSystem
         /// <returns></returns>
         private Texture2D CalculateChunkVFXTexture()
         {
-            Texture2D texture = new Texture2D(activeCells.Count, 1);
+            Texture2D texture = new Texture2D(ActiveCells.Count, 1);
 
             int i = 0;
-            foreach (FireCell cell in activeCells.Values)
+            foreach (FireCell cell in ActiveCells.Values)
             {
                 var r = LinearToGamma(cell.x % Chunk.Size / (float)(Chunk.Size - 1));
                 var g = LinearToGamma(cell.height / 16f);

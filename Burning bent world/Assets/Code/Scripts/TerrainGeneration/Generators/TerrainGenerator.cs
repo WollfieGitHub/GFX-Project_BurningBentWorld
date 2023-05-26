@@ -11,7 +11,6 @@ using TerrainGeneration;
 using TerrainGeneration.Layers;
 using UnityEngine;
 using Utils;
-using Terrain = TerrainGeneration.Components.Terrain;
 
 namespace Code.Scripts.TerrainGeneration.Generators
 {

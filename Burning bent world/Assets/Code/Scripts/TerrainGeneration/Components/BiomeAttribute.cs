@@ -1,6 +1,4 @@
 ﻿using System;
-using TerrainGeneration.Components;
-using UnityEngine;
 
 namespace Code.Scripts.TerrainGeneration.Components
 {

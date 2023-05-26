@@ -1,8 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using static Utils.Utils;
-using Vector2 = UnityEngine.Vector2;
-using Vector3 = UnityEngine.Vector3;
 
 namespace Code.Scripts.TerrainGeneration.Loaders
 {

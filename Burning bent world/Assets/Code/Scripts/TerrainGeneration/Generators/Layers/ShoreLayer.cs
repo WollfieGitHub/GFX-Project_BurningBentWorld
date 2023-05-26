@@ -1,11 +1,9 @@
 ﻿using System.Linq;
-using Code.Scripts.TerrainGeneration;
 using Code.Scripts.TerrainGeneration.Components;
 using Code.Scripts.TerrainGeneration.Generators.Layers.Optimization;
 using TerrainGeneration;
-using TerrainGeneration.Components;
 
-namespace Code.Scripts.TerrainGeneration.Layers
+namespace Code.Scripts.TerrainGeneration.Generators.Layers
 {
     public class ShoreLayer : TransformLayer
     {

@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using Code.Scripts.TerrainGeneration.Components;
 using UnityEngine;
 using Utils;
 using static Utils.Utils;
-using Terrain = TerrainGeneration.Components.Terrain;
 
 namespace Code.Scripts.TerrainGeneration.Rendering
 {

@@ -1,10 +1,8 @@
-﻿using Code.Scripts.TerrainGeneration;
-using Code.Scripts.TerrainGeneration.Components;
-using TerrainGeneration.Components;
+﻿using Code.Scripts.TerrainGeneration.Components;
+using TerrainGeneration;
 using UnityEngine;
-using Utils;
 
-namespace TerrainGeneration.Layers
+namespace Code.Scripts.TerrainGeneration.Generators.Layers
 {
     public class AddTemperaturesLayer : TransformLayer
     {

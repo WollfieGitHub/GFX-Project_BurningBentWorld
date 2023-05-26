@@ -1,4 +1,5 @@
 ﻿using Code.Scripts.TerrainGeneration;
+using Code.Scripts.TerrainGeneration.Generators.Layers;
 using TerrainGeneration;
 
 namespace Code.Scripts.TerrainGeneration.Layers

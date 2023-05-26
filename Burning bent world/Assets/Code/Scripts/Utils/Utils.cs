@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using TerrainGeneration.Components;
-using Unity.Burst.Intrinsics;
 using UnityEngine;
 
 namespace Utils
@@ -159,5 +157,13 @@ namespace Utils
         /// <param name="b">The modulus' base</param>
         /// <returns>The result of a mod b</returns>
         public static float MathModulus(float a, int b) => (Math.Abs(a * b) + a) % b;
+        
+        /// <summary>
+        /// Computes the mathematical modulus : a (mod b)
+        /// </summary>
+        /// <param name="a">The value</param>
+        /// <param name="b">The modulus' base</param>
+        /// <returns>The result of a mod b</returns>
+        public static int MathModulus(int a, int b) => (Math.Abs(a * b) + a) % b;
     }
 }

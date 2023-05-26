@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
 using Code.Scripts.TerrainGeneration.Components;
 using Code.Scripts.TerrainGeneration.Generators;
-using TerrainGeneration.Components;
 using UnityEngine;
 
 namespace Code.Scripts.TerrainGeneration.Loaders

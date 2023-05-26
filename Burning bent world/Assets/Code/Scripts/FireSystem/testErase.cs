@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using TerrainGeneration.Rendering;
-using TerrainGeneration.Components;
 using UnityEngine;
 using UnityEngine.VFX;
 

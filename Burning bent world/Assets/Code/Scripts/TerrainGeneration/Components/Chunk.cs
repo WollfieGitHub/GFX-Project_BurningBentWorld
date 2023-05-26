@@ -107,7 +107,6 @@ namespace Code.Scripts.TerrainGeneration.Components
         }
 
         public ChunkRenderer ChunkRenderer { private set; get; }
-        public ChunkCollider ChunkCollider { private set; get; }
         public ChunkGrass ChunkGrass       { private set; get; }
 
         /// <summary>
@@ -119,12 +118,10 @@ namespace Code.Scripts.TerrainGeneration.Components
         /// <param name="chunkGrass">Chunk Grass</param>
         public void UpdateRefs(
             ChunkRenderer chunkRenderer,
-            ChunkCollider chunkCollider,
             ChunkGrass chunkGrass
         )
         {
             ChunkRenderer = chunkRenderer;
-            ChunkCollider = chunkCollider;
             ChunkGrass = chunkGrass;
         }
 

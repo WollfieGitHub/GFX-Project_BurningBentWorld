@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Code.Scripts.TerrainGeneration.Components;
 using Unity.VisualScripting;
 using UnityEngine;
+using static Code.Scripts.TerrainGeneration.Rendering.ChunkTexture;
 using static Utils.Utils;
 
 namespace Code.Scripts.TerrainGeneration.Rendering
@@ -24,7 +23,7 @@ namespace Code.Scripts.TerrainGeneration.Rendering
         private Texture2D _texture;
         private Renderer _rend;
         private MeshFilter _meshFilter;
-        private ChunkCollider _chunkCollider;
+        private MeshCollider _chunkCollider;
         
         private Mesh _mesh;
 
@@ -52,9 +51,9 @@ namespace Code.Scripts.TerrainGeneration.Rendering
         /// The <see cref="ChunkTexture.DisplayType"/> that
         /// the renderer should use to display the chunk
         /// </summary>
-        private ChunkTexture.DisplayType _displayType;
+        private DisplayType _displayType;
         ///<summary><inheritdoc cref="_displayType"/></summary>
-        public ChunkTexture.DisplayType DisplayType
+        public DisplayType DisplayType
         {
             set
             {
@@ -79,7 +78,8 @@ namespace Code.Scripts.TerrainGeneration.Rendering
             // Collect rendering components
             _rend = GetComponent<Renderer>();
             _meshFilter = GetComponent<MeshFilter>();
-            _chunkCollider = GetComponent<ChunkCollider>();
+            
+            _chunkCollider = GetComponent<MeshCollider>();
         }
 
         private void OnEnable() => _chunk.NeighbourStateChanged += OnNeighbourChanged;
@@ -121,21 +121,49 @@ namespace Code.Scripts.TerrainGeneration.Rendering
 
         private static void UpdateTexture(Direction direction, Texture src, Texture dst)
         {
-            var dstX = (direction == Direction.East ? Chunk.Size+1 : 1) * ChunkTexture.TextureResolution;
-            var dstY = (direction == Direction.North ? Chunk.Size+1 : 1) * ChunkTexture.TextureResolution;
+            var dstX = (direction == Direction.East ? Chunk.Size+1 : 1) * ChunkTexture.Resolution;
+            var dstY = (direction == Direction.North ? Chunk.Size+1 : 1) * ChunkTexture.Resolution;
 
-            var width = (direction == Direction.East ? 1 : Chunk.Size) * ChunkTexture.TextureResolution;
-            var height = (direction == Direction.North ? 1 : Chunk.Size) * ChunkTexture.TextureResolution;
+            var width = (direction == Direction.East ? 1 : Chunk.Size) * ChunkTexture.Resolution;
+            var height = (direction == Direction.North ? 1 : Chunk.Size) * ChunkTexture.Resolution;
 
-            const int srcX = 1 * ChunkTexture.TextureResolution;
-            const int srcY = 1 * ChunkTexture.TextureResolution;
-            
-            Debug.Log(direction);
+            const int srcX = 1 * ChunkTexture.Resolution;
+            const int srcY = 1 * ChunkTexture.Resolution;
             
             Graphics.CopyTexture(
                 src, srcElement: 0, srcMip: 0, srcX: srcX, srcY: srcY, 
                 srcWidth: width, srcHeight: height,
                 dst, dstElement: 0, dstMip: 0, dstX: dstX, dstY: dstY
+            );
+        }
+
+        public void UpdateBurntColor()
+        {
+            for (var x = 0; x < Chunk.Size; x++)
+            {
+                for (var z = 0; z < Chunk.Size; z++)
+                {
+                    var cell = _chunk.GetCellAt(x, z);
+                    if (cell.burnt)
+                    {
+                        SetCellColor(x, z, Color.Lerp(
+                            new Color(0.77f, 0.29f, 0.20f),
+                            cell.Info.Biome.Color, 0.2f)
+                        );
+                    }
+                }
+            }
+        }
+
+        private void SetCellColor(int cellX, int cellZ, Color color)
+        {
+            var colors = new Color[ChunkTexture.Resolution * ChunkTexture.Resolution];
+            Array.Fill(colors, color);
+            
+            _texture.SetPixels(
+                (1 + cellX) * ChunkTexture.Resolution, (1 + cellZ) * ChunkTexture.Resolution, 
+                ChunkTexture.Resolution, ChunkTexture.Resolution,
+                colors
             );
         }
 
@@ -161,7 +189,7 @@ namespace Code.Scripts.TerrainGeneration.Rendering
             
             _meshFilter.sharedMesh = _mesh;
             
-            _chunkCollider.Recalculate();
+            _chunkCollider.sharedMesh = _mesh;
         }
         /// <summary>
         /// Recomputes the new texture for the mesh given the <see cref="_displayType"/>
@@ -170,7 +198,7 @@ namespace Code.Scripts.TerrainGeneration.Rendering
         {
             if (_texture != null && !_texture.IsDestroyed()) { Destroy(_texture); }
             
-            _texture = ChunkTexture.From(_chunk, _displayType);
+            _texture = From(_chunk, _displayType);
             _rend.material.mainTexture = _texture;
 
             OnTextureLoaded?.Invoke();
