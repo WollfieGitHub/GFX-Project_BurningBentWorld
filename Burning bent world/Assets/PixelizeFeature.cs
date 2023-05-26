@@ -30,7 +30,6 @@ public class PixelizeFeature : ScriptableRendererFeature
         if (renderingData.cameraData.cameraType == CameraType.Game)
         {
             pass.ConfigureInput(ScriptableRenderPassInput.Color);
-            pass.SetTarget(renderer.cameraColorTargetHandle);
         }
     }
 
