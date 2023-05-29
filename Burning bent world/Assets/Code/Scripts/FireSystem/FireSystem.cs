@@ -21,10 +21,8 @@ namespace Code.Scripts.FireSystem
         [Header("Propagation parameters")]        
         [SerializeField] private float baseCellHp = 50f;
         [SerializeField] private float damageMultiplier = 1f;
-        [SerializeField] private float averageTemperature = 20f;
         [Tooltip("Coefficient that will be applied to increase HP from the cell average temperature.")]
         [SerializeField] private float temperatureHpMultiplier = 0.5f;
-        [SerializeField] private float averageHumidity = 100f;
         [Tooltip("Coefficient that will be applied to increase HP from the cell average humidity.")]
         [SerializeField] private float humidityHpMultiplier = 0.5f;
         [SerializeField] private float baseBurningLifetime = 10f;
@@ -283,8 +281,7 @@ namespace Code.Scripts.FireSystem
         private FireCell CreateNewCellAt(int x, int z, Cell cell)
         {
             return new FireCell(
-                cell, x, z, 
-                averageTemperature, averageHumidity, temperatureHpMultiplier,
+                cell, x, z, temperatureHpMultiplier,
                 humidityHpMultiplier, baseCellHp, baseBurningLifetime,
                 burningLifetimeRandomizer
             );
