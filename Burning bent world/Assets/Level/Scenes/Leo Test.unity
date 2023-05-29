@@ -571,12 +571,12 @@ MonoBehaviour:
     type: 3}
   spawningTextureNameFireVFX: ActiveCells
   initialVFXPoolSize: 20
-  baseCellHp: 2
-  damageMultiplier: 1.5
+  baseCellHp: 0.5
+  damageMultiplier: 0.7
   averageTemperature: 20
   temperatureHpMultiplier: 1.4
   averageHumidity: 150
-  humidityHpMultiplier: 1.7
+  humidityHpMultiplier: 0.9
   baseBurningLifetime: 10
   burningLifetimeRandomizer: 0.2
   windDirection: {x: 0, y: 0, z: 0}
