@@ -108,7 +108,7 @@ namespace Code.Scripts.FireSystem
             {
                 //Mark the chunk to update the terrain texture
                 var terrainChunk = terrain.GetChunkAt(cell.x / Chunk.Size, cell.z / Chunk.Size);
-                terrain.GetCellAt(cell.x, cell.z).burnt = true;
+                terrain.GetCellAt(cell.x, cell.z).Burnt = true;
                 _chunksToUpdateTextures.Add(terrainChunk);
 
                 //Mark the chunk to update the VFX texture (the value should always exist in the dictionnary)          

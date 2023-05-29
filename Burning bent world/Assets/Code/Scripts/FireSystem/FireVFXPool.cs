@@ -8,16 +8,16 @@ namespace FireSystem
     /// </summary>
     public class FireVFXPool
     {
-        private List<GameObject> pool = new List<GameObject>();
-        private GameObject firePrefab;
-        private Transform poolParent;
+        private readonly List<GameObject> _pool = new ();
+        private readonly GameObject _firePrefab;
+        private readonly Transform _poolParent;
 
         public FireVFXPool(Transform poolParent, GameObject firePrefab, int initialPoolSize)
         {            
-            this.firePrefab = firePrefab;
-            this.poolParent = poolParent;
+            _firePrefab = firePrefab;
+            _poolParent = poolParent;
 
-            for (int i = 0; i < initialPoolSize; i++)
+            for (var i = 0; i < initialPoolSize; i++)
             {
                 CreateNewFireVFXGameobject(poolParent);
             }
@@ -29,13 +29,13 @@ namespace FireSystem
         /// <returns></returns>
         public GameObject PopPool()
         {
-            if (pool.Count == 0)
+            if (_pool.Count == 0)
             {
-                CreateNewFireVFXGameobject(poolParent);
+                CreateNewFireVFXGameobject(_poolParent);
             }
 
-            GameObject res = pool[pool.Count - 1];
-            pool.RemoveAt(pool.Count - 1);
+            GameObject res = _pool[_pool.Count - 1];
+            _pool.RemoveAt(_pool.Count - 1);
             return res;
         }
 
@@ -46,18 +46,19 @@ namespace FireSystem
         public void DisableAndPushToPool(GameObject fireVFX)
         {
             fireVFX.SetActive(false);
-            pool.Add(fireVFX);
+            _pool.Add(fireVFX);
         }
 
         private void CreateNewFireVFXGameobject(Transform poolParent)
         {
-            GameObject newFireVFX = Object.Instantiate(firePrefab,
+            var newFireVFX = Object.Instantiate(_firePrefab,
                     new Vector3(0f, 0f, 0f),
                     Quaternion.identity,
-                    poolParent.transform);
-
+                    poolParent.transform
+            );
+            
             newFireVFX.SetActive(false);
-            pool.Add(newFireVFX);
+            _pool.Add(newFireVFX);
         }
     }
 }

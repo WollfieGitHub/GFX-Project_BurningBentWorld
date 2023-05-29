@@ -65,7 +65,7 @@ Material:
     - _RipplePower: 3
     - _RippleShearStrength: 1
     - _RippleSpeed: 0.5
-    - _WaterAlpha: 1
+    - _WaterAlpha: 0.1
     - _WaterDepth: 0.75
     - _WaterSpeed: 0
     - _WaveScale: 0
