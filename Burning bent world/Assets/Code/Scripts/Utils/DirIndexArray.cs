@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Utils;
 using static Utils.Utils;
 
 namespace Code.Scripts.Utils
 {
-    public class DirIndexArray<T>
+    public class DirIndexArray<T> : IEnumerable<T>
     {
         private T[] _array = new T[Constants.NbSidesInSquare];
 
@@ -22,5 +23,9 @@ namespace Code.Scripts.Utils
         }
 
         public List<T> ToList() => _array.ToList();
+        
+        public IEnumerator<T> GetEnumerator() => ((IEnumerable<T>)_array).GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

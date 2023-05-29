@@ -55,6 +55,21 @@ namespace Utils
             );
         }
 
-        
+        /// <summary>
+        /// Finds the opposite direction
+        /// </summary>
+        /// <param name="direction">The initial direction</param>
+        /// <returns>The opposite direction</returns>
+        /// <exception cref="InvalidOperationException">If not a valid direction</exception>
+        public static Utils.Direction Opposite(this Utils.Direction direction) => direction switch
+        {
+            Utils.Direction.North => Utils.Direction.South,
+            Utils.Direction.South => Utils.Direction.North,
+            Utils.Direction.East => Utils.Direction.West,
+            Utils.Direction.West => Utils.Direction.East,
+            _ => throw new InvalidOperationException()
+        };
+
+
     }
 }

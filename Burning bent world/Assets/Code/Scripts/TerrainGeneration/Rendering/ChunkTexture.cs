@@ -8,13 +8,12 @@ namespace Code.Scripts.TerrainGeneration.Rendering
 {
     public static class ChunkTexture
     {
+        private static readonly Color WaterColor = Color255(164, 197, 235);
+        private static readonly Color BurntColor = new (0.77f, 0.29f, 0.20f);
         private const float NoiseFrequency = 0.5f;
         private const float NoiseAmplitude = 0.25f;
 
         public const int Resolution = 2;
-        
-        //TODO: Check if this is a good way of doing this
-        public static Color burntColor = Color255(77, 29, 20);
 
         public enum DisplayType
         {
@@ -56,11 +55,11 @@ namespace Code.Scripts.TerrainGeneration.Rendering
                 var color = displayType switch
                 {
                     DisplayType.Default => cellInfo.Ocean || cellInfo.Biome.IsRiver ? (
-                            Color.black.Mix(Color255(164, 197, 235), InverseLerp(
+                            Color.black.Mix(WaterColor, InverseLerp(
                                 GeneratedTerrain.SeaLevel, GeneratedTerrain.MinHeight / 4f, cell.Height
                             ))
                         )
-                        : cell.Burnt ? Color.Lerp(new Color(0.77f, 0.29f, 0.20f), cellInfo.Biome.Color, 0.2f)
+                        : cell.Burnt ? Color.Lerp(BurntColor, cellInfo.Biome.Color, 0.2f)
                         : cellInfo.Biome.Color,
                     DisplayType.Temperature => GetTemperatureColor(cellInfo.Temperature),
                     DisplayType.Humidity => GetPrecipitationColor(cellInfo.Precipitation),

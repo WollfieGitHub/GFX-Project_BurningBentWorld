@@ -138,8 +138,6 @@ namespace Code.Scripts.TerrainGeneration
             _manager.ChunkDistance = chunkDistance;
 
             _chunkFactory = GetComponent<ChunkFactory>();
-
-            ChunkCollider.Threshold = chunkColliderActivationDistance * Chunk.Size;
         }
 
         private void OnEnable()

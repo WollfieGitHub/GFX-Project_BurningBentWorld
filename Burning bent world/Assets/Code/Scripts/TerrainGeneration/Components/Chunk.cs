@@ -61,6 +61,7 @@ namespace Code.Scripts.TerrainGeneration.Components
             }
         }
 
+        private DirIndexArray<NeighbouringChunk> _neighbouringChunks = new();
         /// <summary>
         /// Convention :
         /// 0 -> North
@@ -72,24 +73,40 @@ namespace Code.Scripts.TerrainGeneration.Components
         {
             get
             {
-                var result = new DirIndexArray<NeighbouringChunk>
+                // Cache but refetch if not loaded
+                for (var i = 0; i < 4; i++)
                 {
-                    [Direction.North] = _terrainManager.TryGetChunkAt(ChunkX, ChunkZ+1, out var neighbour) 
-                        ? NeighbouringChunk.Of(neighbour) 
-                        : NeighbouringChunk.None,
-                    [Direction.East] = _terrainManager.TryGetChunkAt(ChunkX+1, ChunkZ, out neighbour) 
-                        ? NeighbouringChunk.Of(neighbour) 
-                        : NeighbouringChunk.None,
-                    [Direction.South] = _terrainManager.TryGetChunkAt(ChunkX, ChunkZ-1, out neighbour) 
-                        ? NeighbouringChunk.Of(neighbour) 
-                        : NeighbouringChunk.None,
-                    [Direction.West] = _terrainManager.TryGetChunkAt(ChunkX-1, ChunkZ, out neighbour) 
-                        ? NeighbouringChunk.Of(neighbour) 
-                        : NeighbouringChunk.None
-                };
-                return result;
+                    var dir = (Direction)i;
+
+                    if (!_neighbouringChunks[dir].Loaded)
+                    {
+                        _neighbouringChunks[dir] = dir switch
+                        {
+                            Direction.North => _terrainManager.TryGetChunkAt(ChunkX, ChunkZ+1, out var north) 
+                                ? NeighbouringChunk.Of(north)
+                                : NeighbouringChunk.None,
+                            Direction.East => _terrainManager.TryGetChunkAt(ChunkX+1, ChunkZ, out var east) 
+                                ? NeighbouringChunk.Of(east)
+                                : NeighbouringChunk.None,
+                            Direction.South => _terrainManager.TryGetChunkAt(ChunkX, ChunkZ-1, out var south) 
+                                ? NeighbouringChunk.Of(south)
+                                : NeighbouringChunk.None,
+                            Direction.West => _terrainManager.TryGetChunkAt(ChunkX-1, ChunkZ, out var west) 
+                                ? NeighbouringChunk.Of(west)
+                                : NeighbouringChunk.None,
+                            _ => throw new InvalidOperationException()
+                        };
+                    }
+                }
+
+                return _neighbouringChunks;
             }
         }
+
+        /// <summary>
+        /// The neighbours which already notified this chunk they existed
+        /// </summary>
+        private readonly DirIndexArray<bool> _noticedNeighbour = new();
 
         private TerrainManager _terrainManager;
 
@@ -136,30 +153,39 @@ namespace Code.Scripts.TerrainGeneration.Components
 
         private void Start()
         {
-            NotifyNeighbour(ChunkX - 1, ChunkZ);
-            NotifyNeighbour(ChunkX, ChunkZ - 1);
-        }
-        
-        private void NotifyNeighbour(int neighbourX, int neighbourZ)
-        {
-            if (!_terrainManager.TryGetChunkAt(neighbourX, neighbourZ, out var neighbour)) return;
+            NotifyNeighbour(Direction.South);
+            NotifyNeighbour(Direction.West);
             
-            var dir = (ChunkZ - neighbourZ) switch
-            {
-                > 0 => Direction.North,
-                < 0 => Direction.South,
-                // ReSharper disable once ArrangeRedundantParentheses : This is wrong, it needs parentheses
-                _ => (ChunkX - neighbourX > 0) ? Direction.East : Direction.West
-            };
+            NotifySelf(Direction.North);
+            NotifySelf(Direction.East);
+        }
 
-            neighbour.OnNeighbourLoaded(dir);
+        private void NotifyNeighbour(Direction direction)
+        {
+            if (!NeighbouringChunks[direction].GetIfLoaded(out var neighbour)) { return; }
+                
+            neighbour.OnNeighbourLoaded(direction.Opposite());
+        }
+
+        private void NotifySelf(Direction direction)
+        {
+            // If the neighbour is already loaded, then we can take its texture
+            if (!NeighbouringChunks[direction].Loaded) { return; }
+            OnNeighbourLoaded(direction);
         }
 
 //======== ====== ==== ==
 //      METHODS
 //======== ====== ==== ==
 
-        public void OnNeighbourLoaded(Direction direction) => NeighbourStateChanged?.Invoke(direction);
+        private void OnNeighbourLoaded(Direction direction)
+        {
+            // If already notified, return
+            if (_noticedNeighbour[direction]) return;
+            
+            NeighbourStateChanged?.Invoke(direction);
+            _noticedNeighbour[direction] = true;
+        }
 
         /// <param name="x">The x coordinate in the chunk's referential</param>
         /// <param name="z">The y coordinate in the chunk's referential</param>
