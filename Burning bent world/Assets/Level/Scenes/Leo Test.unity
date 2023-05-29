@@ -574,9 +574,9 @@ MonoBehaviour:
   baseCellHp: 2
   damageMultiplier: 1.5
   averageTemperature: 20
-  temperatureHpMultiplier: 0
-  averageHumidity: 100
-  humidityHpMultiplier: 0
+  temperatureHpMultiplier: 1.4
+  averageHumidity: 150
+  humidityHpMultiplier: 1.7
   baseBurningLifetime: 10
   burningLifetimeRandomizer: 0.2
   windDirection: {x: 0, y: 0, z: 0}
@@ -850,7 +850,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enablePlanet: 1
-  bendingAmount: 0
+  bendingAmount: 0.5
 --- !u!4 &2053304156
 Transform:
   m_ObjectHideFlags: 0
