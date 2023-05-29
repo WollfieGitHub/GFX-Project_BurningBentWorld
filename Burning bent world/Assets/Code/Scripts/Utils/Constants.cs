@@ -1,8 +1,9 @@
 ﻿using System;
-using System.IO;
-using UnityEditor;
-using UnityEngine;
 using Random = System.Random;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Utils
 {
@@ -26,11 +27,20 @@ namespace Utils
         static Constants()
         {
             InitSeed();
+#if UNITY_EDITOR
+            InitCallback();
+#endif
+        }
+        
+#if UNITY_EDITOR
+        private static void InitCallback()
+        {
             EditorApplication.playModeStateChanged += mode =>
             {
                 if (mode == PlayModeStateChange.EnteredPlayMode) { InitSeed(); }
             };
         }
+#endif 
 
         private static void InitSeed()
         {
