@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Utils
 {
@@ -13,7 +16,7 @@ namespace Utils
             South = 2,
             West = 3,
         }
-        
+
         /// <summary>
         /// Generates a perlin noise value, rounded to an int, which distribution
         /// is between min and max
@@ -165,5 +168,21 @@ namespace Utils
         /// <param name="b">The modulus' base</param>
         /// <returns>The result of a mod b</returns>
         public static int MathModulus(int a, int b) => (Math.Abs(a * b) + a) % b;
+
+        private static readonly Dictionary<string, bool> PrintOnceTracker = new();
+
+        /// <summary>
+        /// Prints a message once based on stack trace entries
+        /// </summary>
+        /// <param name="msg">The message to print as info</param>
+        public static void LogInfoOnce(string msg)
+        {
+            var key = Environment.StackTrace.Split("\n")[2];
+
+            if (PrintOnceTracker.ContainsKey(key)) { return; }
+            
+            Debug.Log(msg);
+            PrintOnceTracker[key] = true;
+        }
     }
 }

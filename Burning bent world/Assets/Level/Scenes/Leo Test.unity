@@ -850,7 +850,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enablePlanet: 1
-  bendingAmount: 0.5
+  bendingAmount: 0
 --- !u!4 &2053304156
 Transform:
   m_ObjectHideFlags: 0

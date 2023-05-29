@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Code.Scripts.TerrainGeneration.Components;
 using Unity.VisualScripting;
 using UnityEngine;
 using static Code.Scripts.TerrainGeneration.Rendering.ChunkTexture;
+using static Utils.Utils;
 using static Utils.Utils;
 
 namespace Code.Scripts.TerrainGeneration.Rendering
 {
     [RequireComponent(typeof(Renderer))]
     [RequireComponent(typeof(MeshFilter))]
-    [RequireComponent(typeof(ChunkCollider))]
     public class ChunkRenderer : MonoBehaviour
     {
 
@@ -23,8 +25,15 @@ namespace Code.Scripts.TerrainGeneration.Rendering
         private Texture2D _texture;
         private Renderer _rend;
         private MeshFilter _meshFilter;
-        private MeshCollider _chunkCollider;
+
+        private static readonly Dictionary<(int, int), bool> NorthDirs = new ();
+        private static readonly Dictionary<(int, int), bool> NorthCalled = new ();
+        private static readonly Dictionary<(int, int), bool> NorthInvoked = new ();
         
+        private static readonly Dictionary<(int, int), bool> EastDirs = new ();
+        private static readonly Dictionary<(int, int), bool> EastCalled = new ();
+        private static readonly Dictionary<(int, int), bool> EastInvoked = new ();
+
         private Mesh _mesh;
 
         private Chunk _chunk;
@@ -78,12 +87,41 @@ namespace Code.Scripts.TerrainGeneration.Rendering
             // Collect rendering components
             _rend = GetComponent<Renderer>();
             _meshFilter = GetComponent<MeshFilter>();
-            
-            _chunkCollider = GetComponent<MeshCollider>();
         }
 
         private void OnEnable() => _chunk.NeighbourStateChanged += OnNeighbourChanged;
-        private void OnDisable() => _chunk.NeighbourStateChanged -= OnNeighbourChanged;
+
+        private void OnDisable()
+        {
+            _chunk.NeighbourStateChanged -= OnNeighbourChanged;
+            
+            var c = NorthDirs.Keys
+                .Union(EastDirs.Keys)
+                .Union(NorthCalled.Keys)
+                .Union(EastCalled.Keys);
+
+            var sb = new StringBuilder();
+            foreach (var (chunkX, chunkZ) in c)
+            {
+                var north = NorthDirs.GetValueOrDefault((chunkX, chunkZ), false);
+                var northCalled = NorthCalled.GetValueOrDefault((chunkX, chunkZ), false);
+                var northInvoked = NorthInvoked.GetValueOrDefault((chunkX, chunkZ), false);
+                
+                var east = EastDirs.GetValueOrDefault((chunkX, chunkZ), false);
+                var eastCalled = EastCalled.GetValueOrDefault((chunkX, chunkZ), false);
+                var eastInvoked = EastInvoked.GetValueOrDefault((chunkX, chunkZ), false);
+
+                if (!north || !east || !northCalled || !eastCalled)
+                {
+                    sb.Append($"[{chunkX}, {chunkZ}]> North :")
+                        .Append(north).Append(" - C:[").Append(northCalled).Append("]:I:[").Append(northInvoked)
+                        .Append("], East : ")
+                        .Append(east).Append(" - C:[").Append(eastCalled).Append("]:I:[").Append(eastInvoked)
+                        .Append("]\n");
+                }
+            }
+            LogInfoOnce(sb.ToString());
+        }
 
         /// <summary>
         /// A neighbour's state has changed, we must recompute the
@@ -97,10 +135,22 @@ namespace Code.Scripts.TerrainGeneration.Rendering
 
         private void TryUpdateTexture(Direction direction)
         {
+            switch (direction)
+            {
+                case Direction.North: NorthInvoked[(_chunk.ChunkX, _chunk.ChunkZ)] = true; break;
+                case Direction.East: EastInvoked[(_chunk.ChunkX, _chunk.ChunkZ)] = true; break;
+            }
+            
             if (!_chunk.NeighbouringChunks[direction].GetIfLoaded(out var neighbour)) { return; }
             
             var srcText = neighbour.ChunkRenderer._texture;
             var dstText = _texture;
+            
+            switch (direction)
+            {
+                case Direction.North: NorthCalled[(_chunk.ChunkX, _chunk.ChunkZ)] = true; break;
+                case Direction.East: EastCalled[(_chunk.ChunkX, _chunk.ChunkZ)] = true; break;
+            }
             
             if (dstText == null || dstText.IsDestroyed())
             {
@@ -119,7 +169,7 @@ namespace Code.Scripts.TerrainGeneration.Rendering
             UpdateTexture(direction, srcText, dstText);
         }
 
-        private static void UpdateTexture(Direction direction, Texture src, Texture dst)
+        private void UpdateTexture(Direction direction, Texture src, Texture dst)
         {
             var dstX = (direction == Direction.East ? Chunk.Size+1 : 1) * ChunkTexture.Resolution;
             var dstY = (direction == Direction.North ? Chunk.Size+1 : 1) * ChunkTexture.Resolution;
@@ -129,11 +179,17 @@ namespace Code.Scripts.TerrainGeneration.Rendering
 
             const int srcX = 1 * ChunkTexture.Resolution;
             const int srcY = 1 * ChunkTexture.Resolution;
-            
+
+            switch (direction)
+            {
+                case Direction.North: NorthDirs[(_chunk.ChunkX, _chunk.ChunkZ)] = true; break;
+                case Direction.East: EastDirs[(_chunk.ChunkX, _chunk.ChunkZ)] = true; break;
+            }
+
             Graphics.CopyTexture(
-                src, srcElement: 0, srcMip: 0, srcX: srcX, srcY: srcY, 
+                src: src, srcElement: 0, srcMip: 0, srcX: srcX, srcY: srcY, 
                 srcWidth: width, srcHeight: height,
-                dst, dstElement: 0, dstMip: 0, dstX: dstX, dstY: dstY
+                dst: dst, dstElement: 0, dstMip: 0, dstX: dstX, dstY: dstY
             );
         }
 
@@ -190,8 +246,6 @@ namespace Code.Scripts.TerrainGeneration.Rendering
             _mesh = _renderMesh ? GenerateChunkMesh(_chunk) : GeneratePlanarMesh();
             
             _meshFilter.sharedMesh = _mesh;
-            
-            _chunkCollider.sharedMesh = _mesh;
         }
         /// <summary>
         /// Recomputes the new texture for the mesh given the <see cref="_displayType"/>
@@ -260,6 +314,5 @@ namespace Code.Scripts.TerrainGeneration.Rendering
         /// <param name="chunk">The chunk for which we generate the mesh</param>
         /// <returns>The newly created chunk mesh</returns>
         private static Mesh GenerateChunkMesh(Chunk chunk) => ChunkMesh.From(chunk);
-
     }
 }
