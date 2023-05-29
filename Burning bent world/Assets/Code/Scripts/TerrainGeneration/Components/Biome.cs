@@ -114,6 +114,11 @@ namespace Code.Scripts.TerrainGeneration.Components
             return resultBiome;
         }
 
+        /// <summary>
+        /// From a predefined Id, finds the corresponding biome
+        /// </summary>
+        /// <param name="biomeId">The Id of the biome</param>
+        /// <returns>The Biome found or null if none found</returns>
         public static Biome FromId(int biomeId)
         {
             foreach (var biome in AllBiomes)

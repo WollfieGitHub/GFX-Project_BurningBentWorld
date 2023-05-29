@@ -144,7 +144,7 @@ namespace Code.Scripts.TerrainGeneration.Rendering
                 for (var z = 0; z < Chunk.Size; z++)
                 {
                     var cell = _chunk.GetCellAt(x, z);
-                    if (cell.burnt)
+                    if (cell.Burnt)
                     {
                         Debug.Log("Burnt");
                         SetCellColor(x, z, Color.Lerp(

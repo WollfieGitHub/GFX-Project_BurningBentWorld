@@ -60,7 +60,7 @@ namespace Code.Scripts.TerrainGeneration.Rendering
                                 GeneratedTerrain.SeaLevel, GeneratedTerrain.MinHeight / 4f, cell.Height
                             ))
                         )
-                        : cell.burnt ? Color.Lerp(new Color(0.77f, 0.29f, 0.20f), cellInfo.Biome.Color, 0.2f)
+                        : cell.Burnt ? Color.Lerp(new Color(0.77f, 0.29f, 0.20f), cellInfo.Biome.Color, 0.2f)
                         : cellInfo.Biome.Color,
                     DisplayType.Temperature => GetTemperatureColor(cellInfo.Temperature),
                     DisplayType.Humidity => GetPrecipitationColor(cellInfo.Precipitation),
