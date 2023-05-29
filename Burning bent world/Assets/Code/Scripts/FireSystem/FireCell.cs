@@ -31,7 +31,7 @@ namespace FireSystem
         /// <param name="baseBurningLifetime"></param>
         /// <param name="burningLifetimeRandomizer"></param>
         public FireCell(Cell c, int x, int z,
-            float averageTemperature, float averageHumidity, float temperatureHpMultiplier, float humidityHpMultiplier,
+            float temperatureHpMultiplier, float humidityHpMultiplier,
             float baseCellHp, float baseBurningLifetime, float burningLifetimeRandomizer)
         {                        
             if (c.Info.Ocean || c.Info.Biome.IsRiver)
@@ -41,10 +41,14 @@ namespace FireSystem
             }
             else
             {
+                var relativeTemperature =
+                    Mathf.InverseLerp(Biome.MinTemperatureDeg, Biome.MaxTemperatureDeg, c.Info.Temperature);
+                var relativePrecipitation = 
+                    Mathf.InverseLerp(Biome.MinPrecipitationCm, Biome.MaxPrecipitationCm, c.Info.Precipitation);
                 //TODO: Revise this calculation. For now it is very arbitrary, but the idea is that the higher the temperature, the lower 
                 //the HP; and the higher the precipitation, the higher the HP.
-                HP = averageTemperature / c.Info.Temperature * temperatureHpMultiplier 
-                     + c.Info.Precipitation / averageHumidity * humidityHpMultiplier 
+                HP = temperatureHpMultiplier * Mathf.Lerp(2f, 0f, relativeTemperature)
+                     + humidityHpMultiplier * Mathf.Lerp(0, 2f, relativePrecipitation)
                      + baseCellHp;
                 
                 burningLifetime = baseBurningLifetime * Random.Range(
