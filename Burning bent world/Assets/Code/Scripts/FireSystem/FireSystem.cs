@@ -27,8 +27,8 @@ namespace Code.Scripts.FireSystem
         [SerializeField] private float humidityHpMultiplier = 0.5f;
         [SerializeField] private float baseBurningLifetime = 10f;
         [SerializeField] private float burningLifetimeRandomizer = 0.2f;
-        [SerializeField] private Vector3 windDirection = new(0, 0, 0);
-        [SerializeField] private float windDamageMultiplier = 0.5f;
+        [SerializeField] public Vector3 windDirection = new(0, 0, 0);
+        [SerializeField] public float windDamageMultiplier = 0.5f;
 
         //General
         private bool _active;
@@ -187,10 +187,10 @@ namespace Code.Scripts.FireSystem
                     
                     neighbor.HP -= Time.deltaTime * (
                         damageMultiplier +
-                        windDamageMultiplier * Vector3.Dot(
+                        Math.Max(windDamageMultiplier * Vector3.Dot(
                             windDirection, 
                             new Vector3(neighbor.x, neighbor.height, neighbor.z) - cellPos
-                        )
+                        ), 0)
                     );
 
                     if (neighbor.HP < 0) { SetCellOnFire(neighbor); }
@@ -285,6 +285,12 @@ namespace Code.Scripts.FireSystem
                 humidityHpMultiplier, baseCellHp, baseBurningLifetime,
                 burningLifetimeRandomizer
             );
+        }
+
+        public void ResetFires()
+        {
+            _activeCells.Clear();
+            _newActiveCells.Clear();
         }
 
 
